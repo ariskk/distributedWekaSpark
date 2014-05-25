@@ -14,5 +14,32 @@
   		<artifactId>spark-core_2.10</artifactId>
   		<version>0.9.1</version>
   	</dependency>
+  	<dependency>
+  		<groupId>nz.ac.waikato.cms.weka</groupId>
+  		<artifactId>weka-dev</artifactId>
+  		<version>3.7.11</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>nz.ac.waikato.cms.weka</groupId>
+  		<artifactId>distributedWekaBase</artifactId>
+  		<version>1.0.4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>nz.ac.waikato.cms.weka</groupId>
+  		<artifactId>distributedWekaHadoop</artifactId>
+  		<version>1.0.7</version>
+  	</dependency>
   </dependencies>
+  <organization>
+  	<name>University of Manchester</name>
+  </organization>
+  <developers>
+        <developer>
+            <id>ariskk</id>
+            <name>Aris-Kyriakos Koliopoulos</name>
+            <email>ak.koliopoulos@gmail.com</email>
+            <organization>School of Computer Science,University or Manchester</organization>
+            <organizationUrl>http://www.cs.manchester.ac.uk/</organizationUrl>
+        </developer>
+    </developers>
 </project>
