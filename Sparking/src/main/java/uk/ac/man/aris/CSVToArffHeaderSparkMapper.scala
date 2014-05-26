@@ -7,51 +7,28 @@ import weka.core.Instance
 import scala.collection.mutable.ListBuffer
 
 
+/**Mapper implementation for CSVToArffHeaderSpark job 
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ *   */
 
+/**Constructor
+ * Spark serializes classes before distributing them to the nodes.
+ * All classes must be serializable
+ * @param CSVToArffMapTask options array of Strings */
 class CSVToArffHeaderSparkMapper (options:Array[String] ) extends java.io.Serializable{
- // 
+ 
   var m_task=new CSVToARFFHeaderMapTask
   m_task.setOptions(options)
   
-  
-  
-  ///this line-line mapping and the m_task does chunk-line mapping thus producing n^2 instances
-    
-   def map (row:String,m_attNames:ArrayList[String]): Instances={
-    m_task.processRow(row, m_attNames)
-    
-    return m_task.getHeader()
-   }
-  
-  
-    def map1 (rows:Iterator[String],m_attNames:ArrayList[String]): Instances={
-   
-      m_task.processRow(rows.next, m_attNames)
-    
-    return m_task.getHeader()
-   }
-    
-    
-      def map2 (rows:Iterator[String],m_attNames:ArrayList[String]): Iterator[Instances]={
-   
-       m_task.processRow(rows.next, m_attNames)
-       //println(m_task.getHeader.toString())
-       return Iterator(m_task.getHeader())
-   }
-      
-      
-       def map4 (rows:String,m_attNames:ArrayList[String]): TraversableOnce[Instances]={
-   
-      m_task.processRow(rows, m_attNames)
-    
-       return ListBuffer(m_task.getHeader())
-   }
-      def mapf (rows:Array[String],names: ArrayList[String]): Instances ={
+/**   Spark  wrapper for CSVToArffMapTask base task
+ *    
+ *    @param rows an RDD or HadoopRDD partition
+ *    @param names is a list with the attributes names
+ *    @return a Header for the processed partition         */
+      def map (rows:Array[String],names: ArrayList[String]): Instances ={
         for(i <- rows){
           m_task.processRow(i,names)
         }
-        
         return m_task.getHeader()
       }
-    
-}
+ }

@@ -19,32 +19,24 @@ object SimpleSparkApp {
       val sc=new SparkContext(conf)
       
       //dataloading
-      val data=sc.textFile("hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv",4)
+      val data=sc.textFile("hdfs://sandbox.hortonworks.com:8020/user/weka/susy1m",24)
      
       
       //caching
       //data.persist(StorageLevel.MEMORY_AND_DISK)
-       data.cache()
+       data.persist(StorageLevel.MEMORY_ONLY)
      
       //headers
      var names=new ArrayList[String]
-     for (i <- 1 to 12){
+     for (i <- 1 to 19){
        names.add("att"+i)
      }
-       data.glom.map(new CSVToArffHeaderSparkMapper(null).mapf(_,names)).reduce(new CSVToArffHeaderSparkReducer().reduce(_,_))
-       println(data.collect)
-      // data.mapPartitions(new CSVToArffHeaderSparkMapper2().map(_,names)).reduce(new CSVToArffHeaderSparkReducer().reduce(_,_))
-      //data.foreachPartition(new CSVToArffHeaderSparkMapper(null).map1(_,names))
-       //println(data)
-       //data.mapPartitions(new CSVToArffHeaderSparkMapper(null).map2(_,names)).reduce(new CSVToArffHeaderSparkReducer().reduce(_,_))
-      // println(data.collect)
-       // data.flatMap(new CSVToArffHeaderSparkMapper(null).map4(_,names)).reduce(new CSVToArffHeaderSparkReducer().reduce(_,_))
-     
-       // println(data.collect)
-     
-        //val headers=data.map(line => new CSVToArffHeaderSparkMapper(null).map(line,names)).reduce(new CSVToArffHeaderSparkReducer().reduce(_,_))
-      //  println(headers.toString())
-        while(true){}
+      
+      //compute headers
+       val headers=data.glom.map(new CSVToArffHeaderSparkMapper(null).map(_,names)).reduce(new CSVToArffHeaderSparkReducer().reduce(_,_))
+       println(headers.toString)
+      
+        
        
    }
    
