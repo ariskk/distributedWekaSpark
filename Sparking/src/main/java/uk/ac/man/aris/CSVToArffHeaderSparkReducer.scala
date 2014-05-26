@@ -14,6 +14,7 @@ class CSVToArffHeaderSparkReducer extends java.io.Serializable {
     var list=new ArrayList[Instances]
     list.add(headerA)
     list.add(headerB)
+     println(list.toString())
     return r_task.aggregate(list)
   }
 }
