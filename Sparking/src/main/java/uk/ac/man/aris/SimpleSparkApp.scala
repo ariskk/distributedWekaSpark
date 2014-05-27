@@ -19,12 +19,12 @@ object SimpleSparkApp {
       val sc=new SparkContext(conf)
       
       //dataloading
-      val data=sc.textFile("hdfs://sandbox.hortonworks.com:8020/user/weka/susy1m",24)
+      val data=sc.textFile("hdfs://sandbox.hortonworks.com:8020/user/weka/susy1m",8)
      
       
-      //caching
+      //caching Only if this fits in memory! else either outofmem exception or need to implement caching stategy
       //data.persist(StorageLevel.MEMORY_AND_DISK)
-       data.persist(StorageLevel.MEMORY_ONLY)
+      // data.persist(StorageLevel.DISK_ONLY)
      
       //headers
      var names=new ArrayList[String]
