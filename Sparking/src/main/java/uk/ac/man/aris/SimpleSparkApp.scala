@@ -15,10 +15,11 @@ import weka.core.Instances
 object SimpleSparkApp {
    def main(args : Array[String]){
     
-     val job=new CSVToArffHeaderSparkJob
-     job.buildHeaders("local[4]", "hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv", 12, 4)
-       
-       
+     val headerjob=new CSVToArffHeaderSparkJob
+     val header=headerjob.buildHeaders("local[4]", "hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv", 12, 4,null)
+     val classifierjob=new WekaClassifierSparkJob
+     val classifier=classifierjob.buildClassifier("local[4]", "hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv", 12, 4, header,headerjob.getd) 
+      println(classifier.toString())
    }
    
  

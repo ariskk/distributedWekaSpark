@@ -26,8 +26,8 @@ class CSVToArffHeaderSparkMapper (options:Array[String] ) extends java.io.Serial
  *    @param names is a list with the attributes names
  *    @return a Header for the processed partition         */
       def map (rows:Array[String],names: ArrayList[String]): Instances ={
-        for(i <- rows){
-          m_task.processRow(i,names)
+        for(x <- rows){
+          m_task.processRow(x,names)
         }
         return m_task.getHeader()
       }
