@@ -19,6 +19,7 @@ object distributedWekaSpark {
       val hdfsPath="hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv"
       val numberOfPartitions=4
       val numberOfAttributes=12
+      val classifierToTrain="weka.classifiers.bayes.NaiveBayes"
       
       //Configuration of Context
       val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(master).set("spark.executor.memory","1g")
@@ -36,8 +37,11 @@ object distributedWekaSpark {
       val headerjob=new CSVToArffHeaderSparkJob
       val header=headerjob.buildHeaders(numberOfAttributes,dataset)
       val classifierjob=new WekaClassifierSparkJob
-      val classifier=classifierjob.buildClassifier(header,dataset) 
-       println(classifier.toString())
+      val classifier=classifierjob.buildClassifier(classifierToTrain,header,dataset) 
+      
+      
+      
+      println(classifier.toString())
    }
    
  
