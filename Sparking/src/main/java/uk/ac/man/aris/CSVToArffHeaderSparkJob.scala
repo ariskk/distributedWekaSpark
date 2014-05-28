@@ -21,22 +21,11 @@ class CSVToArffHeaderSparkJob {
      var data2:RDD[String]=null
   
    
-  def buildHeaders (master:String,hdfsPath:String,numOfAttributes:Int,numberOfPartitions:Int,data1:RDD[String]) : Instances = {
-     ///Config
-      val conf=new SparkConf().setAppName("CSVToArffHeaderSparkJob").setMaster(master).set("spark.executor.memory","1g")
-      val sc=new SparkContext(conf)
-      
-       
-      //dataloading
-       
-       val data=sc.textFile(hdfsPath,numberOfPartitions)
-       data.cache()
-        data2=data
-      //caching Only if this fits in memory! else either outofmem exception or need to implement caching stategy
-      //data.persist(StorageLevel.MEMORY_AND_DISK)
+  def buildHeaders (numOfAttributes:Int,data:RDD[String]) : Instances = {
+     
        
      
-      //headers
+      //generate headers' names if not provided
      var names=new ArrayList[String]
      for (i <- 1 to numOfAttributes){
        names.add("att"+i)
@@ -47,7 +36,7 @@ class CSVToArffHeaderSparkJob {
        println(headers.toString)
        
        //cleanup ? or pass a reference to the next task
-        data.unpersist()
+        
        return headers
   }
 

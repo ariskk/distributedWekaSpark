@@ -13,7 +13,7 @@ class WekaClassifierSparkReducer (options:Array[String]) extends java.io.Seriali
        var list=new ArrayList[Classifier]
        list.add(classifierA)
        list.add(classifierB)
-       
+      // println(classifierA.toString())
        //a list of classifiers,to-do tranining instances each classifier has, force vote(for aggregatables)
        return r_task.aggregate(list)
      }
