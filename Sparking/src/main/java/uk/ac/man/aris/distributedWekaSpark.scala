@@ -35,13 +35,14 @@ object distributedWekaSpark {
      
      
       val headerjob=new CSVToArffHeaderSparkJob
-      val header=headerjob.buildHeaders(numberOfAttributes,dataset)
+      val headers=headerjob.buildHeaders(numberOfAttributes,dataset)
       val classifierjob=new WekaClassifierSparkJob
-      val classifier=classifierjob.buildClassifier(classifierToTrain,header,dataset) 
-      
-      
-      
+      val classifier=classifierjob.buildClassifier(classifierToTrain,headers,dataset) 
+      val evaluationJob=new WekaClassifierEvaluationSparkJob
+      val eval=evaluationJob.evaluateClassifier(classifier, headers, dataset)
+
       println(classifier.toString())
+      println(eval.toString())
    }
    
  

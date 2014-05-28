@@ -16,6 +16,9 @@ import weka.classifiers.SingleClassifierEnhancer
  *  
  *  Trains and returns a classifier on a dataset partition  */
 
+//
+
+//maybe refactor and put setup() at the constructor
 class WekaClassifierSparkMapper (classifierToTrain:String,classifierOptions:Array[String],rowparserOptions:Array[String],header:Instances) extends java.io.Serializable{
   var strippedHeader:Instances=null
   var m_task=new WekaClassifierMapTask()
@@ -28,7 +31,7 @@ class WekaClassifierSparkMapper (classifierToTrain:String,classifierOptions:Arra
     for(x <- rows){
       m_task.processInstance(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))) //many options here: updatable/not, batch/not, forced must do++
                     }
-    m_task.finalizeTask()
+      m_task.finalizeTask()
     
     return m_task.getClassifier()    //he also saves number of instances (for voting) in the same file. must check reducer
   }

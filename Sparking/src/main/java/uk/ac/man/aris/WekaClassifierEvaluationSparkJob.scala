@@ -11,7 +11,7 @@ class WekaClassifierEvaluationSparkJob {
   def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[String]): Evaluation={
     
     
-    val eval=dataset.glom.map(new WekaClassifierEvaluationSparkMapper().map(_,null)).reduce(new WekaClassifierEvaluationSparkReducer().reduce(_,_))
+    val eval=dataset.glom.map(new WekaClassifierEvaluationSparkMapper(headers,classifier).map(_)).reduce(new WekaClassifierEvaluationSparkReducer(headers).reduce(_,_))
     return eval
   }
 
