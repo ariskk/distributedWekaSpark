@@ -33,8 +33,12 @@ class WekaClassifierSparkMapper (classAtt:Int,metaLearner:String,classifierToTra
   val obj=Class.forName(classifierToTrain).newInstance()
   val cla=obj.asInstanceOf[Classifier]
   if(metaLearner!="default"){
-  val claMeta=obj.asInstanceOf[SingleClassifierEnhancer]
+  val obj2=Class.forName(metaLearner).newInstance()
+  val claMeta=obj2.asInstanceOf[SingleClassifierEnhancer]
   claMeta.setClassifier(cla)
+  //val opt=new Array[String](1)
+  //opt.+("P 10")
+  //claMeta.setOptions(opt)
   m_task.setClassifier(claMeta)
   }
   else{
