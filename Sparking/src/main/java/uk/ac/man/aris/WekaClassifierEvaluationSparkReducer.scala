@@ -13,6 +13,7 @@ class WekaClassifierEvaluationSparkReducer (headers:Instances) extends java.io.S
   var r_task=new WekaClassifierEvaluationReduceTask
   //might be optional-- update:IS optional
   val strippedHeaders=CSVToARFFHeaderReduceTask.stripSummaryAtts(headers)
+  strippedHeaders.setClassIndex(11)
   val classAt=strippedHeaders.classAttribute()
   val classAtSummaryName=CSVToARFFHeaderMapTask.ARFF_SUMMARY_ATTRIBUTE_PREFIX+classAt.name()
   val classSummaryAt=headers.attribute(classAtSummaryName)

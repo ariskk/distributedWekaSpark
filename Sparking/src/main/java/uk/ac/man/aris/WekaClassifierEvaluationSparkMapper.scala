@@ -5,6 +5,7 @@ import weka.classifiers.Classifier
 import weka.classifiers.evaluation.Evaluation
 import weka.distributed.CSVToARFFHeaderMapTask
 import weka.core.Instances
+import weka.core.Environment
 import weka.distributed.CSVToARFFHeaderReduceTask
 
 class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifier) extends java.io.Serializable {
@@ -15,10 +16,10 @@ class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifie
    strippedHeaders.setClassIndex(11)
    m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeaders))
    val classAtt=strippedHeaders.classAttribute()
-   
+   val seed=1L
    val classAttSummaryName = CSVToARFFHeaderMapTask.ARFF_SUMMARY_ATTRIBUTE_PREFIX + classAtt.name()
    val summaryClassAtt=headers.attribute(classAttSummaryName)
-   m_task.setup(strippedHeaders, computePriors(), computePriorsCount(), 1L, 1)
+   m_task.setup(strippedHeaders, computePriors(), computePriorsCount(), seed, 0) //last is predFrac and is used to compute AUC/AuPRC ??
    m_task.setClassifier(classifier)
    m_task.setTotalNumFolds(1)
    
@@ -33,10 +34,21 @@ class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifie
    }
 
     def computePriors (): Array[Double]={ 
-      
+      if(classAtt.isNominal()){
+        val priorsNom=new Array[Double](classAtt.numValues())
+         for (i <- 0  to classAtt.numValues()-1) {
+            val label = classAtt.value(i);
+            val labelWithCount = summaryClassAtt.value(i).replace(label + "_", "").trim();
+            priorsNom(i) = labelWithCount.toDouble }
+            return priorsNom
+           }
+       else{
+         val priorsNonNom=new Array[Double](1)
+         priorsNonNom(0)=CSVToARFFHeaderMapTask.ArffSummaryNumericMetric.SUM.valueFromAttribute(summaryClassAtt)
+         return priorsNonNom
+      }
     
-    
-    return null}
+    }
     
     
     def computePriorsCount():Double={

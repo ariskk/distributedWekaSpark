@@ -14,12 +14,14 @@ import weka.core.Instances
 
 object distributedWekaSpark {
    def main(args : Array[String]){
-    ///Input Parameters . to-do: accept args(0), args(1) from command line , accept task details
+      ///Input Parameters . to-do: accept args(0), args(1) from command line , accept task details
       val master="local[4]"
       val hdfsPath="hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv"
       val numberOfPartitions=4
       val numberOfAttributes=12
       val classifierToTrain="weka.classifiers.bayes.NaiveBayes"
+      val metaL="default"
+      val classAtt=11
       
       //Configuration of Context
       val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(master).set("spark.executor.memory","1g")
@@ -37,12 +39,13 @@ object distributedWekaSpark {
       val headerjob=new CSVToArffHeaderSparkJob
       val headers=headerjob.buildHeaders(numberOfAttributes,dataset)
       val classifierjob=new WekaClassifierSparkJob
-      val classifier=classifierjob.buildClassifier(classifierToTrain,headers,dataset) 
+      val classifier=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset) 
       val evaluationJob=new WekaClassifierEvaluationSparkJob
       val eval=evaluationJob.evaluateClassifier(classifier, headers, dataset)
 
       println(classifier.toString())
-      println(eval.toString())
+      evaluationJob.displayEval(eval)
+      
    }
    
  

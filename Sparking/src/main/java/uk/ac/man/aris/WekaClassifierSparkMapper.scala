@@ -12,45 +12,54 @@ import weka.classifiers.meta.Bagging
 import weka.classifiers.SingleClassifierEnhancer
 
 /**Mapper implementation for WekaClassifierSpark job 
- * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ * 
+ *  @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  *  
- *  Trains and returns a classifier on a dataset partition  */
-
-//
-
-//maybe refactor and put setup() at the constructor
-class WekaClassifierSparkMapper (classifierToTrain:String,classifierOptions:Array[String],rowparserOptions:Array[String],header:Instances) extends java.io.Serializable{
-  var strippedHeader:Instances=null
+ *  Trains and returns a classifier on a dataset partition 
+ *  @param classAtt is the class index
+ *  @param metaLearner is the requested metaLearner. if 'default' Vote will be used
+ *  @param classifierToTrain is the requested base classifier
+ *  @param two option strings for parser/classifier
+ *  @param header is the header file for the job */
+class WekaClassifierSparkMapper (classAtt:Int,metaLearner:String,classifierToTrain:String,classifierOptions:Array[String],rowparserOptions:Array[String],header:Instances) extends java.io.Serializable{
+  
+  //Init and set provided options  ToDo:option parser
   var m_task=new WekaClassifierMapTask()
   var m_rowparser=new CSVToARFFHeaderMapTask()
-  
+  m_task.setOptions(classifierOptions)
+   m_rowparser.setOptions(rowparserOptions)
+   
+  //set the class to train. set a custo Meta-Learner if requested else leave default 
+  val obj=Class.forName(classifierToTrain).newInstance()
+  val cla=obj.asInstanceOf[Classifier]
+  if(metaLearner!="default"){
+  val claMeta=obj.asInstanceOf[SingleClassifierEnhancer]
+  claMeta.setClassifier(cla)
+  m_task.setClassifier(claMeta)
+  }
+  else{
+  m_task.setClassifier(cla) 
+  }
+     
+   
+  //remove the summary from the headers , set class att
+  val strippedHeader:Instances=CSVToARFFHeaderReduceTask.stripSummaryAtts(header)
+  strippedHeader.setClassIndex(classAtt)
+  m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
+  m_task.setup(strippedHeader)
   
   //true in make instance means classifier is updateable
+  /**Map task for training classifiers
+   * 
+   * @param rows is a dataset partition
+   * @return a trained classifier on the provided parition
+   */
   def map(rows:Array[String]): Classifier={
-    this.setupTask
     for(x <- rows){
-      m_task.processInstance(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))) //many options here: updatable/not, batch/not, forced must do++
-                    }
+      m_task.processInstance(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
+      }                                    //ToDo:many options here: updatable/not, batch/not, forced
       m_task.finalizeTask()
-    
-    return m_task.getClassifier()    //he also saves number of instances (for voting) in the same file. must check reducer
-  }
+      return m_task.getClassifier()        //he also saves number of instances (for voting) in the same file. must check reducer
+   } 
 
-   def setupTask() :Unit={
-    
-      //var c = weka.core.Utils.forName(k,l,null).asInstanceOf[Classifier];
-     val obj=Class.forName(classifierToTrain).newInstance()
-     val cla=obj.asInstanceOf[Classifier]
-     //val cla=obj.asInstanceOf[SingleClassifierEnhancer]
-     //cla.setClassifier(new NaiveBayes)
-    
-     
-     m_task.setClassifier(cla)
-     m_task.setOptions(classifierOptions)
-     m_rowparser.setOptions(rowparserOptions)
-     strippedHeader=CSVToARFFHeaderReduceTask.stripSummaryAtts(header)
-     strippedHeader.setClassIndex(11)
-     m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
-     m_task.setup(strippedHeader)
-   }
 }
