@@ -22,21 +22,26 @@ object distributedWekaSpark {
       val classifierToTrain="weka.classifiers.bayes.NaiveBayes"
       val metaL="default"  //default is weka.classifiers.meta.Vote
       val classAtt=11
-      
+      val randomChunks=4
+      val names=new ArrayList[String]
       //Configuration of Context
       val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(master).set("spark.executor.memory","1g")
       val sc=new SparkContext(conf)
       
        
       //Load Dataset and cache. ToDo: global caching strategy   -data.persist(StorageLevel.MEMORY_AND_DISK)
-       val dataset=sc.textFile(hdfsPath,numberOfPartitions)
+       var dataset=sc.textFile(hdfsPath,numberOfPartitions)
        dataset.cache()
        
-    
+       //headers
+       val headerjob=new CSVToArffHeaderSparkJob
+       val headers=headerjob.buildHeaders(names,numberOfAttributes,dataset)
+      
+       //randomize if necessary 
+       //if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
      
-      //configure a task
-      val headerjob=new CSVToArffHeaderSparkJob
-      val headers=headerjob.buildHeaders(numberOfAttributes,dataset)
+     
+      //build a classifier+ evaluate
       val classifierjob=new WekaClassifierSparkJob
       val classifier=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset) 
       val evaluationJob=new WekaClassifierEvaluationSparkJob
