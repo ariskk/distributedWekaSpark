@@ -10,6 +10,7 @@ import weka.distributed.CSVToARFFHeaderReduceTask
 import weka.classifiers.bayes.NaiveBayes
 import weka.classifiers.meta.Bagging
 import weka.classifiers.SingleClassifierEnhancer
+import weka.core.Utils
 
 /**Mapper implementation for WekaClassifierSpark job 
  * 
@@ -23,26 +24,32 @@ import weka.classifiers.SingleClassifierEnhancer
  *  @param header is the header file for the job */
 class WekaClassifierSparkMapper (classAtt:Int,metaLearner:String,classifierToTrain:String,classifierOptions:Array[String],rowparserOptions:Array[String],header:Instances) extends java.io.Serializable{
   
+  val options="-W weka.classifiers.meta.Bagging"
+  val split=Utils.splitOptions(options)
+  val optA=Utils.getOption("num-nodes", split)
+  
+  
+  
+  
+  
   //Init and set provided options  ToDo:option parser
   var m_task=new WekaClassifierMapTask()
   var m_rowparser=new CSVToARFFHeaderMapTask()
   m_task.setOptions(classifierOptions)
-   m_rowparser.setOptions(rowparserOptions)
+  m_rowparser.setOptions(rowparserOptions)
    
   //set the class to train. set a custo Meta-Learner if requested else leave default 
   val obj=Class.forName(classifierToTrain).newInstance()
   val cla=obj.asInstanceOf[Classifier]
+  
   if(metaLearner!="default"){
-  val obj2=Class.forName(metaLearner).newInstance()
-  val claMeta=obj2.asInstanceOf[SingleClassifierEnhancer]
-  claMeta.setClassifier(cla)
-  //val opt=new Array[String](1)
-  //opt.+("P 10")
-  //claMeta.setOptions(opt)
-  m_task.setClassifier(claMeta)
+	  val obj2=Class.forName(metaLearner).newInstance()
+	  val claMeta=obj2.asInstanceOf[SingleClassifierEnhancer]
+	  claMeta.setClassifier(cla)
+      m_task.setClassifier(claMeta)
   }
   else{
-  m_task.setClassifier(cla) 
+      m_task.setClassifier(cla) 
   }
      
    
@@ -52,13 +59,15 @@ class WekaClassifierSparkMapper (classAtt:Int,metaLearner:String,classifierToTra
   m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
   m_task.setup(strippedHeader)
   
+  
+  
   //true in make instance means classifier is updateable
   /**Map task for training classifiers
    * 
    * @param rows is a dataset partition
    * @return a trained classifier on the provided parition
    */
-  def map(rows:Array[String]): Classifier={
+   def map(rows:Array[String]): Classifier={
     for(x <- rows){
       m_task.processInstance(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
       }                                    //ToDo:many options here: updatable/not, batch/not, forced

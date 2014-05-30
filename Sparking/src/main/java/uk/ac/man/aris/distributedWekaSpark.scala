@@ -9,6 +9,7 @@ import weka.distributed.CSVToARFFHeaderMapTask
 import weka.distributed.CSVToARFFHeaderReduceTask
 import java.util.ArrayList
 import weka.core.Instances
+import weka.core.Utils
 
 
 
@@ -24,6 +25,15 @@ object distributedWekaSpark {
       val classAtt=11
       val randomChunks=4
       val names=new ArrayList[String]
+      
+      
+      // Option parsing: should be a class
+      val options="-W weka.classifiers.tress.J48  -seed 2L -num-nodes 3"
+      val split=Utils.splitOptions(options)
+      val optA=Utils.getOption("num-nodes", split)
+      println(optA)
+      //
+      
       //Configuration of Context
       val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(master).set("spark.executor.memory","1g")
       val sc=new SparkContext(conf)
