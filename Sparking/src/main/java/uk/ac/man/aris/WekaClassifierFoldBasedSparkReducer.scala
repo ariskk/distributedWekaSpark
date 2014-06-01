@@ -5,6 +5,12 @@ import weka.classifiers.Classifier
 import java.util.ArrayList
 import weka.distributed.WekaClassifierReduceTask
 
+
+
+/**Spark Reducer for training an arbitrary number of folds
+ * 
+ *  @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ */
 class WekaClassifierFoldBasedSparkReducer(folds:Int) extends java.io.Serializable{
   
   var r_task=new WekaClassifierReduceTask
@@ -22,5 +28,6 @@ class WekaClassifierFoldBasedSparkReducer(folds:Int) extends java.io.Serializabl
     aggregated_models.add(r_task.aggregate(toaggregate_models.get(i))) 
     }
     return aggregated_models}
-
+  
+  
 }

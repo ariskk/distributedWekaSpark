@@ -10,6 +10,8 @@ import weka.distributed.CSVToARFFHeaderReduceTask
 import java.util.ArrayList
 import weka.core.Instances
 import weka.core.Utils
+import weka.associations.Apriori
+import weka.associations.FPGrowth
 
 
 
@@ -53,11 +55,12 @@ object distributedWekaSpark {
        
      //build foldbased
       val foldjob=new WekaClassifierFoldBasedSparkJob
-      val classifiers=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL)
-      for(c<- 0 to classifiers.size()-1){
-        println("Fold"+c+"\n"+classifiers.get(c).toString())
-        
-      }
+      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL)
+      println(classifier.toString())
+      val evalfoldjob=new WekaClassifierEvaluationSparkJob
+     // val eval=evalfoldjob.evaluateFoldBasedClassifier
+      
+      
       //build a classifier+ evaluate
 //      val classifierjob=new WekaClassifierSparkJob
 //      val classifier=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset) 
@@ -70,5 +73,5 @@ object distributedWekaSpark {
       
    }
    
- 
+     
 }

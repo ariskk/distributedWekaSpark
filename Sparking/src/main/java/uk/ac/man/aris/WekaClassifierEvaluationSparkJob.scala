@@ -14,7 +14,7 @@ import weka.core.Attribute
 class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
   
   
-  /** Evaluate the provided clasisifer
+  /** Evaluate the provided clasisifer or regressor
    *  
    *  @param classifier is the trained classifier
    *  @param headers is the headers object
@@ -27,6 +27,13 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
     return eval
   }
 
+  def evaluateFoldBasedClassifier(folds:Int,classifier:Classifier,headers:Instances,dataset:RDD[String]):Evaluation={
+  //  val eval=dataset.glom.map(new WekaClassifierFoldBasedEvaluationSparkMapper(headers,classifier,folds).map(_)).reduce(new WekaClassifierEvaluationSparkReducer(headers).reduce(_, _))
+    return null
+  }
+  
+  
+  
    /** A method to display the evaluation results
     *  
     *   @param an Evaluation object */

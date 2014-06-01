@@ -9,6 +9,11 @@ import weka.classifiers.Classifier
 import weka.classifiers.SingleClassifierEnhancer
 import java.util.ArrayList
 
+
+/**Spark Mapper for training an arbitrary number of folds
+ * 
+ *  @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ */
 class WekaClassifierFoldBasedSparkMapper(folds:Int,headers:Instances,toTrain:String,metaLearner:String) extends java.io.Serializable{
   
   //ToDo:parse string for folds not explicit
