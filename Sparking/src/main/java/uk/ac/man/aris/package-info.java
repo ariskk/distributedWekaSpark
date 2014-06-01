@@ -2,7 +2,7 @@
  * 
  */
 /**
- * @author weka
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  *
  */
 package uk.ac.man.aris;

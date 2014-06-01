@@ -25,6 +25,7 @@ object distributedWekaSpark {
       val classAtt=11
       val randomChunks=4
       val names=new ArrayList[String]
+      val folds=5
       
       
       // Option parsing: should be a class
@@ -49,17 +50,23 @@ object distributedWekaSpark {
       
        //randomize if necessary 
        //if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
-     
-     
+       
+     //build foldbased
+      val foldjob=new WekaClassifierFoldBasedSparkJob
+      val classifiers=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL)
+      for(c<- 0 to classifiers.size()-1){
+        println("Fold"+c+"\n"+classifiers.get(c).toString())
+        
+      }
       //build a classifier+ evaluate
-      val classifierjob=new WekaClassifierSparkJob
-      val classifier=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset) 
-      val evaluationJob=new WekaClassifierEvaluationSparkJob
-      val eval=evaluationJob.evaluateClassifier(classifier, headers, dataset)
+//      val classifierjob=new WekaClassifierSparkJob
+//      val classifier=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset) 
+//      val evaluationJob=new WekaClassifierEvaluationSparkJob
+//      val eval=evaluationJob.evaluateClassifier(classifier, headers, dataset)
 
       //display results
-      println(classifier.toString())
-      evaluationJob.displayEval(eval)
+//      println(classifier.toString())
+//      evaluationJob.displayEval(eval)
       
    }
    
