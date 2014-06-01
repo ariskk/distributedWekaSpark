@@ -1,6 +1,4 @@
-package uk.ac.man.aris
-
-import weka.classifiers.evaluation.Evaluation
+package uk.ac.manchester.ariskk.distributedWekaSpark.classifiers
 import weka.distributed.WekaClassifierMapTask
 import weka.distributed.CSVToARFFHeaderMapTask
 import weka.distributed.CSVToARFFHeaderReduceTask
@@ -27,13 +25,13 @@ class WekaClassifierFoldBasedSparkMapper(folds:Int,headers:Instances,toTrain:Str
    strippedHeaders.setClassIndex(11) //must be passed 
    m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeaders))
    val classAtt=strippedHeaders.classAttribute()
-     //set the class to train. set a custo Meta-Learner if requested else leave default 
+     //set the class to train. set a custom Meta-Learner if requested else leave default 
   val obj=Class.forName(toTrain).newInstance()
   val cla=obj.asInstanceOf[Classifier]
   
   //setup the tasks (one per fold)
    for(i<-0 to folds-1){
-     m_tasks.get(i).setFoldNumber(i)
+     m_tasks.get(i).setFoldNumber(i+1)
      m_tasks.get(i).setTotalNumFolds(folds)
      //setContinueTrainingUpdateble , addPreconstructedFilter
    
@@ -57,6 +55,7 @@ class WekaClassifierFoldBasedSparkMapper(folds:Int,headers:Instances,toTrain:Str
   def map(rows:Array[String]): ArrayList[Classifier]={
     val models=new ArrayList[Classifier]
     for(i<-0 to rows.length-1){
+      //m_task checks if instance is in the fold set. no need to check here
     m_tasks.get(i%folds).processInstance(m_rowparser.makeInstance(strippedHeaders, true, m_rowparser.parseRowOnly(rows(i))))}
     for(j<-0 to folds-1){
     m_tasks.get(j).finalizeTask()

@@ -1,11 +1,11 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.classifiers
 
 import weka.classifiers.Classifier
 import org.apache.spark.rdd.RDD
 import weka.core.Instances
 import weka.classifiers.evaluation.Evaluation
-import java.util.ArrayList
 import weka.core.Attribute
+import java.util.ArrayList
 
 /**Spark Job for running an evaluation job on a trained classifier or regressor
  * 
@@ -28,8 +28,8 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
   }
 
   def evaluateFoldBasedClassifier(folds:Int,classifier:Classifier,headers:Instances,dataset:RDD[String]):Evaluation={
-  //  val eval=dataset.glom.map(new WekaClassifierFoldBasedEvaluationSparkMapper(headers,classifier,folds).map(_)).reduce(new WekaClassifierEvaluationSparkReducer(headers).reduce(_, _))
-    return null
+    val eval=dataset.glom.map(new WekaClassifierFoldBasedEvaluationSparkMapper(headers,classifier,folds).map(_)).reduce(new WekaClassifierEvaluationSparkReducer(headers).reduce(_, _))
+    return eval
   }
   
   

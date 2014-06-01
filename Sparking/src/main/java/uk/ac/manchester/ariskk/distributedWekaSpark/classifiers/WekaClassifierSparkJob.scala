@@ -1,13 +1,11 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.classifiers
 
 import weka.classifiers.Classifier
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
-import java.util.ArrayList
 import weka.core.Instances
 import weka.core.Utils._
 import weka.classifiers.Classifier._
 import org.apache.spark.rdd.RDD
+
 
 /**This job trains any classifier from the weka.classifiers._ package
  * 

@@ -1,4 +1,4 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.classifiers
 
 import weka.distributed.WekaClassifierReduceTask
 import weka.classifiers.Classifier

@@ -1,6 +1,4 @@
-package uk.ac.man.aris
-
-import weka.classifiers.evaluation.Evaluation
+package uk.ac.manchester.ariskk.distributedWekaSpark.classifiers
 import weka.classifiers.Classifier
 import java.util.ArrayList
 import weka.distributed.WekaClassifierReduceTask
@@ -23,11 +21,11 @@ class WekaClassifierFoldBasedSparkReducer(folds:Int) extends java.io.Serializabl
     toaggregate_models.add(new ArrayList)
     toaggregate_models.get(i).add(modelsA.get(i))  
     toaggregate_models.get(i).add(modelsB.get(i)) 
+    aggregated_models.add(r_task.aggregate(toaggregate_models.get(i)))
     }
-    for(i<-0 to folds-1){
-    aggregated_models.add(r_task.aggregate(toaggregate_models.get(i))) 
+  
+    return aggregated_models
     }
-    return aggregated_models}
   
   
 }

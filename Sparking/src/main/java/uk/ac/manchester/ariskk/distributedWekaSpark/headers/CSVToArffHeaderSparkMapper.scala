@@ -1,10 +1,8 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.headers
 
 import weka.distributed.CSVToARFFHeaderMapTask
 import java.util.ArrayList
 import weka.core.Instances
-import weka.core.Instance
-import scala.collection.mutable.ListBuffer
 
 
 /**Mapper implementation for CSVToArffHeaderSpark job 

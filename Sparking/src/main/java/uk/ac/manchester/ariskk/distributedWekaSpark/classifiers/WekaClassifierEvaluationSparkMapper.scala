@@ -1,11 +1,10 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.classifiers
 
 import weka.distributed.WekaClassifierEvaluationMapTask
 import weka.classifiers.Classifier
 import weka.classifiers.evaluation.Evaluation
 import weka.distributed.CSVToARFFHeaderMapTask
 import weka.core.Instances
-import weka.core.Environment
 import weka.distributed.CSVToARFFHeaderReduceTask
 
 class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifier) extends java.io.Serializable {

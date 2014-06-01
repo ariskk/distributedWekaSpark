@@ -1,4 +1,4 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.classifiers
 
 import weka.distributed.WekaClassifierEvaluationMapTask
 import weka.distributed.CSVToARFFHeaderReduceTask
@@ -25,26 +25,30 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
    for(i<-0 to folds-1){
    m_tasks.add(new WekaClassifierEvaluationMapTask)
    m_tasks.get(i).setClassifier(classifier)
-   m_tasks.get(i).setFoldNumber(i)
+   m_tasks.get(i).setFoldNumber(i+1)
    m_tasks.get(i).setTotalNumFolds(folds)
    m_tasks.get(i).setup(strippedHeaders, computePriors(), computePriorsCount(), seed, 0) //last is predFrac and is used to compute AUC/AuPRC ??
    //setbatch trained incremental ??
    }
   
-  def map(rows:Array[String]): ArrayList[Evaluation]={
+  def map(rows:Array[String]): Evaluation={
    val evals=new ArrayList[Evaluation]
    for(i<-0 to rows.length-1){
      for(j<-0 to folds-1){
-    m_tasks.get(j).processInstance(m_rowparser.makeInstance(strippedHeaders, true, m_rowparser.parseRowOnly(rows(i))))
+       //m_task checks if instance is in the fold set. no need to check here
+      //if((i)%folds!=j){
+      m_tasks.get(j).processInstance(m_rowparser.makeInstance(strippedHeaders, true, m_rowparser.parseRowOnly(rows(i))))
       }
     }
     for(j<-0 to folds-1){
       m_tasks.get(j).finalizeTask()
       evals.add(m_tasks.get(j).getEvaluation())
     }
-    return evals
+    return m_combiner.aggregate(evals)   //needs semantic checking
   }
    
+  
+  
     def computePriors (): Array[Double]={ 
       if(classAtt.isNominal()){
         val priorsNom=new Array[Double](classAtt.numValues())

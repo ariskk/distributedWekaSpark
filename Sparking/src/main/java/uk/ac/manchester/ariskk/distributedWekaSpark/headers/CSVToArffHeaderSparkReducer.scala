@@ -1,4 +1,4 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.headers
 
 import weka.core.Instances
 import weka.distributed.CSVToARFFHeaderReduceTask

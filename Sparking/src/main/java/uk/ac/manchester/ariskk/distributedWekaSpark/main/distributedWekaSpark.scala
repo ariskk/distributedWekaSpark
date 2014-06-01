@@ -1,18 +1,20 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.main
 
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
-import org.apache.spark.storage.StorageLevel
-import weka.classifiers.bayes.net.search.fixed.NaiveBayes
-import weka.distributed.WekaClassifierMapTask
-import weka.distributed.CSVToARFFHeaderMapTask
-import weka.distributed.CSVToARFFHeaderReduceTask
 import java.util.ArrayList
-import weka.core.Instances
 import weka.core.Utils
-import weka.associations.Apriori
-import weka.associations.FPGrowth
+import uk.ac.manchester.ariskk.distributedWekaSpark.headers.CSVToArffHeaderSparkJob
+import uk.ac.manchester.ariskk.distributedWekaSpark.classifiers.WekaClassifierSparkJob
+import uk.ac.manchester.ariskk.distributedWekaSpark.classifiers.WekaClassifierEvaluationSparkJob
+import uk.ac.manchester.ariskk.distributedWekaSpark.classifiers.WekaClassifierFoldBasedSparkJob
 
+
+/** Project main class 
+ *  
+ *   @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ *   
+ *   ToDo: user-interface, option parser and loader-saver for persistence  */
 
 
 object distributedWekaSpark {
@@ -23,11 +25,11 @@ object distributedWekaSpark {
       val numberOfPartitions=4
       val numberOfAttributes=12
       val classifierToTrain="weka.classifiers.bayes.NaiveBayes"
-      val metaL="default"  //default is weka.classifiers.meta.Vote
+      val metaL="weka.classifiers.meta.Bagging"  //default is weka.classifiers.meta.Vote
       val classAtt=11
       val randomChunks=4
       val names=new ArrayList[String]
-      val folds=5
+      val folds=3
       
       
       // Option parsing: should be a class
@@ -51,25 +53,24 @@ object distributedWekaSpark {
        val headers=headerjob.buildHeaders(names,numberOfAttributes,dataset)
       
        //randomize if necessary 
-       //if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
+       if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
        
      //build foldbased
       val foldjob=new WekaClassifierFoldBasedSparkJob
       val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL)
       println(classifier.toString())
       val evalfoldjob=new WekaClassifierEvaluationSparkJob
-     // val eval=evalfoldjob.evaluateFoldBasedClassifier
-      
+      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset)
+      evalfoldjob.displayEval(eval)
       
       //build a classifier+ evaluate
-//      val classifierjob=new WekaClassifierSparkJob
-//      val classifier=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset) 
-//      val evaluationJob=new WekaClassifierEvaluationSparkJob
-//      val eval=evaluationJob.evaluateClassifier(classifier, headers, dataset)
+      val classifierjob=new WekaClassifierSparkJob
+      val classifier2=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset) 
+      val evaluationJob=new WekaClassifierEvaluationSparkJob
+      val eval2=evaluationJob.evaluateClassifier(classifier, headers, dataset)
 
-      //display results
-//      println(classifier.toString())
-//      evaluationJob.displayEval(eval)
+      println(classifier.toString())
+      evaluationJob.displayEval(eval)
       
    }
    

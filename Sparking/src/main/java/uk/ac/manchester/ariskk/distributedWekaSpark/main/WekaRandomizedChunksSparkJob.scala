@@ -1,4 +1,4 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.main
 
 import org.apache.spark.rdd.RDD
 import weka.core.Instances

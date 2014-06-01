@@ -1,4 +1,4 @@
-package uk.ac.man.aris
+package uk.ac.manchester.ariskk.distributedWekaSpark.classifiers
 
 import weka.core.Instances
 import weka.core.Utils._
@@ -7,8 +7,6 @@ import weka.distributed.WekaClassifierMapTask
 import weka.distributed.CSVToARFFHeaderMapTask
 import weka.distributed.CSVToARFFHeaderReduceTask._
 import weka.distributed.CSVToARFFHeaderReduceTask
-import weka.classifiers.bayes.NaiveBayes
-import weka.classifiers.meta.Bagging
 import weka.classifiers.SingleClassifierEnhancer
 import weka.core.Utils
 

@@ -1,19 +1,13 @@
-package uk.ac.man.aris
-
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkConf
-import org.apache.spark.storage.StorageLevel
-import weka.classifiers.bayes.net.search.fixed.NaiveBayes
-import weka.distributed.WekaClassifierMapTask
-import weka.distributed.CSVToARFFHeaderMapTask
-import weka.distributed.CSVToARFFHeaderReduceTask
+package uk.ac.manchester.ariskk.distributedWekaSpark.headers
 import java.util.ArrayList
 import weka.core.Instances
 import org.apache.spark.rdd.RDD
 
+
 /**  This Job builds Weka Headers for the provided dataset
  *   
- *   @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ *   @author Aris-Kyriakos import uk.ac.manchester.ariskk.distributedWekaSpark.headers.CSVToArffHeaderSparkMapper
+Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
 class CSVToArffHeaderSparkJob {
   //To-do: caching option + number of objects
