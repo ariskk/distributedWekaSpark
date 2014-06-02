@@ -9,14 +9,14 @@ import weka.classifiers.Classifier
 import weka.classifiers.evaluation.Evaluation
 import weka.distributed.WekaClassifierEvaluationReduceTask
 
-class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:Classifier,folds:Int) extends java.io.Serializable {
+class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:Classifier,folds:Int,classIndex:Int) extends java.io.Serializable {
 
    //ToDo: isupdatable, forced trained
    var m_combiner=new WekaClassifierEvaluationReduceTask ////is this correct?
    var m_tasks=new ArrayList[WekaClassifierEvaluationMapTask]
    var m_rowparser=new CSVToARFFHeaderMapTask()
    var strippedHeaders=CSVToARFFHeaderReduceTask.stripSummaryAtts(headers)
-   strippedHeaders.setClassIndex(11) //ToDo:must be provided in the constructor
+   strippedHeaders.setClassIndex(classIndex) //ToDo:must be provided in the constructor
    m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeaders))
    val classAtt=strippedHeaders.classAttribute()
    val seed=1L
@@ -36,7 +36,7 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
    for(i<-0 to rows.length-1){
      for(j<-0 to folds-1){
        //m_task checks if instance is in the fold set. no need to check here
-      //if((i)%folds!=j){
+      
       m_tasks.get(j).processInstance(m_rowparser.makeInstance(strippedHeaders, true, m_rowparser.parseRowOnly(rows(i))))
       }
     }

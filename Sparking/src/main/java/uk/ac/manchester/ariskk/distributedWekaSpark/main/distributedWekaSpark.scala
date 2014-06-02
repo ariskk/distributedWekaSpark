@@ -23,15 +23,16 @@ object distributedWekaSpark {
    def main(args : Array[String]){
       ///Input Parameters . ToDo: accept params as args(0), args(1) etc from command line , 
       val master="local[4]"
-      val hdfsPath="hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv"
+      val hdfsPath="hdfs://sandbox.hortonworks.com:8020/user/weka/breast.csv"
       val numberOfPartitions=4
-      val numberOfAttributes=12
+      val numberOfAttributes=10
       val classifierToTrain="weka.classifiers.bayes.NaiveBayes"
       val metaL="default"  //default is weka.classifiers.meta.Vote
-      val classAtt=11
+      val classAtt=9
       val randomChunks=4
       val names=new ArrayList[String]
       val folds=3
+      val headerJobOptions=null
       
       
       // Option parsing: should be a class
@@ -47,36 +48,35 @@ object distributedWekaSpark {
       val hdfshandler=new HDFSHandler(sc)
        
       //Load Dataset and cache. ToDo: global caching strategy   -data.persist(StorageLevel.MEMORY_AND_DISK)
-       var dataset=sc.textFile(hdfsPath,numberOfPartitions)
+       var dataset=hdfshandler.loadFromHDFS(hdfsPath, numberOfPartitions)
        dataset.cache()
        //glom? here on not?
-       
-       
+
        
        //headers
        val headerjob=new CSVToArffHeaderSparkJob
-       val headers=headerjob.buildHeaders(names,numberOfAttributes,dataset)
-       hdfshandler.saveToHDFS(headers, "/user/weka/testhdfs.txt", "testtext")
+       val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
+      // hdfshandler.saveToHDFS(headers, "user/weka/testhdfs.txt", "testtext")
        
        //randomize if necessary 
  //      if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
        
      //build foldbased
-//      val foldjob=new WekaClassifierFoldBasedSparkJob
-//      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL)
-//      println(classifier.toString())
-//      val evalfoldjob=new WekaClassifierEvaluationSparkJob
-//      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset)
-//      evalfoldjob.displayEval(eval)
+      val foldjob=new WekaClassifierFoldBasedSparkJob
+      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL,classAtt)
+      println(classifier.toString())
+      val evalfoldjob=new WekaClassifierEvaluationSparkJob
+      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
+      evalfoldjob.displayEval(eval)
       
       //build a classifier+ evaluate
-//      val classifierjob=new WekaClassifierSparkJob
-//      val classifier2=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset) 
-//      val evaluationJob=new WekaClassifierEvaluationSparkJob
-//      val eval2=evaluationJob.evaluateClassifier(classifier, headers, dataset)
-//
-//      println(classifier.toString())
-//      evaluationJob.displayEval(eval)
+      val classifierjob=new WekaClassifierSparkJob
+      val classifier2=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset,null,null) 
+      val evaluationJob=new WekaClassifierEvaluationSparkJob
+      val eval2=evaluationJob.evaluateClassifier(classifier2, headers, dataset,classAtt)
+
+      println(classifier2.toString())
+      evaluationJob.displayEval(eval2)
       
    }
    

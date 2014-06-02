@@ -20,26 +20,20 @@ import weka.core.Utils
  *  @param classifierToTrain is the requested base classifier
  *  @param two option strings for parser/classifier
  *  @param header is the header file for the job */
-class WekaClassifierSparkMapper (classAtt:Int,metaLearner:String,classifierToTrain:String,classifierOptions:Array[String],rowparserOptions:Array[String],header:Instances) extends java.io.Serializable{
-  
-  val options="-W weka.classifiers.meta.Bagging"
-  val split=Utils.splitOptions(options)
-  val optA=Utils.getOption("num-nodes", split)
-  
-  
-  
-  
-  
-  //Init and set provided options  ToDo:option parser
+class WekaClassifierSparkMapper (classIndex:Int,metaLearner:String,classifierToTrain:String,classifierOptions:Array[String],
+                                  rowparserOptions:Array[String],header:Instances) extends java.io.Serializable{
+
+  //Initialize the parser and the Base Map task(It processes a set of instances and produces a classifier)
   var m_task=new WekaClassifierMapTask()
   var m_rowparser=new CSVToARFFHeaderMapTask()
   m_task.setOptions(classifierOptions)
   m_rowparser.setOptions(rowparserOptions)
    
-  //set the class to train. set a custo Meta-Learner if requested else leave default 
+  //Set the classifier to train 
   val obj=Class.forName(classifierToTrain).newInstance()
   val cla=obj.asInstanceOf[Classifier]
   
+  //Check if a custom MetaLearner is requested
   if(metaLearner!="default"){
 	  val obj2=Class.forName(metaLearner).newInstance()
 	  val claMeta=obj2.asInstanceOf[SingleClassifierEnhancer]
@@ -50,10 +44,10 @@ class WekaClassifierSparkMapper (classAtt:Int,metaLearner:String,classifierToTra
       m_task.setClassifier(cla) 
   }
      
-   
-  //remove the summary from the headers , set class att
+  
+  //Remove the summary from the headers. Set the class attribute
   val strippedHeader:Instances=CSVToARFFHeaderReduceTask.stripSummaryAtts(header)
-  strippedHeader.setClassIndex(classAtt)
+  strippedHeader.setClassIndex(classIndex)
   m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
   m_task.setup(strippedHeader)
   
@@ -66,11 +60,11 @@ class WekaClassifierSparkMapper (classAtt:Int,metaLearner:String,classifierToTra
    * @return a trained classifier on the provided parition
    */
    def map(rows:Array[String]): Classifier={
-    for(x <- rows){
-      m_task.processInstance(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
-      }                                    //ToDo:many options here: updatable/not, batch/not, forced
-      m_task.finalizeTask()
-      return m_task.getClassifier()        //he also saves number of instances (for voting) in the same file. must check reducer
+     for(x <- rows){
+       m_task.processInstance(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
+       }                                    //ToDo:many options here: updatable/not, batch/not, forced
+       m_task.finalizeTask()
+    return m_task.getClassifier()        //he also saves number of instances (for voting) in the same file. must check reducer
    } 
 
 }

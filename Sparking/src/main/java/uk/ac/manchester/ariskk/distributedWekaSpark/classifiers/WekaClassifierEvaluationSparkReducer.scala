@@ -8,12 +8,12 @@ import weka.distributed.CSVToARFFHeaderReduceTask._
 import weka.distributed.CSVToARFFHeaderReduceTask
 import weka.distributed.CSVToARFFHeaderMapTask
 
-class WekaClassifierEvaluationSparkReducer (headers:Instances) extends java.io.Serializable {
+class WekaClassifierEvaluationSparkReducer (headers:Instances,classIndex:Int) extends java.io.Serializable {
   
   var r_task=new WekaClassifierEvaluationReduceTask
   //might be optional-- update:IS optional
   val strippedHeaders=CSVToARFFHeaderReduceTask.stripSummaryAtts(headers)
-  strippedHeaders.setClassIndex(11)
+  strippedHeaders.setClassIndex(classIndex)
   val classAt=strippedHeaders.classAttribute()
   val classAtSummaryName=CSVToARFFHeaderMapTask.ARFF_SUMMARY_ATTRIBUTE_PREFIX+classAt.name()
   val classSummaryAt=headers.attribute(classAtSummaryName)

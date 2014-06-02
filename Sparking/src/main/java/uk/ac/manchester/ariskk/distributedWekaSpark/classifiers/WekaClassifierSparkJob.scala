@@ -17,13 +17,19 @@ class WekaClassifierSparkJob extends java.io.Serializable {
    * 
    * @param classifierToTrain is a string representing the classifier and the containing package ex: weka.classifiers.trees.J48
    * @param headers is the header file of the dataset
-   * @param data is the RDD representation of the dataset 
+   * @param data is the RDD representation of the dataset
+   * @param parserOptions are options for the csvparser
+   * @param classifierOptions are options for the classifier
+   * @return a trained classifier 
    */
-  def buildClassifier (metaL:String,classifierToTrain:String,classAtt:Int,headers:Instances,data:RDD[String]) : Classifier = {
+  def buildClassifier (metaLearner:String,classifierToTrain:String,classIndex:Int,headers:Instances,dataset:RDD[String],
+                                                         parserOptions:Array[String],classifierOptions:Array[String]) : Classifier = {
          
-         //compute the classifier: map produces classifiers on each partition and reduce aggregates the partition classifiers to a single
-         val classifier=data.glom.map(new WekaClassifierSparkMapper(classAtt,metaL,classifierToTrain,null,null,headers).map(_)).reduce(new WekaClassifierSparkReducer(null).reduce(_,_))
-         return classifier
+       //compute the classifier: map produces a classifier for each partition and reduce aggregates the partition classifiers to a single output
+      val classifier=dataset.glom.map(new WekaClassifierSparkMapper(classIndex,metaLearner,classifierToTrain,classifierOptions,parserOptions,headers).map(_))
+                                  .reduce(new WekaClassifierSparkReducer(null).reduce(_,_))
+                                  
+      return classifier
   }
           
 }

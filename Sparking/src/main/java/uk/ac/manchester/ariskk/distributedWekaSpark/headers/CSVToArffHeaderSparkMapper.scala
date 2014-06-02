@@ -6,15 +6,19 @@ import weka.core.Instances
 
 
 /**Mapper implementation for CSVToArffHeaderSpark job 
+ * 
+ * It parses a dataset parition and produces a header
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  *   */
 
 /**Constructor
  * Spark serializes classes before distributing them to the nodes.
  * All classes must be serializable
- * @param CSVToArffMapTask options in an array of Strings */
-class CSVToArffHeaderSparkMapper (options:Array[String] ) extends java.io.Serializable{
+ * @param CSVToArffMapTask options in an array of Strings 
+ */
+class CSVToArffHeaderSparkMapper (options:Array[String]) extends java.io.Serializable{
  
+  //Initialize Base Header Map Task (processes a set of rows in CSV format and produces a header
   var m_task=new CSVToARFFHeaderMapTask
   m_task.setOptions(options)
   

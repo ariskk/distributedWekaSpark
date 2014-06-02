@@ -5,6 +5,8 @@ import weka.distributed.CSVToARFFHeaderReduceTask
 import java.util.ArrayList
 
 /**Reducer implementation for CSVToArffHeaderSpark job 
+ * 
+ * Takes two headers (Instances objects) as input, aggregates them and return a single header
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  *   */
 
@@ -13,11 +15,11 @@ class CSVToArffHeaderSparkReducer extends java.io.Serializable {
 
   var r_task=new CSVToARFFHeaderReduceTask
   
-  
   /**   Spark  wrapper for CSVToArffMapTask base task
- *    @param HeaderA represents aggregated headers
- *    @param HeaderB the next Header to aggregate
- *    @return Aggregated headers         */
+    *    @param HeaderA represents aggregated headers
+    *    @param HeaderB the next Header to aggregate
+    *    @return Aggregated headers
+    */
   def reduce (headerA:Instances,headerB:Instances): Instances ={
     var list=new ArrayList[Instances]
     list.add(headerA)

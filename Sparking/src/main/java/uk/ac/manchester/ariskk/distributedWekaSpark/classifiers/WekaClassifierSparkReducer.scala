@@ -10,11 +10,16 @@ import java.util.ArrayList
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com) 
  */
 class WekaClassifierSparkReducer (options:Array[String]) extends java.io.Serializable {
-
-     var r_task=new WekaClassifierReduceTask
-     //ToDo: minimum training fraction
      
-  /** Reducer: aggregated classifiers */
+     //Initialize the Base reduce task (Aggregates aggregatable classifiers or produces a voted ensemble for non-agg)
+     var r_task=new WekaClassifierReduceTask
+     
+     
+  /** Reducer: aggregated classifiers 
+   *  
+   *  @param classifierA Aggregated classifier so far
+   *  @param classifierB The classifier to aggregate
+   *  @return the aggregated classifier*/
   def reduce(classifierA:Classifier,classifierB:Classifier):Classifier={
        var list=new ArrayList[Classifier]
        list.add(classifierA)

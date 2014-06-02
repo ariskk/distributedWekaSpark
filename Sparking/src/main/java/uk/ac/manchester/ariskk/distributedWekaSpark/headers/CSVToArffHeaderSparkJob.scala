@@ -17,7 +17,7 @@ class CSVToArffHeaderSparkJob {
     * @param data is a reference to the RDD of the dataset
     * @return the headers (weka.core.Instances object)
     *   */
-  def buildHeaders (names:ArrayList[String],numOfAttributes:Int,data:RDD[String]) : Instances = {
+  def buildHeaders (options:Array[String],names:ArrayList[String],numOfAttributes:Int,data:RDD[String]) : Instances = {
      
     //generate headers' names if not provided
      if(names.size()==0){
@@ -25,7 +25,7 @@ class CSVToArffHeaderSparkJob {
        names.add("att"+i)
      }}
      //compute headers using map(generate headers for each partition) and reduce (aggregate partial headers)
-     val headers=data.glom.map(new CSVToArffHeaderSparkMapper(null).map(_,names)).reduce(new CSVToArffHeaderSparkReducer().reduce(_,_))
+     val headers=data.glom.map(new CSVToArffHeaderSparkMapper(options).map(_,names)).reduce(new CSVToArffHeaderSparkReducer().reduce(_,_))
      return headers
-  }
-    }
+   }
+ }

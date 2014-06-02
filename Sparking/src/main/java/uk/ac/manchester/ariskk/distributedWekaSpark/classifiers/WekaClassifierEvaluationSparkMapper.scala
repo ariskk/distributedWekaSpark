@@ -7,12 +7,12 @@ import weka.distributed.CSVToARFFHeaderMapTask
 import weka.core.Instances
 import weka.distributed.CSVToARFFHeaderReduceTask
 
-class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifier) extends java.io.Serializable {
+class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifier,classIndex:Int) extends java.io.Serializable {
   
    var m_task=new WekaClassifierEvaluationMapTask
    var m_rowparser=new CSVToARFFHeaderMapTask()
    var strippedHeaders=CSVToARFFHeaderReduceTask.stripSummaryAtts(headers)
-   strippedHeaders.setClassIndex(11)
+   strippedHeaders.setClassIndex(classIndex)
    m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeaders))
    val classAtt=strippedHeaders.classAttribute()
    val seed=1L

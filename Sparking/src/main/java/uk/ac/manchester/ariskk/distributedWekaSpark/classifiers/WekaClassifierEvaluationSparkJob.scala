@@ -19,25 +19,38 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
    *  @param classifier is the trained classifier
    *  @param headers is the headers object
    *  @param dataset is an RDD representation of the dataset
+   *  @param the class index
    *  @return an Evaluation object
    */
-  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[String]): Evaluation={
+  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[String],classIndex:Int): Evaluation={
     
-    val eval=dataset.glom.map(new WekaClassifierEvaluationSparkMapper(headers,classifier).map(_)).reduce(new WekaClassifierEvaluationSparkReducer(headers).reduce(_,_))
+     val eval=dataset.glom.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex).map(_))
+                         .reduce(new WekaClassifierEvaluationSparkReducer(headers,classIndex).reduce(_,_))
     return eval
   }
 
-  def evaluateFoldBasedClassifier(folds:Int,classifier:Classifier,headers:Instances,dataset:RDD[String]):Evaluation={
-    val eval=dataset.glom.map(new WekaClassifierFoldBasedEvaluationSparkMapper(headers,classifier,folds).map(_)).reduce(new WekaClassifierEvaluationSparkReducer(headers).reduce(_, _))
-    return eval
+   /** Evaluate the provided fold-based clasisifer or regressor
+   *  
+   *  @param classifier is the trained classifier
+   *  @param headers is the headers object
+   *  @param dataset is an RDD representation of the dataset
+   *  @param the class index
+   *  @return an Evaluation object
+   */
+  def evaluateFoldBasedClassifier(folds:Int,classifier:Classifier,headers:Instances,dataset:RDD[String],classIndex:Int):Evaluation={
+    
+     val eval=dataset.glom.map(new WekaClassifierFoldBasedEvaluationSparkMapper(headers,classifier,folds,classIndex).map(_))
+                         .reduce(new WekaClassifierEvaluationSparkReducer(headers,classIndex).reduce(_, _))
+   return eval
   }
   
   
   
-   /** A method to display the evaluation results
+  /** A method to display the evaluation results
     *  
-    *   @param an Evaluation object */
-   def displayEval(aggregated:Evaluation):Unit={
+    *   @param an Evaluation object
+    */
+  def displayEval(aggregated:Evaluation):Unit={
     val results=new ArrayList[Double]
     results.add(aggregated.correct())
     results.add(aggregated.incorrect())
