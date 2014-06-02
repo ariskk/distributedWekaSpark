@@ -12,7 +12,7 @@ import weka.core.Instances
 /**Constructor
  * Spark serializes classes before distributing them to the nodes.
  * All classes must be serializable
- * @param CSVToArffMapTask options array of Strings */
+ * @param CSVToArffMapTask options in an array of Strings */
 class CSVToArffHeaderSparkMapper (options:Array[String] ) extends java.io.Serializable{
  
   var m_task=new CSVToARFFHeaderMapTask

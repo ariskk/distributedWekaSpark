@@ -4,13 +4,12 @@ import weka.core.Instances
 import org.apache.spark.rdd.RDD
 
 
-/**  This Job builds Weka Headers for the provided dataset
+/**  This Job builds Weka Arff Headers using a provided dataset in RDD[String] 
  *   
- *   @author Aris-Kyriakos import uk.ac.manchester.ariskk.distributedWekaSpark.headers.CSVToArffHeaderSparkMapper
-Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ *   @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
 class CSVToArffHeaderSparkJob {
-  //To-do: caching option + number of objects
+ 
   
  /**Build the Header file
     * 
