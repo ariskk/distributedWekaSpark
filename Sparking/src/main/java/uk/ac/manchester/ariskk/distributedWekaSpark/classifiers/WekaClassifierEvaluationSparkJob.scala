@@ -25,7 +25,7 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
   def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[String],classIndex:Int): Evaluation={
     
      val eval=dataset.glom.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex).map(_))
-                         .reduce(new WekaClassifierEvaluationSparkReducer(headers,classIndex).reduce(_,_))
+                          .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_,_))
     return eval
   }
 
@@ -40,7 +40,7 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
   def evaluateFoldBasedClassifier(folds:Int,classifier:Classifier,headers:Instances,dataset:RDD[String],classIndex:Int):Evaluation={
     
      val eval=dataset.glom.map(new WekaClassifierFoldBasedEvaluationSparkMapper(headers,classifier,folds,classIndex).map(_))
-                         .reduce(new WekaClassifierEvaluationSparkReducer(headers,classIndex).reduce(_, _))
+                          .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_, _))
    return eval
   }
   

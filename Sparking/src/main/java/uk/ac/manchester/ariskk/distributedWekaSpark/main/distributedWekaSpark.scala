@@ -34,13 +34,10 @@ object distributedWekaSpark {
       val folds=3
       val headerJobOptions=null
       
-      
-      // Option parsing: should be a class
-      val options="-W weka.classifiers.tress.J48  -seed 2L -num-nodes 3"
-      val split=Utils.splitOptions(options)
-      val optA=Utils.getOption("num-nodes", split)
-      println(optA)
-      //
+      // OPTION HANDLING CODE
+      // weka.classifiers.functions.SMO scheme = new weka.classifiers.functions.SMO();
+      // set options
+      // scheme.setOptions(weka.core.Utils.splitOptions("-C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka.classifiers.functions.supportVector.PolyKernel -C 250007 -E 1.0\""));
       
       //Configuration of Context
       val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(master).set("spark.executor.memory","1g")

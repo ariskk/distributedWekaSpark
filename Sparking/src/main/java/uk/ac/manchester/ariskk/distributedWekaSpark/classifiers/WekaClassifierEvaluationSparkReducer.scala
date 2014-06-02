@@ -8,16 +8,22 @@ import weka.distributed.CSVToARFFHeaderReduceTask._
 import weka.distributed.CSVToARFFHeaderReduceTask
 import weka.distributed.CSVToARFFHeaderMapTask
 
-class WekaClassifierEvaluationSparkReducer (headers:Instances,classIndex:Int) extends java.io.Serializable {
+
+/**Classifier evaluation Reduce tasks
+ * 
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)*/
+class WekaClassifierEvaluationSparkReducer  extends java.io.Serializable {
   
+  //Initialize Base reduce task
   var r_task=new WekaClassifierEvaluationReduceTask
-  //might be optional-- update:IS optional
-  val strippedHeaders=CSVToARFFHeaderReduceTask.stripSummaryAtts(headers)
-  strippedHeaders.setClassIndex(classIndex)
-  val classAt=strippedHeaders.classAttribute()
-  val classAtSummaryName=CSVToARFFHeaderMapTask.ARFF_SUMMARY_ATTRIBUTE_PREFIX+classAt.name()
-  val classSummaryAt=headers.attribute(classAtSummaryName)
   
+
+  /**Reducer that merges two evaluations
+   * 
+   * @param evalA evaluations merged so far
+   * @param evalB next evaluation to merge
+   * @return aggregated evaluations
+   * */
   def reduce(evalA:Evaluation,evalB:Evaluation): Evaluation={
     val list=new ArrayList[Evaluation]
     list.add(evalA)

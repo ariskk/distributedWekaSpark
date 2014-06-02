@@ -23,33 +23,33 @@ import weka.core.Utils
 class WekaClassifierSparkMapper (classIndex:Int,metaLearner:String,classifierToTrain:String,classifierOptions:Array[String],
                                   rowparserOptions:Array[String],header:Instances) extends java.io.Serializable{
 
-  //Initialize the parser and the Base Map task(It processes a set of instances and produces a classifier)
-  var m_task=new WekaClassifierMapTask()
-  var m_rowparser=new CSVToARFFHeaderMapTask()
-  m_task.setOptions(classifierOptions)
-  m_rowparser.setOptions(rowparserOptions)
+    //Initialize the parser and the Base Map task(It processes a set of instances and produces a classifier)
+    var m_task=new WekaClassifierMapTask()
+    var m_rowparser=new CSVToARFFHeaderMapTask()
+    m_task.setOptions(classifierOptions)
+    m_rowparser.setOptions(rowparserOptions)
    
-  //Set the classifier to train 
-  val obj=Class.forName(classifierToTrain).newInstance()
-  val cla=obj.asInstanceOf[Classifier]
+    //Set the classifier to train 
+    val obj=Class.forName(classifierToTrain).newInstance()
+    val cla=obj.asInstanceOf[Classifier]
   
   //Check if a custom MetaLearner is requested
-  if(metaLearner!="default"){
-	  val obj2=Class.forName(metaLearner).newInstance()
-	  val claMeta=obj2.asInstanceOf[SingleClassifierEnhancer]
-	  claMeta.setClassifier(cla)
-      m_task.setClassifier(claMeta)
-  }
-  else{
-      m_task.setClassifier(cla) 
-  }
+    if(metaLearner!="default"){
+	    val obj2=Class.forName(metaLearner).newInstance()
+	    val claMeta=obj2.asInstanceOf[SingleClassifierEnhancer]
+	    claMeta.setClassifier(cla)
+        m_task.setClassifier(claMeta)
+    }
+    else{
+        m_task.setClassifier(cla) 
+    }
      
   
-  //Remove the summary from the headers. Set the class attribute
-  val strippedHeader:Instances=CSVToARFFHeaderReduceTask.stripSummaryAtts(header)
-  strippedHeader.setClassIndex(classIndex)
-  m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
-  m_task.setup(strippedHeader)
+    //Remove the summary from the headers. Set the class attribute
+    val strippedHeader:Instances=CSVToARFFHeaderReduceTask.stripSummaryAtts(header)
+    strippedHeader.setClassIndex(classIndex)
+    m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
+    m_task.setup(strippedHeader)
   
   
   
