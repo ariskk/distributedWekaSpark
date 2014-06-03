@@ -1,7 +1,6 @@
 package uk.ac.manchester.ariskk.distributedWekaSpark.main
 
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkConf
+
 import java.util.ArrayList
 import weka.core.Utils
 import uk.ac.manchester.ariskk.distributedWekaSpark.headers.CSVToArffHeaderSparkJob
@@ -10,6 +9,8 @@ import uk.ac.manchester.ariskk.distributedWekaSpark.classifiers.WekaClassifierEv
 import uk.ac.manchester.ariskk.distributedWekaSpark.classifiers.WekaClassifierFoldBasedSparkJob
 import java.io.DataOutput
 import org.apache.hadoop.io.DataOutputBuffer
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
 
 
 /** Project main class 
@@ -62,12 +63,12 @@ object distributedWekaSpark {
  //      if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
        
      //build foldbased
-//      val foldjob=new WekaClassifierFoldBasedSparkJob
-//      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL,classAtt)
-//      println(classifier.toString())
-//      val evalfoldjob=new WekaClassifierEvaluationSparkJob
-//      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
-//      evalfoldjob.displayEval(eval)
+      val foldjob=new WekaClassifierFoldBasedSparkJob
+      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL,classAtt)
+      println(classifier.toString())
+      val evalfoldjob=new WekaClassifierEvaluationSparkJob
+      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
+      evalfoldjob.displayEval(eval)
       
       //build a classifier+ evaluate
       val classifierjob=new WekaClassifierSparkJob
