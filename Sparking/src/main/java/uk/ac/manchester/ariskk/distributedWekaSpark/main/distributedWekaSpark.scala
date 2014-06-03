@@ -32,7 +32,7 @@ object distributedWekaSpark {
       val hdfsPath=optionsHandler.getHdfsPath
       val numberOfPartitions=optionsHandler.getNumberOfPartitions
       val numberOfAttributes=optionsHandler.getNumberOfAttributes
-      val classifierToTrain="weka.classifiers.trees.J48" //this must done in-Weka somehow
+      val classifierToTrain=optionsHandler.getClassifier //this must done in-Weka somehow
       val metaL="default"  //default is weka.classifiers.meta.Vote
       val classAtt=optionsHandler.getClassIndex
       val randomChunks=optionsHandler.getNumberOfRandomChunks

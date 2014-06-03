@@ -79,6 +79,11 @@ class OptionsParser (options:String) {
   else return names.split(",")
   }
   
+  def getClassifier():String={
+    val classifier=Utils.getOption("classifier",split)
+    if (classifier=="")return "weka.classifiers.bayes.NaiveBayes"
+    else return classifier
+  }
   //get algorithm get meta learner ++ might be covered in the first will check
   }
   
