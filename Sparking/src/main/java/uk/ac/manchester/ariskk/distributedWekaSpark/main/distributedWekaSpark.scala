@@ -22,29 +22,34 @@ import org.apache.spark.SparkContext
 
 object distributedWekaSpark {
    def main(args : Array[String]){
+       
+      val optionsHandler=new OptionsParser(args.mkString(" "))
+      
+      
+     
       ///Input Parameters . ToDo: accept params as args(0), args(1) etc from command line , 
-      val master="local[4]"
-      val hdfsPath="hdfs://sandbox.hortonworks.com:8020/user/weka/breast.csv"
-      val numberOfPartitions=4
-      val numberOfAttributes=10
-      val classifierToTrain="weka.classifiers.trees.J48"
+      val master=optionsHandler.getMaster
+      val hdfsPath=optionsHandler.getHdfsPath
+      val numberOfPartitions=optionsHandler.getNumberOfPartitions
+      val numberOfAttributes=optionsHandler.getNumberOfAttributes
+      val classifierToTrain="weka.classifiers.trees.J48" //this must done in-Weka somehow
       val metaL="default"  //default is weka.classifiers.meta.Vote
-      val classAtt=9
-      val randomChunks=4
+      val classAtt=optionsHandler.getClassIndex
+      val randomChunks=optionsHandler.getNumberOfRandomChunks
       val names=new ArrayList[String]
-      val folds=3
+      val folds=optionsHandler.getNumFolds
       val headerJobOptions=null
       
-      val options=" "
+      
       
        
-      //Configuration of Context
-      val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(master).set("spark.executor.memory","1g")
+      //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
+      val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(optionsHandler.getMaster).set("spark.executor.memory","1g")
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
-      val optionsHandler=new OptionsParser(options)
+     
       
-      println(optionsHandler.getHdfsPath +"   "+optionsHandler.getMaster+" "+optionsHandler.getNumberOfPartitions+optionsHandler.getNumberOfRandomChunks)
+      
       
      // System.exit(0)
       
