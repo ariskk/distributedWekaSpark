@@ -28,7 +28,7 @@ class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
       header.add(inst)
       //add a reservoir. if updatable update else in the finalise. finaleze calls buildClusterer
      }
-    clusterer.buildClusterer(header)
+     clusterer.buildClusterer(header)
     //finalize tasks (build for batch no-op for incremental
     
     return null

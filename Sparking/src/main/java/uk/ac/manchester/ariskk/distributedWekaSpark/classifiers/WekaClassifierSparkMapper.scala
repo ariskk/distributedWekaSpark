@@ -32,7 +32,7 @@ class WekaClassifierSparkMapper (classIndex:Int,metaLearner:String,classifierToT
     //Set the classifier to train 
     val obj=Class.forName(classifierToTrain).newInstance()
     val cla=obj.asInstanceOf[Classifier]
-  
+    
   //Check if a custom MetaLearner is requested
     if(metaLearner!="default"){
 	    val obj2=Class.forName(metaLearner).newInstance()
@@ -43,7 +43,7 @@ class WekaClassifierSparkMapper (classIndex:Int,metaLearner:String,classifierToT
     else{
         m_task.setClassifier(cla) 
     }
-     
+    
   
     //Remove the summary from the headers. Set the class attribute
     val strippedHeader:Instances=CSVToARFFHeaderReduceTask.stripSummaryAtts(header)
