@@ -67,11 +67,6 @@
   		<artifactId>distributedWekaBase</artifactId>
   		<version>1.0.4</version>
   	</dependency>
-  	<dependency>
-  		<groupId>nz.ac.waikato.cms.weka</groupId>
-  		<artifactId>distributedWekaHadoop</artifactId>
-  		<version>1.0.7</version>
-  	</dependency>
   </dependencies>
   <organization>
   	<name>University of Manchester</name>

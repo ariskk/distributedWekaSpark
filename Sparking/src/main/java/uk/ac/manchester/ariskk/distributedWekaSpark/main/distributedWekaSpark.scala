@@ -11,6 +11,9 @@ import java.io.DataOutput
 import org.apache.hadoop.io.DataOutputBuffer
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
+import weka.associations.AssociationRule
+import weka.associations.AssociationRulesProducer
+import weka.associations.Apriori
 
 
 /** Project main class 
