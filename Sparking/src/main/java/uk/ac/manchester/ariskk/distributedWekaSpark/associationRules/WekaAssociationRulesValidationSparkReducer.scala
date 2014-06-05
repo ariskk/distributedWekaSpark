@@ -1,5 +1,14 @@
 package uk.ac.manchester.ariskk.distributedWekaSpark.associationRules
 
-class WekaAssociationRulesValidationSparkReducer {
+import weka.associations.AssociationRules
+
+class WekaAssociationRulesValidationSparkReducer extends java.io.Serializable{
+  
+  
+  def reduce(rulesA:AssociationRules,rulesB:AssociationRules):AssociationRules={
+    
+    
+    return null
+  }
 
 }
