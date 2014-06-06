@@ -37,6 +37,8 @@ import weka.associations.AssociationRulesProducer
 import weka.associations.Apriori
 import org.apache.spark.rdd.RDD
 import weka.core.Instance
+import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.WekaAssociationRulesSparkJob
+
 
 
 /** Project main  
@@ -76,7 +78,6 @@ object distributedWekaSpark {
      
       
       
-      
      // System.exit(0)
       
       //Load Dataset and cache. ToDo: global caching strategy   -data.persist(StorageLevel.MEMORY_AND_DISK)
@@ -86,30 +87,38 @@ object distributedWekaSpark {
        
        
        //headers
-       val headerjob=new CSVToArffHeaderSparkJob
-       val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
+         val headerjob=new CSVToArffHeaderSparkJob
+         val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
       // hdfshandler.saveToHDFS(headers, "user/weka/testhdfs.txt", "testtext")
-       
+        
+        // System.exit(0)
        //randomize if necessary 
  //      if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
        
      //build foldbased
-      val foldjob=new WekaClassifierFoldBasedSparkJob
-      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL,classAtt)
-      println(classifier.toString())
-      val evalfoldjob=new WekaClassifierEvaluationSparkJob
-      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
-      evalfoldjob.displayEval(eval)
+//      val foldjob=new WekaClassifierFoldBasedSparkJob
+//      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL,classAtt)
+//      println(classifier.toString())
+//      val evalfoldjob=new WekaClassifierEvaluationSparkJob
+//      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
+//      evalfoldjob.displayEval(eval)
+//      
+//      //build a classifier+ evaluate
+//      val classifierjob=new WekaClassifierSparkJob
+//      val classifier2=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset,null,optionsHandler.getWekaOptions) 
+//      val evaluationJob=new WekaClassifierEvaluationSparkJob
+//      val eval2=evaluationJob.evaluateClassifier(classifier2, headers, dataset,classAtt)
+//
+//      println(classifier2.toString())
+//      evaluationJob.displayEval(eval2)
+    
       
-      //build a classifier+ evaluate
-      val classifierjob=new WekaClassifierSparkJob
-      val classifier2=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset,null,optionsHandler.getWekaOptions) 
-      val evaluationJob=new WekaClassifierEvaluationSparkJob
-      val eval2=evaluationJob.evaluateClassifier(classifier2, headers, dataset,classAtt)
-
-      println(classifier2.toString())
-      evaluationJob.displayEval(eval2)
-      
+      val rulejob=new WekaAssociationRulesSparkJob
+      val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
+      rules.foreach{
+        keyv => println(keyv._2.getRuleString)
+        
+      }
    }
    
      

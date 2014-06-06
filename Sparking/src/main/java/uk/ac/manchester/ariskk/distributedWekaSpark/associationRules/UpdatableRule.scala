@@ -3,7 +3,7 @@ package uk.ac.manchester.ariskk.distributedWekaSpark.associationRules
 import weka.associations.AssociationRule
 
 
-class UpdatableRule (rule:AssociationRule) {
+class UpdatableRule (rule:AssociationRule) extends java.io.Serializable{
   
   var support=rule.getTotalSupport()
   var premise=rule.getPremiseSupport()
@@ -11,9 +11,11 @@ class UpdatableRule (rule:AssociationRule) {
   var transactions=rule.getTotalTransactions()
   var ruleID=rule.getPremise()+" "+rule.getConsequence()
   
+  
+  
   def getRule():String=return ruleID
   
-  def getRuleString:String=return rule.getPremise()+" "+getPremiseSupport+" "+rule.getConsequence()+" "+getConsequenceSupport+" conf:"+getCondidence+
+  def getRuleString:String=return rule.getPremise()+" "+getPremiseSupport+" "+rule.getConsequence()+" "+getSupportCount+" conf:"+getCondidence+
                                   " lift:"+getLift+" leverage:"+getLeverage+" conviction:"+getConviction
   
   def getSupportCount:Int=return support
@@ -35,17 +37,20 @@ class UpdatableRule (rule:AssociationRule) {
   def addTransactions(tr:Int):Unit=transactions+=tr
   
   //semantic checking
-  def getRuleSupport:Double=return support/transactions
+  def getRuleSupport:Double=return support.toDouble/transactions.toDouble
   
-  def getCondidence:Double=return support/premise
+  
+  def getCondidence:Double=return support.toDouble/premise.toDouble
   //def setCondidence(conf:Double):Unit=confidence=conf
 
-  def getLift:Double=return support/(premise*consequence)
+  def getLift:Double=return (support.toDouble*transactions.toDouble)/(premise.toDouble*consequence.toDouble)
  // def setSupport(lf:Double):Unit=lift=lf
   
-  def getLeverage:Double=return support/transactions-(consequence/transactions)*(premise/transactions)
+  def getLeverage:Double=return support.toDouble/transactions.toDouble-(consequence.toDouble/transactions.toDouble)*(premise.toDouble/transactions.toDouble)
   //def setLeverage(lev:Int):Unit=leverage=lev
   
-  def getConviction:Double=return (1-consequence)/(1-(support/premise))
+  def getConviction:Double={
+    if(1-(support.toDouble/premise.toDouble)==0){return 0}
+    return (1-(consequence.toDouble/transactions.toDouble))/(1-(support.toDouble/premise.toDouble))}
   //def setConviction(con:Double):Unit=conviction=con
 }

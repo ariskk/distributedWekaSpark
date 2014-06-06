@@ -42,30 +42,38 @@ object testing {
     
   
     val hashmap=new HashMap[String,UpdatableRule]
-    for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).toString,new UpdatableRule(rules.get(x)))}
+    for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).getPremise()+" "+rules.get(x).getConsequence(),new UpdatableRule(rules.get(x)))}
     
-    if(hashmap.containsKey(rules2.get(1).toString)){
+    if(hashmap.containsKey(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())){
       //support update
-    println(hashmap.get(rules2.get(1).toString).getSupportCount)
-    val nrule=hashmap.get(rules2.get(1).toString)
-    hashmap.remove(rules2.get(1).toString)
-    nrule.setSupportCount(nrule.getSupportCount+rules2.get(1).getTotalSupport())
-    hashmap.put(nrule.getRuleString,nrule)
-    println(hashmap.get(rules2.get(1).toString).getSupportCount)
+    println(hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence()).getSupportCount)
+    
+    val nrule=hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
+    hashmap.remove(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
+    nrule.setSupportCount(rules2.get(1).getTotalSupport()+nrule.getSupportCount)
+    nrule.addConsequenceSupport(rules2.get(1).getConsequenceSupport())
+    nrule.addPremiseSupport(rules2.get(1).getPremiseSupport())
+    nrule.addTransactions(rules2.get(1).getTotalTransactions())
+    hashmap.put(nrule.getRule,nrule)
+    println(hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence()).getSupportCount)
     
     
     }
+    val some=hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
+    println(some.getRuleString)
+    
+    
     val ll=rules2.get(1).getMetricValuesForRule()
     
     val kk=rules2.get(1).getMetricNamesForRule()
-    for(x <-0 to ll.length-1){println(kk(x)+" "+ll(x))}
+   // for(x <-0 to ll.length-1){println(kk(x)+" "+ll(x))}
     println(rules.get(0).toString)
-    println(rules.get(0))
+   // println(rules.get(0))
     println(rules.get(0).getConsequence()+"  "+rules.get(0).getConsequenceSupport())
     println(rules.get(0).getPremise()+"  "+rules.get(0).getPremiseSupport())
     println(rules.get(0).getTotalTransactions())
     println(rules.get(0).getTotalSupport())
-    
+   
   
   }
 

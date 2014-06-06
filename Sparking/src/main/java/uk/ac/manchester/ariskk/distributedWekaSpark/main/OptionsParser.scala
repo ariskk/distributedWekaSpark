@@ -33,7 +33,7 @@ class OptionsParser (options:String) {
   /**HDFS path to the dataset*/
   def getHdfsPath():String={
     val hdfsPath=Utils.getOption("hdfs-path",split)
-    if (hdfsPath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/breast.csv"
+    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/supermarket3.csv"
     else return hdfsPath
   }
   
@@ -54,7 +54,7 @@ class OptionsParser (options:String) {
   /**Number of Attributes in the dataset*/
   def getNumberOfAttributes():Int={
     val atts=Utils.getOption("num-ofatts",split)
-    if(atts=="") return 10
+    if(atts=="") return 217
     else return atts.toInt
   }
   
