@@ -9,6 +9,7 @@ import java.util.HashSet
 import weka.associations.AssociationRule
 import java.util.HashMap
 import weka.associations.FPGrowth
+import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
 
 object testing {
 
@@ -37,7 +38,8 @@ object testing {
     val rules=ruless.getRules()
     val ruless2=asl2.getAssociationRules()
     val rules2=ruless2.getRules()
-
+ 
+    
   
     val hashmap=new HashMap[String,UpdatableRule]
     for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).toString,new UpdatableRule(rules.get(x)))}

@@ -40,42 +40,43 @@ class TaskConfiguration (task:String,options:OptionsParser){
     }
     
     def buildClassifier():Classifier={
-      buildHeaders
+      val headers=buildHeaders
       val classifierjob=new WekaClassifierSparkJob
       //classifierjob.buildClassifier(metaLearner, classifierToTrain, classIndex, headers, dataset, parserOptions, classifierOptions)
       return null
     }
     
     def buildClassifierEvaluation():Evaluation={
-      buildHeaders
-      buildClassifier
+      val headers=buildHeaders
+      val classfier=buildClassifier
       val evaluationJob=new WekaClassifierEvaluationSparkJob
       
       return null
     }
     
     def buildFoldBasedClassifier():Classifier={
-      buildHeaders
+      val headers=buildHeaders
       val foldjob=new WekaClassifierFoldBasedSparkJob
       
       return null
     }
     
     def buildFoldBasedClassifierEvaluation():Evaluation={
-      buildHeaders
-      buildFoldBasedClassifier
+      val headers=buildHeaders
+      val classifier=buildFoldBasedClassifier
       val evalfoldjob=new WekaClassifierEvaluationSparkJob
       
       return null
     }
     
     def buildClusterer():Clusterer={
-      buildHeaders //??
+      val headers=buildHeaders //??
       val clustereJob=new WekaClustererSparkJob
       return null
     }
     
     def findAssociationRules():AssociationRules={
+      val headers=buildHeaders
       val associationRulesJob=new WekaAssociationRulesSparkJob
       
       return null
