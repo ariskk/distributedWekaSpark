@@ -13,15 +13,15 @@ import weka.associations.FPGrowth
 object testing {
 
   def main(args: Array[String]): Unit = {
-    
-    class UpdatableSupportRule (initRule:AssociationRule){
-      val rule:AssociationRule=initRule
-      var support:Int=rule.getTotalSupport()
-      
-      def getSup():Int=return support
-      def setSup(sup:Int):Unit={support=sup}
-      def getRuleString():String=return rule.toString()
-    }
+//    
+//    class UpdatableSupportRule (initRule:AssociationRule){
+//      val rule:AssociationRule=initRule
+//      var support:Int=rule.getTotalSupport()
+//      
+//      def getSup():Int=return support
+//      def setSup(sup:Int):Unit={support=sup}
+//      def getRuleString():String=return rule.toString()
+//    }
     
     val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarket.arff"))
    
@@ -38,29 +38,32 @@ object testing {
     val ruless2=asl2.getAssociationRules()
     val rules2=ruless2.getRules()
 
-    
-    
-    val hashmap=new HashMap[String,UpdatableSupportRule]
-    for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).toString,new UpdatableSupportRule(rules.get(x)))}
+  
+    val hashmap=new HashMap[String,UpdatableRule]
+    for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).toString,new UpdatableRule(rules.get(x)))}
     
     if(hashmap.containsKey(rules2.get(1).toString)){
       //support update
-    println(hashmap.get(rules2.get(1).toString).getSup)
+    println(hashmap.get(rules2.get(1).toString).getSupportCount)
     val nrule=hashmap.get(rules2.get(1).toString)
     hashmap.remove(rules2.get(1).toString)
-    nrule.setSup(nrule.getSup+rules2.get(1).getTotalSupport())
+    nrule.setSupportCount(nrule.getSupportCount+rules2.get(1).getTotalSupport())
     hashmap.put(nrule.getRuleString,nrule)
-    println(hashmap.get(rules2.get(1).toString).getSup)
+    println(hashmap.get(rules2.get(1).toString).getSupportCount)
     
     
     }
     val ll=rules2.get(1).getMetricValuesForRule()
+    
     val kk=rules2.get(1).getMetricNamesForRule()
     for(x <-0 to ll.length-1){println(kk(x)+" "+ll(x))}
     println(rules.get(0).toString)
     println(rules.get(0))
+    println(rules.get(0).getConsequence()+"  "+rules.get(0).getConsequenceSupport())
+    println(rules.get(0).getPremise()+"  "+rules.get(0).getPremiseSupport())
+    println(rules.get(0).getTotalTransactions())
+    println(rules.get(0).getTotalSupport())
     
-   
   
   }
 

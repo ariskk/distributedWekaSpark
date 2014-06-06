@@ -35,36 +35,42 @@ class TaskConfiguration (task:String,options:OptionsParser){
        
     def buildHeaders():Instances={
       val headerjob=new CSVToArffHeaderSparkJob
-     
+     // headerjob.buildHeaders(options, names, numOfAttributes, data)
       return null
     }
     
     def buildClassifier():Classifier={
       buildHeaders
       val classifierjob=new WekaClassifierSparkJob
-      
+      //classifierjob.buildClassifier(metaLearner, classifierToTrain, classIndex, headers, dataset, parserOptions, classifierOptions)
       return null
     }
     
     def buildClassifierEvaluation():Evaluation={
+      buildHeaders
+      buildClassifier
       val evaluationJob=new WekaClassifierEvaluationSparkJob
       
       return null
     }
     
     def buildFoldBasedClassifier():Classifier={
+      buildHeaders
       val foldjob=new WekaClassifierFoldBasedSparkJob
       
       return null
     }
     
     def buildFoldBasedClassifierEvaluation():Evaluation={
+      buildHeaders
+      buildFoldBasedClassifier
       val evalfoldjob=new WekaClassifierEvaluationSparkJob
       
       return null
     }
     
     def buildClusterer():Clusterer={
+      buildHeaders //??
       val clustereJob=new WekaClustererSparkJob
       return null
     }

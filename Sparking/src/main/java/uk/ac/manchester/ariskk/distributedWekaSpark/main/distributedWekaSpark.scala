@@ -1,5 +1,26 @@
-package uk.ac.manchester.ariskk.distributedWekaSpark.main
+/*
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
+/*
+ *    distributedWekaSpark.scala
+ *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *
+ */
+
+
+package uk.ac.manchester.ariskk.distributedWekaSpark.main
 
 import java.util.ArrayList
 import weka.core.Utils
@@ -14,9 +35,11 @@ import org.apache.spark.SparkContext
 import weka.associations.AssociationRule
 import weka.associations.AssociationRulesProducer
 import weka.associations.Apriori
+import org.apache.spark.rdd.RDD
+import weka.core.Instance
 
 
-/** Project main class 
+/** Project main  
  *  
  *   @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  *   
@@ -60,7 +83,7 @@ object distributedWekaSpark {
        var dataset=hdfshandler.loadFromHDFS(hdfsPath, numberOfPartitions)
        dataset.cache()
        //glom? here on not?
-
+       
        
        //headers
        val headerjob=new CSVToArffHeaderSparkJob
