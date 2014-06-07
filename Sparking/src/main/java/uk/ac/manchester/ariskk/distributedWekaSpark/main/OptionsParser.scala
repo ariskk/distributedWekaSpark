@@ -33,7 +33,7 @@ class OptionsParser (options:String) {
   /**HDFS path to the dataset*/
   def getHdfsPath():String={
     val hdfsPath=Utils.getOption("hdfs-path",split)
-    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/supermarket3.csv"
+    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/supermarket.csv"
     else return hdfsPath
   }
   

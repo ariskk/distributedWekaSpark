@@ -87,8 +87,8 @@ object distributedWekaSpark {
        
        
        //headers
-         val headerjob=new CSVToArffHeaderSparkJob
-         val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
+        val headerjob=new CSVToArffHeaderSparkJob
+        val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
       // hdfshandler.saveToHDFS(headers, "user/weka/testhdfs.txt", "testtext")
         
         // System.exit(0)
@@ -115,9 +115,10 @@ object distributedWekaSpark {
       
       val rulejob=new WekaAssociationRulesSparkJob
       val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
+      println("dafaw")
       rules.foreach{
         keyv => println(keyv._2.getRuleString)
-        
+        println("dafaw")
       }
    }
    
