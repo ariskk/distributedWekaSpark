@@ -70,6 +70,7 @@ object distributedWekaSpark {
       
       
       
+      
        
       //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
       val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(optionsHandler.getMaster).set("spark.executor.memory","1g")
@@ -96,12 +97,12 @@ object distributedWekaSpark {
  //      if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
        
      //build foldbased
-//      val foldjob=new WekaClassifierFoldBasedSparkJob
-//      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL,classAtt)
-//      println(classifier.toString())
-//      val evalfoldjob=new WekaClassifierEvaluationSparkJob
-//      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
-//      evalfoldjob.displayEval(eval)
+      val foldjob=new WekaClassifierFoldBasedSparkJob
+      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL,classAtt)
+      println(classifier.toString())
+      val evalfoldjob=new WekaClassifierEvaluationSparkJob
+      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
+      evalfoldjob.displayEval(eval)
 //      
 //      //build a classifier+ evaluate
 //      val classifierjob=new WekaClassifierSparkJob
@@ -119,6 +120,7 @@ object distributedWekaSpark {
       rules.foreach{
         keyv => println(keyv._2.getRuleString)
         println("dafaw")
+        
       }
    }
    
