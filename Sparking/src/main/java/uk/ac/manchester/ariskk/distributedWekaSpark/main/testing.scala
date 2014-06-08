@@ -7,9 +7,10 @@ import weka.core.Instances
 import weka.associations.Apriori
 import java.util.HashSet
 import weka.associations.AssociationRule
-import java.util.HashMap
 import weka.associations.FPGrowth
 import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
+import scala.collection.mutable.HashMap
+import weka.core.converters.CSVLoader
 
 object testing {
 
@@ -39,27 +40,27 @@ object testing {
     val ruless2=asl2.getAssociationRules()
     val rules2=ruless2.getRules()
  
-    
+   
   
     val hashmap=new HashMap[String,UpdatableRule]
     for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).getPremise()+" "+rules.get(x).getConsequence(),new UpdatableRule(rules.get(x)))}
     
-    if(hashmap.containsKey(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())){
+    if(hashmap.contains(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())){
       //support update
-    println(hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence()).getSupportCount)
+    println(hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1)))
     
-    val nrule=hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
+    val nrule=hashmap(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
     hashmap.remove(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
     nrule.setSupportCount(rules2.get(1).getTotalSupport()+nrule.getSupportCount)
     nrule.addConsequenceSupport(rules2.get(1).getConsequenceSupport())
     nrule.addPremiseSupport(rules2.get(1).getPremiseSupport())
     nrule.addTransactions(rules2.get(1).getTotalTransactions())
     hashmap.put(nrule.getRule,nrule)
-    println(hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence()).getSupportCount)
+    println(hashmap(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence()).getSupportCount)
     
     
     }
-    val some=hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
+    val some=hashmap(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
     println(some.getRuleString)
     
     

@@ -4,7 +4,7 @@ import weka.associations.AssociationRule
 
 
 class UpdatableRule (rule:AssociationRule) extends java.io.Serializable{
-  
+  //To-Do : accept accuracies
   var support=rule.getTotalSupport()
   var premise=rule.getPremiseSupport()
   var consequence=rule.getConsequenceSupport()
@@ -37,20 +37,22 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable{
   def addTransactions(tr:Int):Unit=transactions+=tr
   
   //semantic checking
-  def getRuleSupport:Double=return support.toDouble/transactions.toDouble
+  def getRuleSupport:Double=return round(support.toDouble/transactions.toDouble)
   
   
-  def getCondidence:Double=return support.toDouble/premise.toDouble
+  def getCondidence:Double=return round(support.toDouble/premise.toDouble)
   //def setCondidence(conf:Double):Unit=confidence=conf
 
-  def getLift:Double=return (support.toDouble*transactions.toDouble)/(premise.toDouble*consequence.toDouble)
+  def getLift:Double=return round((support.toDouble*transactions.toDouble)/(premise.toDouble*consequence.toDouble))
  // def setSupport(lf:Double):Unit=lift=lf
   
-  def getLeverage:Double=return support.toDouble/transactions.toDouble-(consequence.toDouble/transactions.toDouble)*(premise.toDouble/transactions.toDouble)
+  def getLeverage:Double=return round(support.toDouble/transactions.toDouble-(consequence.toDouble/transactions.toDouble)*(premise.toDouble/transactions.toDouble))
   //def setLeverage(lev:Int):Unit=leverage=lev
   
   def getConviction:Double={
     if(1-(support.toDouble/premise.toDouble)==0){return 0}
-    return (1-(consequence.toDouble/transactions.toDouble))/(1-(support.toDouble/premise.toDouble))}
+    return round((1-(consequence.toDouble/transactions.toDouble))/(1-(support.toDouble/premise.toDouble)))}
   //def setConviction(con:Double):Unit=conviction=con
+  
+  def round(num:Double):Double=return BigDecimal(num).setScale(4, BigDecimal.RoundingMode.HALF_UP).toDouble
 }

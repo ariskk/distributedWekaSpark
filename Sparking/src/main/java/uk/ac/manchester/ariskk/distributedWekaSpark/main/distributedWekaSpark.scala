@@ -97,12 +97,12 @@ object distributedWekaSpark {
  //      if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
        
      //build foldbased
-      val foldjob=new WekaClassifierFoldBasedSparkJob
-      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL,classAtt)
-      println(classifier.toString())
-      val evalfoldjob=new WekaClassifierEvaluationSparkJob
-      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
-      evalfoldjob.displayEval(eval)
+//      val foldjob=new WekaClassifierFoldBasedSparkJob
+//      val classifier=foldjob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaL,classAtt)
+//      println(classifier.toString())
+//      val evalfoldjob=new WekaClassifierEvaluationSparkJob
+//      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
+//      evalfoldjob.displayEval(eval)
 //      
 //      //build a classifier+ evaluate
 //      val classifierjob=new WekaClassifierSparkJob
@@ -116,10 +116,10 @@ object distributedWekaSpark {
       
       val rulejob=new WekaAssociationRulesSparkJob
       val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
-      println("dafaw")
+      
       rules.foreach{
         keyv => println(keyv._2.getRuleString)
-        println("dafaw")
+        
         
       }
    }

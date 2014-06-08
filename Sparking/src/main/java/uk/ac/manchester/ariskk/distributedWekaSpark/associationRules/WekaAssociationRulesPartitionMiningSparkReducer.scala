@@ -10,24 +10,28 @@ import scala.collection.mutable.HashMap
 class WekaAssociationRulesPartitionMiningSparkReducer extends java.io.Serializable{
   
   
-  def reduce(rulesMap:HashMap[String,UpdatableRule],newRules:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
-    newRules.foreach{
+  def reduce(rulesMapA:HashMap[String,UpdatableRule],rulesMapB:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
+    println(rulesMapA.isEmpty+" "+rulesMapA.keys.size)
+    println(rulesMapB.isEmpty+" "+rulesMapB.keys.size)
+    rulesMapB.foreach{
        rule=>{
-        if(rulesMap.contains(rule._1)){
-        var modifiedRule=rulesMap.remove(rule._1).getOrElse(rule._2)
+        if(rulesMapA.contains(rule._1)){
+         println("hooray")
+        var modifiedRule=rulesMapB(rule._1)
         modifiedRule.addConsequenceSupport(rule._2.getConsequenceSupport)
         modifiedRule.addPremiseSupport(rule._2.getPremiseSupport)
         modifiedRule.addSupportCount(rule._2.getSupportCount)
         modifiedRule.addTransactions(rule._2.getTransactions)
-        rulesMap.put(modifiedRule.getRule,modifiedRule)
+        rulesMapA.update(modifiedRule.getRule,modifiedRule)
       }
       else{
-        rulesMap.put(rule._1,rule._2)
+        
+        rulesMapA+=(rule._1 -> rule._2)
       }
     }
     }
     
-    return rulesMap
+    return rulesMapA
   }
 
 }
