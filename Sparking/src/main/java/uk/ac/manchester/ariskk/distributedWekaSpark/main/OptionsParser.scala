@@ -40,7 +40,7 @@ class OptionsParser (options:String) {
   /**Number of partitions the RDD should have*/
   def getNumberOfPartitions():Int={
     val partitions=Utils.getOption("num-partitions",split)
-    if(partitions=="")return 4
+    if(partitions=="")return 2
     else return partitions.toInt
   }
   

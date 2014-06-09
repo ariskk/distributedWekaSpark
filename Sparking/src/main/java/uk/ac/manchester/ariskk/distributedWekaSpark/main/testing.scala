@@ -11,6 +11,7 @@ import weka.associations.FPGrowth
 import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
 import scala.collection.mutable.HashMap
 import weka.core.converters.CSVLoader
+import weka.core.converters.ConverterUtils.DataSource;
 
 object testing {
 
@@ -24,6 +25,10 @@ object testing {
 //      def setSup(sup:Int):Unit={support=sup}
 //      def getRuleString():String=return rule.toString()
 //    }
+    val src=DataSource.read("")
+    println(src)
+    exit(0)
+    
     
     val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarket.arff"))
    
@@ -40,7 +45,7 @@ object testing {
     val ruless2=asl2.getAssociationRules()
     val rules2=ruless2.getRules()
  
-   
+    
   
     val hashmap=new HashMap[String,UpdatableRule]
     for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).getPremise()+" "+rules.get(x).getConsequence(),new UpdatableRule(rules.get(x)))}

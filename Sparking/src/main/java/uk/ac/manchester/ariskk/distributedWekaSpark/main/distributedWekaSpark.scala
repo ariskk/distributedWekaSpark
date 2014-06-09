@@ -66,7 +66,7 @@ object distributedWekaSpark {
       val randomChunks=optionsHandler.getNumberOfRandomChunks
       val names=new ArrayList[String]
       val folds=optionsHandler.getNumFolds
-      val headerJobOptions=null
+      val headerJobOptions=Utils.splitOptions("-N first-last")
       
       
       
