@@ -47,7 +47,7 @@ class OptionsParser (options:String) {
   /**Number of  Randomized/Stratified RDDs to produce from the dataset*/
   def getNumberOfRandomChunks():Int={
     val chunks=Utils.getOption("num-randChunks",split)
-    if(chunks=="") return 0
+    if(chunks=="") return 4
     else return chunks.toInt   
   }
   

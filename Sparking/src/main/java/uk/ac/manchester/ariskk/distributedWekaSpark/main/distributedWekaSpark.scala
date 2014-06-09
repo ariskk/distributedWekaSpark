@@ -38,6 +38,9 @@ import weka.associations.Apriori
 import org.apache.spark.rdd.RDD
 import weka.core.Instance
 import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.WekaAssociationRulesSparkJob
+import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
+import java.util.Collections
+import java.util.Comparator
 
 
 
@@ -94,7 +97,7 @@ object distributedWekaSpark {
         
         // System.exit(0)
        //randomize if necessary 
- //      if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
+      //if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
        
      //build foldbased
 //      val foldjob=new WekaClassifierFoldBasedSparkJob
@@ -113,14 +116,18 @@ object distributedWekaSpark {
 //      println(classifier2.toString())
 //      evaluationJob.displayEval(eval2)
     
+      val broad=sc.broadcast(headers)
       
       val rulejob=new WekaAssociationRulesSparkJob
       val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
-      
+      val list=new Array[UpdatableRule](rules.keys.size)
+      var j=0
       rules.foreach{
-        keyv => println(keyv._2.getRuleString)
-          
-      }
+        
+        keyv => if(keyv._2.getCondidence>0.9)println(keyv._2.getRuleString);list(j)=keyv._2
+        j+=1
+       }
+       
    }
    
      

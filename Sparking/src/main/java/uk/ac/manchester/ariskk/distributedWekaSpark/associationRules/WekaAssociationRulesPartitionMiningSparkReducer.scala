@@ -13,25 +13,28 @@ class WekaAssociationRulesPartitionMiningSparkReducer extends java.io.Serializab
   def reduce(rulesMapA:HashMap[String,UpdatableRule],rulesMapB:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
     println(rulesMapA.isEmpty+" "+rulesMapA.keys.size)
     println(rulesMapB.isEmpty+" "+rulesMapB.keys.size)
+    var rulesMapA1=rulesMapA
     rulesMapB.foreach{
        rule=>{
-        if(rulesMapA.contains(rule._1)){
-         println("hooray")
-        var modifiedRule=rulesMapB(rule._1)
+         
+       //  println(rule._1)
+        if(rulesMapA1.contains(rule._1)){
+        println("hooray")
+        val modifiedRule=rulesMapA1(rule._1)
         modifiedRule.addConsequenceSupport(rule._2.getConsequenceSupport)
         modifiedRule.addPremiseSupport(rule._2.getPremiseSupport)
         modifiedRule.addSupportCount(rule._2.getSupportCount)
         modifiedRule.addTransactions(rule._2.getTransactions)
-        rulesMapA.update(modifiedRule.getRule,modifiedRule)
+        rulesMapA1.update(rule._1,modifiedRule)
+        
       }
       else{
-        
-        rulesMapA+=(rule._1 -> rule._2)
+        rulesMapA1+=(rule._1 -> rule._2)
       }
     }
     }
-    
-    return rulesMapA
+   // exit(0)
+    return rulesMapA1
   }
 
 }

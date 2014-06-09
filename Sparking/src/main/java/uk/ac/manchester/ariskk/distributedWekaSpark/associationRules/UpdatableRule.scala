@@ -9,7 +9,7 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable{
   var premise=rule.getPremiseSupport()
   var consequence=rule.getConsequenceSupport()
   var transactions=rule.getTotalTransactions()
-  var ruleID=rule.getPremise()+" "+rule.getConsequence()
+  val ruleID=rule.getPremise()+" "+rule.getConsequence()
   
   
   
@@ -41,18 +41,18 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable{
   
   
   def getCondidence:Double=return round(support.toDouble/premise.toDouble)
-  //def setCondidence(conf:Double):Unit=confidence=conf
+
 
   def getLift:Double=return round((support.toDouble*transactions.toDouble)/(premise.toDouble*consequence.toDouble))
- // def setSupport(lf:Double):Unit=lift=lf
+
   
   def getLeverage:Double=return round(support.toDouble/transactions.toDouble-(consequence.toDouble/transactions.toDouble)*(premise.toDouble/transactions.toDouble))
-  //def setLeverage(lev:Int):Unit=leverage=lev
+
   
   def getConviction:Double={
     if(1-(support.toDouble/premise.toDouble)==0){return 0}
     return round((1-(consequence.toDouble/transactions.toDouble))/(1-(support.toDouble/premise.toDouble)))}
-  //def setConviction(con:Double):Unit=conviction=con
+
   
   def round(num:Double):Double=return BigDecimal(num).setScale(4, BigDecimal.RoundingMode.HALF_UP).toDouble
 }

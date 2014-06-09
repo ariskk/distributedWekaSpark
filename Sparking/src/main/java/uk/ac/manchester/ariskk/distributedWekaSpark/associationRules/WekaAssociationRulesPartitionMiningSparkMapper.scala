@@ -20,6 +20,7 @@ import weka.core.Utils
 import java.io.BufferedReader
 import java.io.FileReader
 import weka.distributed.DistributedWekaException
+import org.apache.spark.SparkContext
 
 class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner:String,rowparserOptions:Array[String]) extends java.io.Serializable{
     var ruleList:List[AssociationRule]=null
@@ -61,14 +62,14 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
      var inst=new Instances(strippedHeader,0)
      m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
      
-     println(inst)
+     //println(inst)
      
   def map(rows:Array[String]):HashMap[String,UpdatableRule]={
      
      for (x <-rows){
        inst.add(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
       }
-    println(inst.size)
+   // println(inst.size)
 
 
 //    println(asl.getOptions().mkString(" "))
@@ -78,7 +79,8 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 //    println(instA.equalHeadersMsg(inst))
 //    println(instA.equalHeaders(inst))
     
-  
+    asl.setLowerBoundMinSupport(0.1)
+    asl.setNumRulesToFind(10)
     asl.buildAssociations(inst)
     
     
@@ -91,16 +93,16 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
     
     println(asl.getAssociationRules().getRules().size)
     ruleList=asl.getAssociationRules().getRules()
-    println(ruleList.get(0))
-    println(ruleList.get(0).getPremise()+" "+ruleList.get(0).getConsequence())
-   // exit(0)
+   // println(ruleList.get(0))
+   // println(ruleList.get(0).getPremise()+" "+ruleList.get(0).getConsequence())
+     
 
     val hash=new HashMap[String,UpdatableRule]
     for(x<-0 to ruleList.size()-1){
       hash+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() -> new UpdatableRule(ruleList.get(x)))
      }
 
-    println(hash.isEmpty+" "+hash.keys.size)
+   // println(hash.isEmpty+" "+hash.keys.size)
     return hash
   }
 
