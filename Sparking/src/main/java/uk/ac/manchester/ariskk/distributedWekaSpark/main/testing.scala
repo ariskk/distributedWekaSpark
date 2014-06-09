@@ -25,15 +25,17 @@ object testing {
 //      def setSup(sup:Int):Unit={support=sup}
 //      def getRuleString():String=return rule.toString()
 //    }
-    val src=DataSource.read("")
-    println(src)
+    
+    val hashi=new HashMap[String,Int]()
+    hashi+=("add" -> 5)
+    hashi+=("dad" -> 7)
+    println(hashi("add")+" "+ hashi("dad"))
     exit(0)
     
-    
-    val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarket.arff"))
+    val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarketmod.arff"))
    
     val inst=new Instances(source) 
-   
+    
     val asl=new FPGrowth
     asl.setLowerBoundMinSupport(0.1)
     asl.buildAssociations(inst)
@@ -44,7 +46,8 @@ object testing {
     val rules=ruless.getRules()
     val ruless2=asl2.getAssociationRules()
     val rules2=ruless2.getRules()
- 
+    
+     println(asl)
     
   
     val hashmap=new HashMap[String,UpdatableRule]

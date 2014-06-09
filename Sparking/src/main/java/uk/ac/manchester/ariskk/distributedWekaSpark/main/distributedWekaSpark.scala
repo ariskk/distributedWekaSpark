@@ -54,7 +54,15 @@ import java.util.Comparator
 object distributedWekaSpark {
    def main(args : Array[String]){
        
-      val optionsHandler=new OptionsParser(args.mkString(" "))
+     val optionsHandler=new OptionsParser(args.mkString(" "))
+       
+      //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
+      val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(optionsHandler.getMaster).set("spark.executor.memory","1g")
+      val sc=new SparkContext(conf)
+      val hdfshandler=new HDFSHandler(sc)
+      
+     
+      
       
       
      
@@ -67,18 +75,14 @@ object distributedWekaSpark {
       val metaL="default"  //default is weka.classifiers.meta.Vote
       val classAtt=optionsHandler.getClassIndex
       val randomChunks=optionsHandler.getNumberOfRandomChunks
-      val names=new ArrayList[String]
+      var names=new ArrayList[String]
       val folds=optionsHandler.getNumFolds
       val headerJobOptions=Utils.splitOptions("-N first-last")
+      val namesPath=optionsHandler.getNamesPath
       
       
       
-      
-       
-      //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
-      val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(optionsHandler.getMaster).set("spark.executor.memory","1g")
-      val sc=new SparkContext(conf)
-      val hdfshandler=new HDFSHandler(sc)
+     
      
       
       
@@ -88,8 +92,10 @@ object distributedWekaSpark {
        var dataset=hdfshandler.loadFromHDFS(hdfsPath, numberOfPartitions)
        dataset.cache()
        //glom? here on not?
+       val namesfromfile=hdfshandler.loadFromHDFS(namesPath,1)
+       println(namesfromfile.collect.mkString(""))
        
-       
+       names=optionsHandler.getNamesFromString(namesfromfile.collect.mkString(""))
        //headers
         val headerjob=new CSVToArffHeaderSparkJob
         val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
@@ -124,7 +130,12 @@ object distributedWekaSpark {
       var j=0
       rules.foreach{
         
-        keyv => if(keyv._2.getCondidence>0.9)println(keyv._2.getRuleString);list(j)=keyv._2
+        keyv => 
+//          if(keyv._1=="[att83=t, att32=t, att18=t, att217=high] [att13=t]")println(keyv._2.getRuleString)
+//          if(keyv._1=="[att83=t, att14=t, att18=t, att217=high] [att13=t]")println(keyv._2.getRuleString)
+//          if(keyv._1=="[att83=t, att14=t, att32=t, att217=high] [att13=t]")println(keyv._2.getRuleString)
+          println(keyv._2.getRuleString)
+          list(j)=keyv._2
         j+=1
        }
        

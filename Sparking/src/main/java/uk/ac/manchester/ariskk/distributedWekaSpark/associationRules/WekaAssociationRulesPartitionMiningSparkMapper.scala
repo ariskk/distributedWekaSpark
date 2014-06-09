@@ -29,7 +29,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
     var my_nom2=new ArrayList[String](2)
      my_nom2.add("low")
      my_nom2.add("high")
-    val att=new Attribute("att217",my_nom2)
+    val att=new Attribute("total",my_nom2)
     
 
 
@@ -53,7 +53,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 //    if(cla.isInstanceOf[Apriori]){asl=new Apriori;}
 //    else if(cla.isInstanceOf[FPGrowth]){asl=new FPGrowth}
        
-     var asl=new FPGrowth
+     var asl=new Apriori
      var heady=headers
      heady.replaceAttributeAt(att, 216)  ///WHY IS THAT?????
   
@@ -80,7 +80,8 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 //    println(instA.equalHeaders(inst))
     
     asl.setLowerBoundMinSupport(0.1)
-    asl.setNumRulesToFind(10)
+    
+    //asl.setNumRulesToFind(10)
     asl.buildAssociations(inst)
     
     

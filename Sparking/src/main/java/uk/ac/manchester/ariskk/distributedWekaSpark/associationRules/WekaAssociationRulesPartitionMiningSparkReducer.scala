@@ -16,8 +16,6 @@ class WekaAssociationRulesPartitionMiningSparkReducer extends java.io.Serializab
     var rulesMapA1=rulesMapA
     rulesMapB.foreach{
        rule=>{
-         
-       //  println(rule._1)
         if(rulesMapA1.contains(rule._1)){
         println("hooray")
         val modifiedRule=rulesMapA1(rule._1)

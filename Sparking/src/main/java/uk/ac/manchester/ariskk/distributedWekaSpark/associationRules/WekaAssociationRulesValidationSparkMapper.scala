@@ -66,12 +66,12 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
     for(x<-0 to ruleList.size()-1){
        if(hashy.contains(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())){
         println("hooray")
-        val modifiedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
-        modifiedRule.setConsequenceSupport(ruleList.get(x).getConsequenceSupport)
-        modifiedRule.setPremiseSupport(ruleList.get(x).getPremiseSupport)
-        modifiedRule.setSupportCount(ruleList.get(x).getTotalSupport())
-        modifiedRule.setTransactions(ruleList.get(x).getTotalTransactions())
-        hashy.update(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence(),modifiedRule)
+        val updatedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
+        updatedRule.setConsequenceSupport(ruleList.get(x).getConsequenceSupport)
+        updatedRule.setPremiseSupport(ruleList.get(x).getPremiseSupport)
+        updatedRule.setSupportCount(ruleList.get(x).getTotalSupport())
+        updatedRule.setTransactions(ruleList.get(x).getTotalTransactions())
+        hashy.update(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence(),updatedRule)
         
       }
      }

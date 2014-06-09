@@ -1,6 +1,7 @@
 package uk.ac.manchester.ariskk.distributedWekaSpark.main
 
 import weka.core.Utils
+import java.util.ArrayList
 
 /**Class that parses Strings containing task options++
  * 
@@ -10,6 +11,7 @@ class OptionsParser (options:String) {
   //String containing options of the format "-option-type optionValue"
   
   val split=Utils.splitOptions(options)
+  
   
   def getDep():Int={
    return  Utils.getOption("depth",split).toInt
@@ -40,7 +42,7 @@ class OptionsParser (options:String) {
   /**Number of partitions the RDD should have*/
   def getNumberOfPartitions():Int={
     val partitions=Utils.getOption("num-partitions",split)
-    if(partitions=="")return  2
+    if(partitions=="")return  4
     else return partitions.toInt
   }
   
@@ -78,6 +80,21 @@ class OptionsParser (options:String) {
   if (names=="") return null
   else return names.split(",")
   }
+  
+  //ODD must make a utils class with stuff like this
+  def getNamesFromString(str:String):ArrayList[String]={
+    val list=new ArrayList[String]
+    val nm=str.split(",")
+    for(i<-0 to nm.length-1){list.add(nm(i))}
+    return list
+  }
+  
+  def getNamesPath():String={
+    val namespath=Utils.getOption("names-path",split)
+    if (namespath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/namessupermarket"
+    else return namespath
+  }
+  
   
   def getClassifier():String={
     val classifier=Utils.getOption("classifier",split)
