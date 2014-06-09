@@ -119,8 +119,7 @@ object distributedWekaSpark {
       
       rules.foreach{
         keyv => println(keyv._2.getRuleString)
-        
-        
+          
       }
    }
    

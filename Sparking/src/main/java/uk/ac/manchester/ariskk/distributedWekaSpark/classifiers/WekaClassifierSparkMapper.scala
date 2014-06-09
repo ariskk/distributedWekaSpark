@@ -33,7 +33,7 @@ class WekaClassifierSparkMapper (classIndex:Int,metaLearner:String,classifierToT
     val obj=Class.forName(classifierToTrain).newInstance()
     val cla=obj.asInstanceOf[Classifier]
     
-  //Check if a custom MetaLearner is requested
+    //Check if a custom MetaLearner is requested
     if(metaLearner!="default"){
 	    val obj2=Class.forName(metaLearner).newInstance()
 	    val claMeta=obj2.asInstanceOf[SingleClassifierEnhancer]
