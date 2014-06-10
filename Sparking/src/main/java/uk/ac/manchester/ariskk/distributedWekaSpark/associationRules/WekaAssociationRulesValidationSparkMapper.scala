@@ -11,6 +11,8 @@ import weka.associations.FPGrowth
 import weka.core.Instances
 import weka.distributed.CSVToARFFHeaderReduceTask
 import java.util.List
+import weka.associations.DefaultAssociationRule
+import weka.associations.Apriori
 
 class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:String,rowparserOptions:Array[String]) extends java.io.Serializable{
     var ruleList:List[AssociationRule]=null
@@ -19,7 +21,7 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
     var my_nom2=new ArrayList[String](2)
      my_nom2.add("low")
      my_nom2.add("high")
-    val att=new Attribute("att217",my_nom2)
+     val att=new Attribute("total",my_nom2)
     
 
 
@@ -34,7 +36,7 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
      
 
        
-     var asl=new FPGrowth
+     var asl=new Apriori
      var heady=headers
      heady.replaceAttributeAt(att, 216)  ///WHY IS THAT?????
   
@@ -43,40 +45,51 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
      var inst=new Instances(strippedHeader,0)
      m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
      
-     //println(inst)
+   //  println(strippedHeader)
      
-  def map(rows:Array[String],hashy:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
+  def map(rows:Array[String],hashi:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
+     val hashy=hashi
      
      for (x <-rows){
        inst.add(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
       }
-    
-    
+      
+    asl.setMinMetric(0.9)
     asl.setLowerBoundMinSupport(0.1)
-    asl.setNumRulesToFind(10)
+    asl.setDelta(0.1)
+   // asl.setFindAllRulesForSupportLevel(true)
+    //asl.setFindAllRulesForSupportLevel(true)
     asl.buildAssociations(inst)
-
+    
     
     println(asl.getAssociationRules().getRules().size)
     ruleList=asl.getAssociationRules().getRules()
-
     
-
+    val hashyB=new HashMap[String,UpdatableRule]
+    var updatedRule:UpdatableRule=null
+     
     //val hash=new HashMap[String,UpdatableRule]
+    println(ruleList.size)
+    
     for(x<-0 to ruleList.size()-1){
+      
        if(hashy.contains(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())){
+         
         println("hooray")
-        val updatedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
+        
+        updatedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
         updatedRule.setConsequenceSupport(ruleList.get(x).getConsequenceSupport)
         updatedRule.setPremiseSupport(ruleList.get(x).getPremiseSupport)
         updatedRule.setSupportCount(ruleList.get(x).getTotalSupport())
         updatedRule.setTransactions(ruleList.get(x).getTotalTransactions())
         hashy.update(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence(),updatedRule)
-        
+        hashyB+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() ->updatedRule)
+      
       }
      }
 
-   // println(hash.isEmpty+" "+hash.keys.size)
+      
+      println(hashy.isEmpty+" "+hashy.keys.size)
     return hashy
   }
 

@@ -26,6 +26,10 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
      val candidateRules=dataset.glom.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,null).map(_))
                                     .reduce(new WekaAssociationRulesPartitionMiningSparkReducer().reduce(_,_))
     
+     
+       candidateRules.foreach{r=>println(r._2.getRuleString)}                             
+     //  exit(0)                             
+                                    //
      val finalRules=dataset.glom.map(new WekaAssociationRulesValidationSparkMapper(headers,null,null).map(_,candidateRules))
                                 .reduce(new WekaAssociationRulesPartitionMiningSparkReducer().reduce(_,_))
     

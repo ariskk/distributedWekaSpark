@@ -12,6 +12,7 @@ import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRu
 import scala.collection.mutable.HashMap
 import weka.core.converters.CSVLoader
 import weka.core.converters.ConverterUtils.DataSource;
+import scala.util.matching.Regex
 
 object testing {
 
@@ -30,51 +31,66 @@ object testing {
     hashi+=("add" -> 5)
     hashi+=("dad" -> 7)
     println(hashi("add")+" "+ hashi("dad"))
-    exit(0)
     
-    val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarketmod.arff"))
+    
+    val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarket.arff"))
    
     val inst=new Instances(source) 
     
     val asl=new FPGrowth
     asl.setLowerBoundMinSupport(0.1)
     asl.buildAssociations(inst)
-    val asl2=new FPGrowth
-    asl2.setLowerBoundMinSupport(0.1)
-    asl2.buildAssociations(inst)
+   // val asl2=new FPGrowth
+   // asl2.setLowerBoundMinSupport(0.1)
+   // asl2.buildAssociations(inst)
     val ruless=asl.getAssociationRules()
     val rules=ruless.getRules()
-    val ruless2=asl2.getAssociationRules()
-    val rules2=ruless2.getRules()
+    //val ruless2=asl2.getAssociationRules()
+   // val rules2=ruless2.getRules()
     
      println(asl)
-    
-  
-    val hashmap=new HashMap[String,UpdatableRule]
-    for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).getPremise()+" "+rules.get(x).getConsequence(),new UpdatableRule(rules.get(x)))}
-    
-    if(hashmap.contains(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())){
-      //support update
-    println(hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1)))
-    
-    val nrule=hashmap(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
-    hashmap.remove(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
-    nrule.setSupportCount(rules2.get(1).getTotalSupport()+nrule.getSupportCount)
-    nrule.addConsequenceSupport(rules2.get(1).getConsequenceSupport())
-    nrule.addPremiseSupport(rules2.get(1).getPremiseSupport())
-    nrule.addTransactions(rules2.get(1).getTotalTransactions())
-    hashmap.put(nrule.getRule,nrule)
-    println(hashmap(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence()).getSupportCount)
+     val rul=new UpdatableRule(rules.get(0))
+      println(rul.getPremiseString )
+      println(rul.getNumberOfItems)
+      
+     val listy=rules.get(0).getPremise().toArray
+     var str=""
+     listy.foreach{x => str+=(x.toString.trim.replace("'","").split("=")(0)+",")}
+     println(str)
+     for(x<-0 to 9){
+     asl.setRulesMustContain(str)
+     asl.setMaxNumberOfItems(5)
+     asl.buildAssociations(inst)
+     println(asl.getAssociationRules().getNumRules())}
+    exit(0)
     
     
-    }
-    val some=hashmap(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
-    println(some.getRuleString)
-    
-    
-    val ll=rules2.get(1).getMetricValuesForRule()
-    
-    val kk=rules2.get(1).getMetricNamesForRule()
+//     
+//    val hashmap=new HashMap[String,UpdatableRule]
+//    for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).getPremise()+" "+rules.get(x).getConsequence(),new UpdatableRule(rules.get(x)))}
+//    
+//    if(hashmap.contains(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())){
+//      //support update
+//    println(hashmap.get(rules2.get(1).getPremise()+" "+rules2.get(1)))
+//    
+//    val nrule=hashmap(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
+//    hashmap.remove(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
+//    nrule.setSupportCount(rules2.get(1).getTotalSupport()+nrule.getSupportCount)
+//    nrule.addConsequenceSupport(rules2.get(1).getConsequenceSupport())
+//    nrule.addPremiseSupport(rules2.get(1).getPremiseSupport())
+//    nrule.addTransactions(rules2.get(1).getTotalTransactions())
+//    hashmap.put(nrule.getRule,nrule)
+//    println(hashmap(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence()).getSupportCount)
+//    
+//    
+//    }
+//    val some=hashmap(rules2.get(1).getPremise()+" "+rules2.get(1).getConsequence())
+//    println(some.getRuleString)
+//    
+//    
+//    val ll=rules2.get(1).getMetricValuesForRule()
+//    
+//    val kk=rules2.get(1).getMetricNamesForRule()
    // for(x <-0 to ll.length-1){println(kk(x)+" "+ll(x))}
     println(rules.get(0).toString)
    // println(rules.get(0))

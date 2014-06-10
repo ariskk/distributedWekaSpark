@@ -18,13 +18,13 @@ class WekaAssociationRulesPartitionMiningSparkReducer extends java.io.Serializab
        rule=>{
         if(rulesMapA1.contains(rule._1)){
         println("hooray")
-        val modifiedRule=rulesMapA1(rule._1)
+        var modifiedRule=rulesMapA1(rule._1)
         modifiedRule.addConsequenceSupport(rule._2.getConsequenceSupport)
         modifiedRule.addPremiseSupport(rule._2.getPremiseSupport)
         modifiedRule.addSupportCount(rule._2.getSupportCount)
         modifiedRule.addTransactions(rule._2.getTransactions)
         rulesMapA1.update(rule._1,modifiedRule)
-        
+        modifiedRule=null
       }
       else{
         rulesMapA1+=(rule._1 -> rule._2)

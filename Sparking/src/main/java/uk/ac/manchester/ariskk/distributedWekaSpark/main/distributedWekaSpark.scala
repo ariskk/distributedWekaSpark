@@ -41,6 +41,7 @@ import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.WekaAssocia
 import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
 import java.util.Collections
 import java.util.Comparator
+import scala.util.Sorting
 
 
 
@@ -103,7 +104,7 @@ object distributedWekaSpark {
         
         // System.exit(0)
        //randomize if necessary 
-      //if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
+      // if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
        
      //build foldbased
 //      val foldjob=new WekaClassifierFoldBasedSparkJob
@@ -122,11 +123,11 @@ object distributedWekaSpark {
 //      println(classifier2.toString())
 //      evaluationJob.displayEval(eval2)
     
-      val broad=sc.broadcast(headers)
+      //val broad=sc.broadcast(headers)
       
       val rulejob=new WekaAssociationRulesSparkJob
       val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
-      val list=new Array[UpdatableRule](rules.keys.size)
+      val array=new Array[UpdatableRule](rules.keys.size)
       var j=0
       rules.foreach{
         
@@ -134,11 +135,12 @@ object distributedWekaSpark {
 //          if(keyv._1=="[att83=t, att32=t, att18=t, att217=high] [att13=t]")println(keyv._2.getRuleString)
 //          if(keyv._1=="[att83=t, att14=t, att18=t, att217=high] [att13=t]")println(keyv._2.getRuleString)
 //          if(keyv._1=="[att83=t, att14=t, att32=t, att217=high] [att13=t]")println(keyv._2.getRuleString)
-          println(keyv._2.getRuleString)
-          list(j)=keyv._2
+       //   if(keyv._2.getSupportCount>100) {//println(keyv._2.getRuleString)}
+          array(j)=keyv._2
         j+=1
        }
-       
+       Sorting.quickSort(array)
+       array.foreach{x => println(x.getRuleString)}
    }
    
      

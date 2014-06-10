@@ -22,7 +22,12 @@ import java.io.FileReader
 import weka.distributed.DistributedWekaException
 import org.apache.spark.SparkContext
 
+/**Mapper implementation for the partition mining phase of the Association Rules Mining job
+ * 
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ */
 class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner:String,rowparserOptions:Array[String]) extends java.io.Serializable{
+    
     var ruleList:List[AssociationRule]=null
 
     
@@ -73,15 +78,14 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 
 
 //    println(asl.getOptions().mkString(" "))
-//    val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarketmod.arff"))
-//   
+//    val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarketmod.arff"))   
 //    val instA=new Instances(source) 
 //    println(instA.equalHeadersMsg(inst))
 //    println(instA.equalHeaders(inst))
     
     asl.setLowerBoundMinSupport(0.1)
-    
-    //asl.setNumRulesToFind(10)
+ //   asl.setDelta(0.)
+   // asl.setNumRulesToFind(10)
     asl.buildAssociations(inst)
     
     
@@ -96,7 +100,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
     ruleList=asl.getAssociationRules().getRules()
    // println(ruleList.get(0))
    // println(ruleList.get(0).getPremise()+" "+ruleList.get(0).getConsequence())
-     
+     //ruleList.get(0).getConsequence().
 
     val hash=new HashMap[String,UpdatableRule]
     for(x<-0 to ruleList.size()-1){
