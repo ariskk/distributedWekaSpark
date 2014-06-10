@@ -8,17 +8,28 @@ import java.util.ArrayList
 import weka.classifiers.Classifier
 import weka.classifiers.evaluation.Evaluation
 import weka.distributed.WekaClassifierEvaluationReduceTask
-
+/**Mapper taks for fold-based evaluation
+ * 
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ */
 class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:Classifier,folds:Int,classIndex:Int) extends java.io.Serializable {
 
-   //ToDo: isupdatable, forced trained
-   var m_combiner=new WekaClassifierEvaluationReduceTask ////is this correct?
+   //ToDo: isupdatable, forced trained, documentation ++
+  
+   
+   var m_combiner=new WekaClassifierEvaluationReduceTask ////is this?
+   
+   //Initialize a container for the WekaBase tasks
    var m_tasks=new ArrayList[WekaClassifierEvaluationMapTask]
+   
+   //Initialize a csv row parser and remove statistics from the headers and set the class attribute
    var m_rowparser=new CSVToARFFHeaderMapTask()
    var strippedHeaders=CSVToARFFHeaderReduceTask.stripSummaryAtts(headers)
    strippedHeaders.setClassIndex(classIndex) //ToDo:must be provided in the constructor
    m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeaders))
    val classAtt=strippedHeaders.classAttribute()
+   
+   //Initialize one WekaBase Map task for each fold
    val seed=1L
    val classAttSummaryName = CSVToARFFHeaderMapTask.ARFF_SUMMARY_ATTRIBUTE_PREFIX + classAtt.name()
    val summaryClassAtt=headers.attribute(classAttSummaryName)
@@ -27,10 +38,16 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
    m_tasks.get(i).setClassifier(classifier)
    m_tasks.get(i).setFoldNumber(i+1)
    m_tasks.get(i).setTotalNumFolds(folds)
-   m_tasks.get(i).setup(strippedHeaders, computePriors(), computePriorsCount(), seed, 0) //last is predFrac and is used to compute AUC/AuPRC ??
-   //setbatch trained incremental ??
+   //Compute priors for the evaluation tasks
+   m_tasks.get(i).setup(strippedHeaders, computePriors(), computePriorsCount(), seed, 0) //last is predFrac and is used to compute AUC/AuPRC ?? setbatch trained incremental ??
    }
   
+   
+  /**Fold-based Evaluation Mapper
+   * 
+   * @param rows represent the dataset partition
+   * @return Evaluation is the fold-based evaluation model computed per partition
+   */
   def map(rows:Array[String]): Evaluation={
    val evals=new ArrayList[Evaluation]
    for(i<-0 to rows.length-1){
@@ -48,8 +65,11 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
   }
    
   
-  
-    def computePriors (): Array[Double]={ 
+  /**Compute the attribute Priors for nominal and non nominal values
+   * 
+   * @return an array of Doubles (one per attribute)
+   */
+  def computePriors (): Array[Double]={ 
       if(classAtt.isNominal()){
         val priorsNom=new Array[Double](classAtt.numValues())
          for (i <- 0  to classAtt.numValues()-1) {
@@ -64,10 +84,13 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
          return priorsNonNom
       }
     
-    }
+  }
     
-    
-    def computePriorsCount():Double={
+  /**Computes prior counts (number of differet values)
+   * 
+   * @return a prior count
+   */
+  def computePriorsCount():Double={
       if(classAtt.isNominal()){return classAtt.numValues()}
       else{ return CSVToARFFHeaderMapTask.ArffSummaryNumericMetric.COUNT.valueFromAttribute(summaryClassAtt)}
       }
