@@ -55,11 +55,11 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
        inst.add(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
       }
     //asl.setNumRulesToFind(hashi.keys.size) 
-    asl.setMinMetric(0.90)
+    asl.setMinMetric(0.9)
     asl.setLowerBoundMinSupport(0.1)
    // asl.setDelta(0.1)
  
-   // asl.setFindAllRulesForSupportLevel(true)
+    asl.setFindAllRulesForSupportLevel(true)
     asl.buildAssociations(inst)
     
     
@@ -69,7 +69,7 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
     val hashyB=new HashMap[String,UpdatableRule]
     var updatedRule:UpdatableRule=null
     
-    // println(ruleList.size);exit(0)
+   // println(ruleList.size);exit(0)
     //val hash=new HashMap[String,UpdatableRule]
 //    for(i<- 0 to ruleList.size()-1){
 //      
@@ -81,7 +81,7 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
       
        if(hashy.contains(ruleList.get(x).getPremise().toString+" "+ruleList.get(x).getConsequence().toString)){
          
-       // println("hooray")
+         println("hooray")
         
         updatedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
         updatedRule.setConsequenceSupport(ruleList.get(x).getConsequenceSupport)

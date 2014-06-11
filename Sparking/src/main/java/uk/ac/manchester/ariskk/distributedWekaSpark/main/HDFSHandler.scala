@@ -2,19 +2,18 @@ package uk.ac.manchester.ariskk.distributedWekaSpark.main
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import org.apache.hadoop.io.Text
 import org.apache.hadoop.io.DataOutputBuffer
 import org.apache.hadoop.fs.FileSystem._
 import org.apache.hadoop.fs.FileSystem
-import java.io.BufferedInputStream
-import java.io.ByteArrayInputStream
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.IOUtils
 import java.io.BufferedOutputStream
 import java.io.ByteArrayOutputStream
-import org.glassfish.grizzly.streams.BufferedOutput
 import java.io.DataInput
 import org.apache.hadoop.io.DataInputBuffer
+import java.net.URI
+import java.io.IOException
+
 
 
 class HDFSHandler (sc:SparkContext) {
@@ -28,24 +27,29 @@ class HDFSHandler (sc:SparkContext) {
    return sc.textFile(path, splits)
  }
   
-  //not: permissions issues?
+  //working
   def saveToHDFS(objectToSave:Object,path:String,key:String):Boolean={
-    val fs=FileSystem.get(sc.hadoopConfiguration)
-    val toWrite=objectToSave.toString
-  //  val in=new BufferedInputStream(new ByteArrayInputStream(toWrite.getBytes()))
-    val in=new DataInputBuffer
-    in.read(toWrite.getBytes())
-    val tohdfs=new Path(path)
-    //val out=fs.append(tohdfs)
-    val out2=new DataOutputBuffer
-    out2.write(in,in.getLength())
-    sc.hadoopConfiguration.write(out2)
-    IOUtils.copyBytes(in,out2,sc.hadoopConfiguration)
+    try{
+    val URI=new URI(path)
+    val fs=FileSystem.get(URI,sc.hadoopConfiguration)
+    val testpath=new Path(path+"file123.csv")
+    val stream=fs.create(testpath)
+    stream.write(objectToSave.toString.getBytes())
+    stream.flush()}
+    catch {
+      case ioe:IOException => println("failed! due to IOException")
+      case e:Exception => println("random exception")
+      case _ : Throwable=>  println("a random throwable")
+      return false
+    }
+    
+
     return true
   }
   
-  //working
+  /**Method to save an RDD to HDFS*/
   def saveRDDToHDFS(rdd:RDD[String],path:String):Boolean={
+    //To-Do: try-catch
     rdd.saveAsTextFile(path)
     return true
   }

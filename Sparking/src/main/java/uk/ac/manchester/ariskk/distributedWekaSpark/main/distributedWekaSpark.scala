@@ -62,8 +62,13 @@ object distributedWekaSpark {
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
       
-     
+      val teststring="asdasdadkjsljflksdjflk;sjfslkafjslkfjskljfal;fjskljflkjfslka;jfasfjkldsjfkjoiucjndhjf"
+        
+      hdfshandler.saveToHDFS(teststring, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)
       
+    //  exit(0)
+     
+     
       
       
      
@@ -96,12 +101,13 @@ object distributedWekaSpark {
        val namesfromfile=hdfshandler.loadFromHDFS(namesPath,1)
        println(namesfromfile.collect.mkString(""))
        
+ 
        names=optionsHandler.getNamesFromString(namesfromfile.collect.mkString(""))
        //headers
         val headerjob=new CSVToArffHeaderSparkJob
         val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
       // hdfshandler.saveToHDFS(headers, "user/weka/testhdfs.txt", "testtext")
-        
+         hdfshandler.saveToHDFS(headers, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null);exit(0)
         // System.exit(0)
        //randomize if necessary 
       // if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
@@ -141,7 +147,18 @@ object distributedWekaSpark {
         j+=1
        }
        Sorting.quickSort(array)
-       array.take(10).foreach{x => if(x.getTransactions>4000){println(x.getRuleString)}}
+       val fullsupport=new Array[String](array.length)
+       val lesssupport=new Array[String](array.length)
+       var i=0;var o=0;
+       array.foreach{x =>
+         x.getTransactions match{
+           case  n if n>2500 => fullsupport(i)=x.getRuleString;i+=1
+           case _ =>   lesssupport(o)=x.getRuleString;o+=1
+         }}
+        println("\n Full Support \n")
+        fullsupport.foreach{x => if(x!=null)println(x)} 
+        println("\n Less support \n")
+        lesssupport.foreach{x => if(x!=null)println(x)}
    }
    
      

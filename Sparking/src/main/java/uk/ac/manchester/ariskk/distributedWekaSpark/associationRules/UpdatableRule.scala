@@ -45,16 +45,16 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   def addTransactions(tr:Int):Unit=transactions+=tr
   
   //semantic checking
-  def getRuleSupport:Double=return round(support.toDouble/transactions.toDouble)
+  def getRuleSupport:Double=if(transactions>0)return round(support.toDouble/transactions.toDouble) else return 0
   
   
-  def getCondidence:Double=return round(support.toDouble/premise.toDouble)
+  def getCondidence:Double=if(premise>0)return round(support.toDouble/premise.toDouble) else return 0
 
 
-  def getLift:Double=return round((support.toDouble*transactions.toDouble)/(premise.toDouble*consequence.toDouble))
+  def getLift:Double=if(premise*consequence>0)return round((support.toDouble*transactions.toDouble)/(premise.toDouble*consequence.toDouble)) else return 0
 
   
-  def getLeverage:Double=return round(support.toDouble/transactions.toDouble-(consequence.toDouble/transactions.toDouble)*(premise.toDouble/transactions.toDouble))
+  def getLeverage:Double=if(transactions>0)return round(support.toDouble/transactions.toDouble-(consequence.toDouble/transactions.toDouble)*(premise.toDouble/transactions.toDouble)) else return 0
 
   
   def getConviction:Double={
