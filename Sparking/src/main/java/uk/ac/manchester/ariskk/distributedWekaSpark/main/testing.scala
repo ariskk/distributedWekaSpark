@@ -50,19 +50,19 @@ object testing {
     
      println(asl)
      val rul=new UpdatableRule(rules.get(0))
-      println(rul.getPremiseString )
-      println(rul.getNumberOfItems)
+//      println(rul.getPremiseString )
+//      println(rul.getNumberOfItems)
       
-     val listy=rules.get(0).getPremise().toArray
-     var str=""
-     listy.foreach{x => str+=(x.toString.trim.replace("'","").split("=")(0)+",")}
-     println(str)
-     for(x<-0 to 9){
-     asl.setRulesMustContain(str)
-     asl.setMaxNumberOfItems(5)
-     asl.buildAssociations(inst)
-     println(asl.getAssociationRules().getNumRules())}
-    exit(0)
+      println(rules.get(0))
+      println(rules.get(0).getConsequenceSupport()+" "+rules.get(0).getPremiseSupport()+" "+rules.get(0).getTotalSupport()+" "+rules.get(0).getTotalTransactions())
+      println(rul.getConsequenceSupport+" "+rul.getPremiseSupport+" "+rul.getSupportCount+" "+rul.getTransactions)
+      rul.addConsequenceSupport(rules.get(0).getConsequenceSupport())
+      rul.addPremiseSupport(rules.get(0).getPremiseSupport())
+      rul.addTransactions(10)
+      rul.addSupportCount(10)
+      println(rul.getConsequenceSupport+" "+rul.getPremiseSupport+" "+rul.getSupportCount+" "+rul.getTransactions)
+      exit(0)
+
     
     
 //     

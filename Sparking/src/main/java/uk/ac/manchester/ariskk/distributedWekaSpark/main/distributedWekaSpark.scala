@@ -127,6 +127,7 @@ object distributedWekaSpark {
       
       val rulejob=new WekaAssociationRulesSparkJob
       val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
+      
       val array=new Array[UpdatableRule](rules.keys.size)
       var j=0
       rules.foreach{
@@ -140,7 +141,7 @@ object distributedWekaSpark {
         j+=1
        }
        Sorting.quickSort(array)
-       array.foreach{x => println(x.getRuleString)}
+       array.take(10).foreach{x => if(x.getTransactions>4000){println(x.getRuleString)}}
    }
    
      

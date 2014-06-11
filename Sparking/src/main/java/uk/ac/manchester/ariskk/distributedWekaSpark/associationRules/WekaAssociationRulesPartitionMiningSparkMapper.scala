@@ -58,7 +58,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 //    if(cla.isInstanceOf[Apriori]){asl=new Apriori;}
 //    else if(cla.isInstanceOf[FPGrowth]){asl=new FPGrowth}
        
-     var asl=new Apriori
+     var asl=new FPGrowth
      var heady=headers
      heady.replaceAttributeAt(att, 216)  ///WHY IS THAT?????
   
@@ -82,10 +82,11 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 //    val instA=new Instances(source) 
 //    println(instA.equalHeadersMsg(inst))
 //    println(instA.equalHeaders(inst))
-    
+    asl.setMinMetric(0.90)
     asl.setLowerBoundMinSupport(0.1)
+   // asl.setFindAllRulesForSupportLevel(true)
  //   asl.setDelta(0.)
-   // asl.setNumRulesToFind(10)
+    asl.setNumRulesToFind(10)
     asl.buildAssociations(inst)
     
     
@@ -98,13 +99,14 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
     
     println(asl.getAssociationRules().getRules().size)
     ruleList=asl.getAssociationRules().getRules()
-   // println(ruleList.get(0))
-   // println(ruleList.get(0).getPremise()+" "+ruleList.get(0).getConsequence())
-     //ruleList.get(0).getConsequence().
+
 
     val hash=new HashMap[String,UpdatableRule]
     for(x<-0 to ruleList.size()-1){
-      hash+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() -> new UpdatableRule(ruleList.get(x)))
+      //
+      val newRule=new UpdatableRule(ruleList.get(x))
+      newRule.setConsequenceSupport(0);newRule.setPremiseSupport(0);newRule.setSupportCount(0);newRule.setTransactions(0)
+      hash+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() -> newRule)
      }
 
    // println(hash.isEmpty+" "+hash.keys.size)
