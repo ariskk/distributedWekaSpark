@@ -42,6 +42,7 @@ import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRu
 import java.util.Collections
 import java.util.Comparator
 import scala.util.Sorting
+import weka.core.Instances
 
 
 
@@ -64,7 +65,7 @@ object distributedWekaSpark {
       
       val teststring="asdasdadkjsljflksdjflk;sjfslkafjslkfjskljfal;fjskljflkjfslka;jfasfjkldsjfkjoiucjndhjf"
         
-      hdfshandler.saveToHDFS(teststring, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)
+      hdfshandler.saveObjectToHDFS(teststring, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)
       
     //  exit(0)
      
@@ -95,10 +96,10 @@ object distributedWekaSpark {
      // System.exit(0)
       
       //Load Dataset and cache. ToDo: global caching strategy   -data.persist(StorageLevel.MEMORY_AND_DISK)
-       var dataset=hdfshandler.loadFromHDFS(hdfsPath, numberOfPartitions)
+       var dataset=hdfshandler.loadRDDFromHDFS(hdfsPath, numberOfPartitions)
        dataset.cache()
        //glom? here on not?
-       val namesfromfile=hdfshandler.loadFromHDFS(namesPath,1)
+       val namesfromfile=hdfshandler.loadRDDFromHDFS(namesPath,1)
        println(namesfromfile.collect.mkString(""))
        
  
@@ -107,7 +108,10 @@ object distributedWekaSpark {
         val headerjob=new CSVToArffHeaderSparkJob
         val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
       // hdfshandler.saveToHDFS(headers, "user/weka/testhdfs.txt", "testtext")
-         hdfshandler.saveToHDFS(headers, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null);exit(0)
+         hdfshandler.saveObjectToHDFS(headers, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)
+         val h=hdfshandler.loadObjectFromHDFS("hdfs://sandbox.hortonworks.com:8020/user/weka/")
+        // val h2=new Instances(h)
+         exit(0)
         // System.exit(0)
        //randomize if necessary 
       // if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
