@@ -32,7 +32,7 @@ class HDFSHandler (sc:SparkContext) {
     val br=new BufferedReader(new InputStreamReader(inStream))
     println("so far so good")
     val inst=new Instances(br)
-    //val cl=new Classifier()
+    //val cl=new Classifier()+++++++++++++
     println(inst.numAttributes())
     println(inst)
     var line=""

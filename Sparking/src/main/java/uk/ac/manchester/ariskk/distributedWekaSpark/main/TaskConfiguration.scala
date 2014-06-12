@@ -11,6 +11,8 @@ import weka.clusterers.Clusterer
 import uk.ac.manchester.ariskk.distributedWekaSpark.clusterers.WekaClustererSparkJob
 import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.WekaAssociationRulesSparkJob
 import weka.associations.AssociationRules
+import scala.collection.mutable.HashMap
+import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
 
 
 /**Task Configuration and submission class
@@ -35,51 +37,52 @@ class TaskConfiguration (task:String,options:OptionsParser){
        
     def buildHeaders():Instances={
       val headerjob=new CSVToArffHeaderSparkJob
-     // headerjob.buildHeaders(options, names, numOfAttributes, data)
-      return null
+      val headers=headerjob.buildHeaders(null, null, options.getNumberOfAttributes, null)
+      return headers
     }
     
     def buildClassifier():Classifier={
       val headers=buildHeaders
       val classifierjob=new WekaClassifierSparkJob
-      //classifierjob.buildClassifier(metaLearner, classifierToTrain, classIndex, headers, dataset, parserOptions, classifierOptions)
-      return null
+      val classifier=classifierjob.buildClassifier(null, null, 0, headers, null, null, null)
+      return classifier
     }
     
     def buildClassifierEvaluation():Evaluation={
       val headers=buildHeaders
-      val classfier=buildClassifier
+      val classifier=buildClassifier
       val evaluationJob=new WekaClassifierEvaluationSparkJob
-      
-      return null
+      val evaluation=evaluationJob.evaluateClassifier(classifier, headers, null, 0)
+      return evaluation
     }
     
     def buildFoldBasedClassifier():Classifier={
       val headers=buildHeaders
-      val foldjob=new WekaClassifierFoldBasedSparkJob
-      
-      return null
+      val foldJob=new WekaClassifierFoldBasedSparkJob
+      val classifier=foldJob.buildFoldBasedModel(null, null, 0, null, null, 0)
+      return classifier
     }
     
     def buildFoldBasedClassifierEvaluation():Evaluation={
       val headers=buildHeaders
       val classifier=buildFoldBasedClassifier
-      val evalfoldjob=new WekaClassifierEvaluationSparkJob
-      
+      val evalFoldJob=new WekaClassifierEvaluationSparkJob
+      val evaluation=evalFoldJob.evaluateClassifier(classifier, headers, null, 0)
       return null
     }
     
     def buildClusterer():Clusterer={
       val headers=buildHeaders //??
-      val clustereJob=new WekaClustererSparkJob
-      return null
+      val clustererJob=new WekaClustererSparkJob
+      val clusterer=clustererJob.buildClusterer(headers, null, null, null)
+      return clusterer
     }
     
-    def findAssociationRules():AssociationRules={
+    def findAssociationRules():HashMap[String,UpdatableRule]={
       val headers=buildHeaders
       val associationRulesJob=new WekaAssociationRulesSparkJob
-      
-      return null
+      val rules=associationRulesJob.findAssociationRules(headers, null, 0, 0, 0)
+      return rules
     }
     
   

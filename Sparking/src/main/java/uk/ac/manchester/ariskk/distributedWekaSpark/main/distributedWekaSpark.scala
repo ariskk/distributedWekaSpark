@@ -63,6 +63,13 @@ object distributedWekaSpark {
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
       
+      val task=new TaskConfiguration(optionsHandler.getTask,optionsHandler)
+      
+     
+     
+     
+     
+     
       val teststring="asdasdadkjsljflksdjflk;sjfslkafjslkfjskljfal;fjskljflkjfslka;jfasfjkldsjfkjoiucjndhjf"
         
       hdfshandler.saveObjectToHDFS(teststring, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)

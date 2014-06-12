@@ -2,6 +2,7 @@ package uk.ac.manchester.ariskk.distributedWekaSpark.main
 
 import weka.core.Utils
 import java.util.ArrayList
+import weka.distributed.DistributedWekaException
 
 /**Class that parses Strings containing task options++
  * 
@@ -11,6 +12,12 @@ class OptionsParser (options:String) {
   //String containing options of the format "-option-type optionValue"
   
   val split=Utils.splitOptions(options)
+  
+  def getTask():String={
+    val task=Utils.getOption("task",split)
+    if(task=="") throw new DistributedWekaException("Unrecognised Task Identifier!")
+    return task
+  }
   
   
   def getDep():Int={
