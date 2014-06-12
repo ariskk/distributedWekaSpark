@@ -13,6 +13,7 @@ import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.WekaAssocia
 import weka.associations.AssociationRules
 import scala.collection.mutable.HashMap
 import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
+import weka.distributed.DistributedWekaException
 
 
 /**Task Configuration and submission class
@@ -32,7 +33,7 @@ class TaskConfiguration (task:String,options:OptionsParser){
        case "buildFoldBasedClassifierEvaluation"=> buildFoldBasedClassifierEvaluation
        case "buildClusterer"=> buildClusterer
        case "findAssociationRules"=> findAssociationRules
-       case ""=>    
+       case _ => throw new DistributedWekaException("Unknown Task Identifier!")  
      }
        
     def buildHeaders():Instances={

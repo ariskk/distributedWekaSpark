@@ -17,6 +17,10 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import weka.core.Instances
 import weka.classifiers.Classifier
+import java.io.ObjectOutputStream
+import java.io.FileOutputStream
+import weka.core.SerializationHelper
+import java.io.ObjectInputStream
 
 
 
@@ -30,23 +34,8 @@ class HDFSHandler (sc:SparkContext) {
     val fs=FileSystem.get(URI,sc.hadoopConfiguration)
     val inStream=fs.open(new Path(path+"file123.csv"))
     val br=new BufferedReader(new InputStreamReader(inStream))
-    println("so far so good")
-    val inst=new Instances(br)
-    //val cl=new Classifier()+++++++++++++
-    println(inst.numAttributes())
-    println(inst)
-    var line=""
-    var next=""
-      while(next!=null){
-        
-        line+=next+"\n"
-     //   println(br.readLine)
-        next=br.readLine
-      }
-       println(line)
-       println("dadsdsff")
-   // val obj=inStream.
-    return line
+    val ois = new ObjectInputStream(inStream)
+    return ois.readObject()
   }
   //working
   def loadRDDFromHDFS(path:String, splits:Int):RDD[String]={
@@ -60,9 +49,12 @@ class HDFSHandler (sc:SparkContext) {
       val fs=FileSystem.get(URI,sc.hadoopConfiguration)
       val testpath=new Path(path+"file123.csv")
       val stream=fs.create(testpath)
-      stream.write(objectToSave.toString.getBytes())
-      stream.close()
-      stream.flush()}
+      val serializer=SerializationHelper.write(stream, objectToSave)
+      
+      //stream.write(objectToSave.toString.getBytes())
+     // stream.close()
+     // stream.flush()
+      }
     catch {
       case ioe:IOException => println("failed! due to IOException")
       case e:Exception => println("random exception")

@@ -1,10 +1,11 @@
 package uk.ac.manchester.ariskk.distributedWekaSpark.main
 
-import weka.core.Utils
+
 import java.util.ArrayList
 import weka.distributed.DistributedWekaException
+import weka.core.Utils
 
-/**Class that parses Strings containing task options++
+/**Class that parses the String of user-provided options and has methods to return ind
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
@@ -89,12 +90,7 @@ class OptionsParser (options:String) {
   }
   
   //ODD must make a utils class with stuff like this
-  def getNamesFromString(str:String):ArrayList[String]={
-    val list=new ArrayList[String]
-    val nm=str.split(",")
-    for(i<-0 to nm.length-1){list.add(nm(i))}
-    return list
-  }
+
   
   def getNamesPath():String={
     val namespath=Utils.getOption("names-path",split)

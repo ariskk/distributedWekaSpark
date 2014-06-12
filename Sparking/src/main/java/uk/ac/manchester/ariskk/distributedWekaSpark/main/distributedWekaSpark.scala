@@ -62,8 +62,8 @@ object distributedWekaSpark {
       val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(optionsHandler.getMaster).set("spark.executor.memory","1g")
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
-      
-      val task=new TaskConfiguration(optionsHandler.getTask,optionsHandler)
+      val utils=new wekaSparkUtils
+      //val task=new TaskConfiguration(optionsHandler.getTask,optionsHandler)
       
      
      
@@ -110,7 +110,7 @@ object distributedWekaSpark {
        println(namesfromfile.collect.mkString(""))
        
  
-       names=optionsHandler.getNamesFromString(namesfromfile.collect.mkString(""))
+       names=utils.getNamesFromString(namesfromfile.collect.mkString(""))
        //headers
         val headerjob=new CSVToArffHeaderSparkJob
         val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
@@ -118,7 +118,7 @@ object distributedWekaSpark {
          hdfshandler.saveObjectToHDFS(headers, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)
          val h=hdfshandler.loadObjectFromHDFS("hdfs://sandbox.hortonworks.com:8020/user/weka/")
         // val h2=new Instances(h)
-         exit(0)
+       //  exit(0)
         // System.exit(0)
        //randomize if necessary 
       // if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
