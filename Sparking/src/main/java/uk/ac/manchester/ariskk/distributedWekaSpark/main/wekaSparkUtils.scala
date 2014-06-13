@@ -13,6 +13,7 @@ import weka.clusterers.Clusterer
 class wekaSparkUtils {
 
   
+  
   def getNamesFromString(str:String):ArrayList[String]={
     val list=new ArrayList[String]
     val nm=str.split(",")
