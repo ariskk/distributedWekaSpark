@@ -43,6 +43,8 @@ import java.util.Collections
 import java.util.Comparator
 import scala.util.Sorting
 import weka.core.Instances
+import weka.distributed.CSVToARFFHeaderMapTask
+import weka.classifiers.trees.J48
 
 
 
@@ -91,7 +93,8 @@ object distributedWekaSpark {
       val randomChunks=optionsHandler.getNumberOfRandomChunks
       var names=new ArrayList[String]
       val folds=optionsHandler.getNumFolds
-      val headerJobOptions=Utils.splitOptions("-N first-last")
+      val headerJobOptions=null
+       // Utils.splitOptions("-N first-last")
       val namesPath=optionsHandler.getNamesPath
       
       
@@ -108,18 +111,29 @@ object distributedWekaSpark {
        //glom? here on not?
        val namesfromfile=hdfshandler.loadRDDFromHDFS(namesPath,1)
        println(namesfromfile.collect.mkString(""))
-       
- 
+   
+       val names1=new ArrayList[String];//for (i <- 0 to 9){names.add("at"+i)}   
        names=utils.getNamesFromString(namesfromfile.collect.mkString(""))
+      // val names1=utils.getNamesFromString(optionsHandler.getNames.mkString(""))
        //headers
         val headerjob=new CSVToArffHeaderSparkJob
-        val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
+        val headers=headerjob.buildHeaders(headerJobOptions,names1,numberOfAttributes,dataset)
+        println(headers)
+        
+            
+       var m_rowparser=new CSVToARFFHeaderMapTask()
+       var dat=dataset.glom.map(new WekaInstancesRDDBuilder().mappy(_,headers))
+       var classifier=dat.map(x=> new TestClassifierMapper().map(x)).collect
+       classifier.foreach{x => println(x)}
+     
+     exit(0)
       // hdfshandler.saveToHDFS(headers, "user/weka/testhdfs.txt", "testtext")
-         hdfshandler.saveObjectToHDFS(headers, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)
-         val h=hdfshandler.loadObjectFromHDFS("hdfs://sandbox.hortonworks.com:8020/user/weka/")
+       
+        // hdfshandler.saveObjectToHDFS(headers, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)
+      //   val h=hdfshandler.loadObjectFromHDFS("hdfs://sandbox.hortonworks.com:8020/user/weka/")
         // val h2=new Instances(h)
-       //  exit(0)
-        // System.exit(0)
+
+         
        //randomize if necessary 
       // if(randomChunks>0){dataset=new WekaRandomizedChunksSparkJob().randomize(dataset, randomChunks, headers, classAtt)}
        
@@ -130,10 +144,11 @@ object distributedWekaSpark {
 //      val evalfoldjob=new WekaClassifierEvaluationSparkJob
 //      val eval=evalfoldjob.evaluateFoldBasedClassifier(folds, classifier, headers, dataset,classAtt)
 //      evalfoldjob.displayEval(eval)
-//      
+  
 //      //build a classifier+ evaluate
-//      val classifierjob=new WekaClassifierSparkJob
-//      val classifier2=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset,null,optionsHandler.getWekaOptions) 
+      val classifierjob=new WekaClassifierSparkJob
+      val classifier2=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset,null,optionsHandler.getWekaOptions) 
+      println(classifier2)
 //      val evaluationJob=new WekaClassifierEvaluationSparkJob
 //      val eval2=evaluationJob.evaluateClassifier(classifier2, headers, dataset,classAtt)
 //
@@ -142,18 +157,17 @@ object distributedWekaSpark {
     
       //val broad=sc.broadcast(headers)
       
+      exit(0)
+      
+      
       val rulejob=new WekaAssociationRulesSparkJob
       val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
       
       val array=new Array[UpdatableRule](rules.keys.size)
       var j=0
-      rules.foreach{
-        
+      rules.foreach{ 
         keyv => 
-//          if(keyv._1=="[att83=t, att32=t, att18=t, att217=high] [att13=t]")println(keyv._2.getRuleString)
-//          if(keyv._1=="[att83=t, att14=t, att18=t, att217=high] [att13=t]")println(keyv._2.getRuleString)
-//          if(keyv._1=="[att83=t, att14=t, att32=t, att217=high] [att13=t]")println(keyv._2.getRuleString)
-       //   if(keyv._2.getSupportCount>100) {//println(keyv._2.getRuleString)}
+
           array(j)=keyv._2
         j+=1
        }

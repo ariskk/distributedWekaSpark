@@ -10,17 +10,18 @@ import weka.core.Utils
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
 class OptionsParser (options:String) {
-  //String containing options of the format "-option-type optionValue"
   
-  val split=Utils.splitOptions(options)
+  //String containing user provided options of the format "-option-type optionValue"
+   val split=Utils.splitOptions(options)
   
+  /**Get a string that describes the user requested task.eg: classification,clustering etc ++*/
   def getTask():String={
     val task=Utils.getOption("task",split)
     if(task=="") throw new DistributedWekaException("Unrecognised Task Identifier!")
     return task
   }
   
-  
+  //will be removed
   def getDep():Int={
    return  Utils.getOption("depth",split).toInt
   }
@@ -43,7 +44,7 @@ class OptionsParser (options:String) {
   /**HDFS path to the dataset*/
   def getHdfsPath():String={
     val hdfsPath=Utils.getOption("hdfs-path",split)
-    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/breast.csv"
+    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv"
     else return hdfsPath
   }
   
@@ -64,7 +65,7 @@ class OptionsParser (options:String) {
   /**Number of Attributes in the dataset*/
   def getNumberOfAttributes():Int={
     val atts=Utils.getOption("num-ofatts",split)
-    if(atts=="") return 10
+    if(atts=="") return 12
     else return atts.toInt
   }
   
@@ -89,21 +90,26 @@ class OptionsParser (options:String) {
   else return names.split(",")
   }
   
-  //ODD must make a utils class with stuff like this
 
-  
+  /**Returns an hdfs path to the names file*/
   def getNamesPath():String={
     val namespath=Utils.getOption("names-path",split)
     if (namespath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/namessupermarket"
     else return namespath
   }
   
-  
+  /**Get a string that contains the name of the user requested classifier*/
   def getClassifier():String={
     val classifier=Utils.getOption("classifier",split)
     if (classifier=="")return "weka.classifiers.bayes.NaiveBayes"
     else return classifier
   }
-  //get algorithm get meta learner ++ might be covered in the first will check
+  
+  
+  def getMetaLearner():String={
+    val meta=Utils.getOption("meta",split)
+    return meta
+  }
+
   }
   
