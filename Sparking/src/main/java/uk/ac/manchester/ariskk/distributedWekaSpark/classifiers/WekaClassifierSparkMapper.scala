@@ -61,6 +61,7 @@ class WekaClassifierSparkMapper (classIndex:Int,metaLearner:String,classifierToT
    */
    def map(rows:Array[String]): Classifier={
      for(x <- rows){
+     
        m_task.processInstance(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
        }                                    //ToDo:many options here: updatable/not, batch/not, forced
        m_task.finalizeTask()

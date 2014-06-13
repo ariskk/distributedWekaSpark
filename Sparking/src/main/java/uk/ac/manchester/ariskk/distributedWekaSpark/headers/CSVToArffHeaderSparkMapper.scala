@@ -26,7 +26,8 @@ class CSVToArffHeaderSparkMapper (options:Array[String]) extends java.io.Seriali
  *    
  *    @param rows an RDD or HadoopRDD partition
  *    @param names is a list with the attributes names
- *    @return a Header for the processed partition         */
+ *    @return a Header for the processed partition     
+ */
       def map (rows:Array[String],names: ArrayList[String]): Instances ={
         for(x <- rows){
           m_task.processRow(x,names)

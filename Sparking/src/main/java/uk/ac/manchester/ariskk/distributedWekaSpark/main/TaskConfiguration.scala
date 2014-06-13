@@ -14,6 +14,7 @@ import weka.associations.AssociationRules
 import scala.collection.mutable.HashMap
 import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
 import weka.distributed.DistributedWekaException
+import org.apache.spark.rdd.RDD
 
 
 /**Task Configuration and submission class
@@ -22,8 +23,8 @@ import weka.distributed.DistributedWekaException
  * it configures and initialized the execution of the task
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  * */
-class TaskConfiguration (task:String,options:OptionsParser){
-  
+class TaskConfiguration (task:String,options:OptionsParser,dataset:RDD[String]){
+     val utils=new wekaSparkUtils
   
      task match  {
        case "buildHeaders" => buildHeaders
@@ -38,14 +39,15 @@ class TaskConfiguration (task:String,options:OptionsParser){
        
     def buildHeaders():Instances={
       val headerjob=new CSVToArffHeaderSparkJob
-      val headers=headerjob.buildHeaders(null, null, options.getNumberOfAttributes, null)
+      val headers=headerjob.buildHeaders(options.getWekaOptions,utils.getNamesFromString(options.getNames.mkString("")), options.getNumberOfAttributes, dataset)
       return headers
     }
     
     def buildClassifier():Classifier={
       val headers=buildHeaders
       val classifierjob=new WekaClassifierSparkJob
-      val classifier=classifierjob.buildClassifier(null, null, 0, headers, null, null, null)
+      val classifier=classifierjob.buildClassifier(null, options.getClassifier, 0, headers, dataset, null, null)
+      //classifierjob.buildClassifier(metaLearner, classifierToTrain, classIndex, headers, dataset, parserOptions, classifierOptions)
       return classifier
     }
     
@@ -53,7 +55,8 @@ class TaskConfiguration (task:String,options:OptionsParser){
       val headers=buildHeaders
       val classifier=buildClassifier
       val evaluationJob=new WekaClassifierEvaluationSparkJob
-      val evaluation=evaluationJob.evaluateClassifier(classifier, headers, null, 0)
+      val evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
+      
       return evaluation
     }
     
