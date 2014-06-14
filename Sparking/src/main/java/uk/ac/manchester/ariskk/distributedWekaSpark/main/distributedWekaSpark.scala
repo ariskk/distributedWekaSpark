@@ -123,10 +123,11 @@ object distributedWekaSpark {
             
        var m_rowparser=new CSVToARFFHeaderMapTask()
        var dat=dataset.glom.map(new WekaInstancesRDDBuilder().mappy(_,headers))
+       dat.cache
        var classifier=dat.map(x=> new TestClassifierMapper().map(x)).collect
        classifier.foreach{x => println(x)}
      
-     exit(0)
+    // exit(0)
       // hdfshandler.saveToHDFS(headers, "user/weka/testhdfs.txt", "testtext")
        
         // hdfshandler.saveObjectToHDFS(headers, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)
