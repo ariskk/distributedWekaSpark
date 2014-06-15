@@ -4,6 +4,7 @@ package uk.ac.manchester.ariskk.distributedWekaSpark.main
 import java.util.ArrayList
 import weka.distributed.DistributedWekaException
 import weka.core.Utils
+import weka.distributed.DistributedWekaException
 
 /**Class that parses the String of user-provided options and has methods to return ind
  * 
@@ -28,24 +29,45 @@ class OptionsParser (options:String) {
   
   /**Return Weka related options (the rest of the options will be returned as well but will be ignored)*/
   def getWekaOptions():Array[String]={
-
+    val wekaOpts=Utils.getOption("weka-options",split)
       // scheme.setOptions(weka.core.Utils.splitOptions("-C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka.classifiers.
        //           functions.supportVector.PolyKernel -C 250007 -E 1.0\""));
-    return split
+    return Utils.splitOptions(wekaOpts)
   } 
   
   /**Spark Master adress*/
   def getMaster():String={
     val master=Utils.getOption("master",split)
-    if (master=="")return "local[4]"
+    if (master==""){println("Master not provided. The tasks will be executed locally.");return "local[4]"}
     else return master
   }
   
   /**HDFS path to the dataset*/
-  def getHdfsPath():String={
-    val hdfsPath=Utils.getOption("hdfs-path",split)
+  def getHdfsDatasetInputPath():String={
+    val hdfsPath=Utils.getOption("hdfs-input-path",split)
     if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv"
     else return hdfsPath
+  }
+  def getHdfsHeadersInputPath():String={
+   val headersPath=Utils.getOption("-hdfs-headers-path",split)
+   return headersPath
+    
+  }
+  def getHdfsClassifierInputPath():String={
+     val classifierPath=Utils.getOption("-hdfs-classifier-path",split) 
+     return classifierPath
+  }
+  
+  def getHdfsClustererInputPath():String={
+    return null
+    
+  }
+  
+  
+  def getHdfsOutputPath():String={
+    val outpath=Utils.getOption("hdfs-output-path",split)
+    if (outpath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/"
+    return outpath
   }
   
   /**Number of partitions the RDD should have*/
@@ -105,7 +127,7 @@ class OptionsParser (options:String) {
     else return classifier
   }
   
-  
+  /**Get a string that contains the name of the user requestes meta learner */
   def getMetaLearner():String={
     val meta=Utils.getOption("meta",split)
     return meta

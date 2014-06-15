@@ -15,6 +15,7 @@ import scala.collection.mutable.HashMap
 import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
 import weka.distributed.DistributedWekaException
 import org.apache.spark.rdd.RDD
+import org.apache.spark.SparkContext
 
 
 /**Task Configuration and submission class
@@ -23,9 +24,11 @@ import org.apache.spark.rdd.RDD
  * it configures and initialized the execution of the task
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  * */
-class TaskConfiguration (task:String,options:OptionsParser,dataset:RDD[String]){
-     val utils=new wekaSparkUtils
+class TaskConfiguration (sc:SparkContext,task:String,options:OptionsParser,dataset:RDD[String]){
   
+     val utils=new wekaSparkUtils
+     val hdfsHandler=new HDFSHandler(sc)
+     
      task match  {
        case "buildHeaders" => buildHeaders
        case "buildClassifier" => buildClassifier
@@ -33,21 +36,37 @@ class TaskConfiguration (task:String,options:OptionsParser,dataset:RDD[String]){
        case "buildFoldBasedClassifier"=> buildFoldBasedClassifier
        case "buildFoldBasedClassifierEvaluation"=> buildFoldBasedClassifierEvaluation
        case "buildClusterer"=> buildClusterer
+       case "buildClustererEvaluation"=>buildClustererEvaluation
        case "findAssociationRules"=> findAssociationRules
        case _ => throw new DistributedWekaException("Unknown Task Identifier!")  
      }
        
     def buildHeaders():Instances={
+      var headers:Instances=null
+      if(options.getHdfsHeadersInputPath==""){
       val headerjob=new CSVToArffHeaderSparkJob
-      val headers=headerjob.buildHeaders(options.getWekaOptions,utils.getNamesFromString(options.getNames.mkString("")), options.getNumberOfAttributes, dataset)
+      headers=headerjob.buildHeaders(options.getWekaOptions,utils.getNamesFromString(options.getNames.mkString("")), options.getNumberOfAttributes, dataset)
+      println(headers)
+      hdfsHandler.saveObjectToHDFS(headers, options.getHdfsOutputPath, null)}
+      else{
+      headers=utils.convertDeserializedObjectToInstances(hdfsHandler.loadObjectFromHDFS(options.getHdfsHeadersInputPath))
+      }
       return headers
     }
     
     def buildClassifier():Classifier={
+      var classifier:Classifier=null
+      if(options.getHdfsClassifierInputPath==""){
       val headers=buildHeaders
       val classifierjob=new WekaClassifierSparkJob
-      val classifier=classifierjob.buildClassifier(null, options.getClassifier, 0, headers, dataset, null, null)
+      classifier=classifierjob.buildClassifier(options.getMetaLearner, options.getClassifier, options.getClassIndex, headers, dataset, null, options.getWekaOptions)
+      println(classifier)
+      hdfsHandler.saveObjectToHDFS(classifier, options.getHdfsOutputPath, null)
       //classifierjob.buildClassifier(metaLearner, classifierToTrain, classIndex, headers, dataset, parserOptions, classifierOptions)
+      }
+      else{
+      classifier=utils.convertDeserializedObjectToClassifier(hdfsHandler.loadObjectFromHDFS(options.getHdfsClassifierInputPath))
+      }
       return classifier
     }
     
@@ -56,14 +75,24 @@ class TaskConfiguration (task:String,options:OptionsParser,dataset:RDD[String]){
       val classifier=buildClassifier
       val evaluationJob=new WekaClassifierEvaluationSparkJob
       val evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
-      
+       println(evaluation)
+      hdfsHandler.saveObjectToHDFS(evaluation, options.getHdfsOutputPath, null)
       return evaluation
     }
     
     def buildFoldBasedClassifier():Classifier={
+      var classifier:Classifier=null
+      if(options.getHdfsClassifierInputPath==""){
       val headers=buildHeaders
       val foldJob=new WekaClassifierFoldBasedSparkJob
-      val classifier=foldJob.buildFoldBasedModel(null, null, 0, null, null, 0)
+      classifier=foldJob.buildFoldBasedModel(dataset, headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
+    // foldJob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaLearner, classIndex)
+      println(classifier)
+      hdfsHandler.saveObjectToHDFS(classifier, options.getHdfsOutputPath, null)
+      }
+      else{
+      classifier=utils.convertDeserializedObjectToClassifier(hdfsHandler.loadObjectFromHDFS(options.getHdfsClassifierInputPath)) 
+      }
       return classifier
     }
     
@@ -71,21 +100,33 @@ class TaskConfiguration (task:String,options:OptionsParser,dataset:RDD[String]){
       val headers=buildHeaders
       val classifier=buildFoldBasedClassifier
       val evalFoldJob=new WekaClassifierEvaluationSparkJob
-      val evaluation=evalFoldJob.evaluateClassifier(classifier, headers, null, 0)
-      return null
+      val evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
+      evalFoldJob.displayEval(evaluation)  
+      println(evaluation)
+      hdfsHandler.saveObjectToHDFS(evaluation, options.getHdfsOutputPath, null)
+      return evaluation
     }
     
     def buildClusterer():Clusterer={
       val headers=buildHeaders //??
       val clustererJob=new WekaClustererSparkJob
       val clusterer=clustererJob.buildClusterer(headers, null, null, null)
+      println(clusterer)
+      hdfsHandler.saveObjectToHDFS(clusterer, options.getHdfsOutputPath, null)
       return clusterer
+    }
+    
+    def buildClustererEvaluation():Evaluation={
+      return null
     }
     
     def findAssociationRules():HashMap[String,UpdatableRule]={
       val headers=buildHeaders
       val associationRulesJob=new WekaAssociationRulesSparkJob
-      val rules=associationRulesJob.findAssociationRules(headers, null, 0, 0, 0)
+      val rules=associationRulesJob.findAssociationRules(headers, dataset, 0, 0, 0)
+     // associationRulesJob.findAssociationRules(headers, dataset, minSupport, minConfidence, minLift)
+      rules.foreach{rule=> println(rule)} //++must sort and output in levels etc
+      hdfsHandler.saveObjectToHDFS(rules, options.getHdfsOutputPath, null)
       return rules
     }
     

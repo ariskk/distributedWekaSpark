@@ -32,7 +32,7 @@ class HDFSHandler (sc:SparkContext) {
   
 //maybe singleton
   
-  /**ToDo: Save and load files to HDFS   */
+  /**Loads a serialized object from HDFS  */
   def loadObjectFromHDFS(path:String):Object={
     val URI=new URI(path)
     val fs=FileSystem.get(URI,sc.hadoopConfiguration)
@@ -41,12 +41,13 @@ class HDFSHandler (sc:SparkContext) {
     val ois = new ObjectInputStream(inStream)
     return ois.readObject()
   }
-  //working
+  
+   /**Loads a file from HDFS as an RDD*/
   def loadRDDFromHDFS(path:String, splits:Int):RDD[String]={
    return sc.textFile(path, splits)
  }
   
-  //working
+   /**Serializes and Saves an object to HDFS*/
   def saveObjectToHDFS(objectToSave:Object, path:String, key:String):Boolean={
     try{
       val URI=new URI(path)
@@ -54,15 +55,10 @@ class HDFSHandler (sc:SparkContext) {
       val testpath=new Path(path+"file123.csv")
       val stream=fs.create(testpath)
       val serializer=SerializationHelper.write(stream, objectToSave)
-      
-      //stream.write(objectToSave.toString.getBytes())
-     // stream.close()
-     // stream.flush()
+
       }
     catch {
-      case ioe:IOException => println("failed! due to IOException")
-      case e:Exception => println("random exception")
-      case _ : Throwable=>  println("a random throwable")
+      case _ : Throwable=>  println("Exception caught while trying to save"+objectToSave.toString()+" to HDFS!")
       return false
     }
     
