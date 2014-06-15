@@ -58,6 +58,7 @@ class TaskConfiguration (sc:SparkContext,task:String,options:OptionsParser,datas
       var classifier:Classifier=null
       if(options.getHdfsClassifierInputPath==""){
       val headers=buildHeaders
+      headers.setClassIndex(options.getClassIndex)
       val classifierjob=new WekaClassifierSparkJob
       classifier=classifierjob.buildClassifier(options.getMetaLearner, options.getClassifier, options.getClassIndex, headers, dataset, null, options.getWekaOptions)
       println(classifier)
@@ -72,6 +73,7 @@ class TaskConfiguration (sc:SparkContext,task:String,options:OptionsParser,datas
     
     def buildClassifierEvaluation():Evaluation={
       val headers=buildHeaders
+      headers.setClassIndex(options.getClassIndex)
       val classifier=buildClassifier
       val evaluationJob=new WekaClassifierEvaluationSparkJob
       val evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
@@ -84,6 +86,7 @@ class TaskConfiguration (sc:SparkContext,task:String,options:OptionsParser,datas
       var classifier:Classifier=null
       if(options.getHdfsClassifierInputPath==""){
       val headers=buildHeaders
+      headers.setClassIndex(options.getClassIndex)
       val foldJob=new WekaClassifierFoldBasedSparkJob
       classifier=foldJob.buildFoldBasedModel(dataset, headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
     // foldJob.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, metaLearner, classIndex)
@@ -98,6 +101,7 @@ class TaskConfiguration (sc:SparkContext,task:String,options:OptionsParser,datas
     
     def buildFoldBasedClassifierEvaluation():Evaluation={
       val headers=buildHeaders
+      headers.setClassIndex(options.getClassIndex)
       val classifier=buildFoldBasedClassifier
       val evalFoldJob=new WekaClassifierEvaluationSparkJob
       val evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
