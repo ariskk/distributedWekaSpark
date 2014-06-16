@@ -130,7 +130,7 @@ class OptionsParser (options:String) {
   /**Get a string that contains the name of the user requested classifier*/
   def getClassifier():String={
     val classifier=Utils.getOption("classifier",split)
-    if (classifier=="")return "weka.classifiers.trees.LMT"
+    if (classifier=="")return "weka.classifiers.functions.VotedPerceptron"
     else return classifier
   }
   

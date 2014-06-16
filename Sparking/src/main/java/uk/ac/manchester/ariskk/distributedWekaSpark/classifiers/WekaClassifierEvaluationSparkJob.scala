@@ -15,7 +15,7 @@ import weka.core.Instance
 class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
   
   
-  /** Evaluate the provided clasisifer or regressor (dataset provided as String (csv rows))
+  /** Evaluate the provided clasisifer or regressor. Accepts dataset as an RDD[String] (each String is a csv row))
    *  
    *  @param classifier is the trained classifier
    *  @param headers is the headers object
@@ -30,7 +30,7 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
     return eval
   }
   
-   /** Evaluate the provided clasisifer or regressor (dataset provided as an Array of Instances)
+   /** Evaluate the provided clasisifer or regressor Accepts dataset  as an RDD[Array[Instance]]
    *  
    *  @param classifier is the trained classifier
    *  @param headers is the headers object
@@ -46,12 +46,12 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
     return eval
   }
   
-   /** Evaluate the provided clasisifer or regressor (dataset provided as a single Instances object)
+   /** Evaluate the provided clasisifer or regressor. Accept dataset  as an RDD[Instances]
    *  
    *  @param classifier is the trained classifier
    *  @param headers is the headers object
    *  @param dataset is an RDD[Instances] representation of the dataset
-   *  @param the class index
+   *  @param the class indexsingle 
    *  @return an Evaluation object
    */
   def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[Instances],classIndex:Int)
@@ -62,7 +62,7 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
     return eval
   }
 
-   /** Evaluate the provided fold-based clasisifer or regressor
+   /** Evaluate the provided fold-based clasisifer or regressor. Accepts dataset in RDD[String]
    *  
    *  @param classifier is the trained classifier
    *  @param headers is the headers object
@@ -77,7 +77,37 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
    return eval
   }
   
+  /** Evaluate the provided fold-based clasisifer or regressor. Accepts dataset in RDD[Array[Instances]]
+   *  
+   *  @param classifier is the trained classifier
+   *  @param headers is the headers object
+   *  @param dataset is an RDD representation of the dataset
+   *  @param the class index
+   *  @return an Evaluation object
+   */
+  def evaluateFoldBasedClassifier(folds:Int,classifier:Classifier,headers:Instances,dataset:RDD[Array[Instance]],classIndex:Int)
+                                                                                                      (implicit d:DummyImplicit):Evaluation={
+    
+     val eval=dataset.map(new WekaClassifierFoldBasedEvaluationSparkMapper(headers,classifier,folds,classIndex).map(_))
+                          .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_, _))
+   return eval
+  }
   
+  /** Evaluate the provided fold-based clasisifer or regressor. Accepts the dataset as an RDD[Instances]
+   *  
+   *  @param classifier is the trained classifier
+   *  @param headers is the headers object
+   *  @param dataset is an RDD representation of the dataset
+   *  @param the class index
+   *  @return an Evaluation object
+   */
+  def evaluateFoldBasedClassifier(folds:Int,classifier:Classifier,headers:Instances,dataset:RDD[Instances],classIndex:Int)
+                                                                             (implicit d1:DummyImplicit,d2:DummyImplicit ):Evaluation={
+    
+     val eval=dataset.map(new WekaClassifierFoldBasedEvaluationSparkMapper(headers,classifier,folds,classIndex).map(_))
+                          .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_, _))
+   return eval
+  }
   
   /** A method to display the evaluation results
     *  

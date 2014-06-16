@@ -8,13 +8,16 @@ import java.util.ArrayList
 import weka.classifiers.Classifier
 import weka.classifiers.evaluation.Evaluation
 import weka.distributed.WekaClassifierEvaluationReduceTask
+import weka.core.Instance
+
+
 /**Mapper taks for fold-based evaluation
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
 class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:Classifier,folds:Int,classIndex:Int) extends java.io.Serializable {
 
-   //ToDo: isupdatable, forced trained, documentation ++
+   //ToDo: isupdatable, forced trained, documentation ++ why so slow?
   
    
    var m_combiner=new WekaClassifierEvaluationReduceTask ////is this?
@@ -43,9 +46,9 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
    }
   
    
-  /**Fold-based Evaluation Mapper
+  /**Fold-based Evaluation Mapper. Accepts the dataset in Array[String] format. Each String represents a row of the csv file
    * 
-   * @param rows represent the dataset partition
+   * @param rows represent the dataset partition in Array[String] 
    * @return Evaluation is the fold-based evaluation model computed per partition
    */
   def map(rows:Array[String]): Evaluation={
@@ -64,6 +67,52 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
     return m_combiner.aggregate(evals)   //needs semantic checking
   }
    
+   /**Fold-based Evaluation Mapper. Accepts the dataset in Array[Instance] format
+   * 
+   * @param rows represent the dataset partition in Array[Instance]
+   * @return Evaluation is the fold-based evaluation model computed per partition
+   */
+  def map(rows:Array[Instance]): Evaluation={
+   val evals=new ArrayList[Evaluation]
+   for(i<-0 to rows.length-1){
+     for(j<-0 to folds-1){
+      //m_task checks if instance is in the fold set. no need to check here
+       m_tasks.get(j).processInstance(rows(i))
+      }
+    }
+    for(j<-0 to folds-1){
+      m_tasks.get(j).finalizeTask()
+      evals.add(m_tasks.get(j).getEvaluation())
+    }
+    return m_combiner.aggregate(evals)   //needs semantic checking
+  }
+  
+  /**Fold-based Evaluation Mapper. Accepts the dataset as an Instances object
+   * 
+   * @param rows represent the dataset partition
+   * @return Evaluation is the fold-based evaluation model computed per partition
+   */
+  def map(instances:Instances): Evaluation={
+   val evals=new ArrayList[Evaluation]
+   
+     for(j<-0 to folds-1){
+       //m_task checks if instance is in the fold set. no need to check here
+     // m_tasks.get(j).setInstances(instances)
+      }
+    
+    for(j<-0 to folds-1){
+      m_tasks.get(j).finalizeTask()
+      evals.add(m_tasks.get(j).getEvaluation())
+    }
+    return m_combiner.aggregate(evals)   //needs semantic checking
+  }
+  
+  
+  
+  
+  
+  
+  
   
   /**Compute the attribute Priors for nominal and non nominal values
    * 

@@ -84,7 +84,7 @@ object distributedWekaSpark {
      
      
      
-     
+     //Dummy test-suite
      
       
       
@@ -135,7 +135,24 @@ object distributedWekaSpark {
        var dat=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
        var dat3=dataset2.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
        var dat2=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers))
+       dat2.cache
        
+       val classifierfold=new WekaClassifierFoldBasedSparkJob
+       val classf1=classifierfold.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, "default", 11)
+       println("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+       val classf2=classifierfold.buildFoldBasedModel(dat2, headers, folds, classifierToTrain, "default", 11)
+       println("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+      // val classf3=classifierfold.buildFoldBasedModel(dat, headers, folds, classifierToTrain, "default", 11)
+      // println(classf1)
+      // println(classf2)
+     //  println(classf3)
+       val evalJ1=new WekaClassifierEvaluationSparkJob
+       val e11=evalJ1.evaluateClassifier(classf1, headers, dataset, 11)
+       val e21=evalJ1.evaluateClassifier(classf2, headers, dat2, 11)
+       evalJ1.displayEval(e11)
+       evalJ1.displayEval(e21)
+       
+       exit(0)
        
        val classifierj=new WekaClassifierSparkJob
       // val classu=classifierj.buildClassifier(dat,"weka.classifiers.meta.Bagging", classifierToTrain,  headers,  null, null)

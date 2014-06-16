@@ -7,6 +7,7 @@ import weka.core.Instances
 import weka.classifiers.Classifier
 import weka.classifiers.SingleClassifierEnhancer
 import java.util.ArrayList
+import weka.core.Instance
 
 
 /**Spark Mapper for training an arbitrary number of folds
@@ -55,7 +56,7 @@ class WekaClassifierFoldBasedSparkMapper(folds:Int,headers:Instances,toTrain:Str
    
    
    
-  /**Mapper task for fold-based classifier training
+  /**Mapper task for fold-based classifier training. Accepts dataset as an Array[String]. Each String represents a line from the csv file
    * 
    * trains a classifier for each fold and returns an ArrayList of classifiers
    * @param rows are the rows of a dataset partition
@@ -74,4 +75,39 @@ class WekaClassifierFoldBasedSparkMapper(folds:Int,headers:Instances,toTrain:Str
     return models
   }
 
+   /**Mapper task for fold-based classifier training. Accepts dataset as an Array[Instance]
+   * 
+   * trains a classifier for each fold and returns an ArrayList of classifiers
+   * @param rows are the rows of a dataset partition
+   * @return an ArrayList of classifiers
+   */ 
+  def map(rows:Array[Instance]): ArrayList[Classifier]={
+    val models=new ArrayList[Classifier]
+    for(i<-0 to rows.length-1){
+      //m_task checks if instance is in the fold set. No need to check here
+      m_tasks.get(i%folds).processInstance(rows(i))
+    }
+    for(j<-0 to folds-1){
+      m_tasks.get(j).finalizeTask()
+      models.add(m_tasks.get(j).getClassifier())
+    }
+    return models
+  }
+  
+    /**Mapper task for fold-based classifier training. Accepts dataset as an Instances object
+   * 
+   * trains a classifier for each fold and returns an ArrayList of classifiers
+   * @param rows are the rows of a dataset partition
+   * @return an ArrayList of classifiers
+   */ 
+  def map(instances:Instances): ArrayList[Classifier]={
+    val models=new ArrayList[Classifier]
+   
+     //m_task.setInstaces(instances)
+    for(j<-0 to folds-1){
+      m_tasks.get(j).finalizeTask()
+      models.add(m_tasks.get(j).getClassifier())
+    }
+    return models
+  }
 }
