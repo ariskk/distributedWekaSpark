@@ -4,6 +4,10 @@ import weka.core.Instances
 import weka.distributed.CSVToARFFHeaderMapTask
 import weka.distributed.CSVToARFFHeaderReduceTask
 
+/**Class that contains a map tasks which produces an Instances object from an Array[String]
+ * 
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ */
 class WekaInstancesRDDBuilder extends java.io.Serializable {
   
   var m_rowparser=new CSVToARFFHeaderMapTask()

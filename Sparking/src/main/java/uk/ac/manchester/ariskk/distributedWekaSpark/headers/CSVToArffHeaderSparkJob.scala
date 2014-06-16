@@ -27,17 +27,17 @@ class CSVToArffHeaderSparkJob {
      }}
      
      
-     val tempMapTask=new CSVToARFFHeaderMapTask()
-     tempMapTask.setOptions(options)
+   //  val tempMapTask=new CSVToARFFHeaderMapTask()
+   //  tempMapTask.setOptions(options)
      
      //Check if headers are available immediately (in case the user specified that there are no nominal attributes (-no-summary-stats option was provided)
-     if(tempMapTask.headerAvailableImmediately(names.size, names, new StringBuffer) &&(! tempMapTask.getComputeSummaryStats())){
-       headers=tempMapTask.getHeader(names.size, names)
-     }
-     else{
+   //  if(tempMapTask.headerAvailableImmediately(names.size, names, new StringBuffer) &&(! tempMapTask.getComputeSummaryStats())){
+    //   headers=tempMapTask.getHeader(names.size, names)
+    // }
+   //  else{
      //compute headers using map(generate headers for each partition) and reduce (aggregate partial headers)
      headers=data.glom.map(new CSVToArffHeaderSparkMapper(options).map(_,names)).reduce(new CSVToArffHeaderSparkReducer().reduce(_,_))
-     }
+    // }
      return headers
    }
  }

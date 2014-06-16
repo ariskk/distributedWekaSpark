@@ -52,7 +52,7 @@ class OptionsParser (options:String) {
   /**HDFS path to the dataset*/
   def getHdfsDatasetInputPath():String={
     val hdfsPath=Utils.getOption("hdfs-input-path",split)
-    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv"
+    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/supermarket.csv"
     else return hdfsPath
   }
   def getHdfsHeadersInputPath():String={
@@ -80,7 +80,7 @@ class OptionsParser (options:String) {
   /**Number of partitions the RDD should have*/
   def getNumberOfPartitions():Int={
     val partitions=Utils.getOption("num-partitions",split)
-    if(partitions=="")return  4
+    if(partitions=="")return  2
     else return partitions.toInt
   }
   
@@ -94,7 +94,7 @@ class OptionsParser (options:String) {
   /**Number of Attributes in the dataset*/
   def getNumberOfAttributes():Int={
     val atts=Utils.getOption("num-ofatts",split)
-    if(atts=="") return 12
+    if(atts=="") return 217
     else return atts.toInt
   }
   

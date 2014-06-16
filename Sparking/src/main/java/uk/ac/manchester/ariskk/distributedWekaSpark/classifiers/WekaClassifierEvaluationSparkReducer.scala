@@ -11,7 +11,8 @@ import weka.distributed.CSVToARFFHeaderMapTask
 
 /**Classifier evaluation Reduce task
  * 
- * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)*/
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ */
 class WekaClassifierEvaluationSparkReducer  extends java.io.Serializable {
   
   //Initialize Base reduce task

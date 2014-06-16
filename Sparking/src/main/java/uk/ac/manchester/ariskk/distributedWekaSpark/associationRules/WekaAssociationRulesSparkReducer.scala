@@ -6,10 +6,19 @@ import weka.associations.AssociationRule
 import scala.collection.mutable.HashMap
 
 
-
+/**Contains a commutative and associative Reduce function that merges two HashMaps and return the result
+ * 
+ * @author Aris-Kyriakos Koliopoulos ak.koliopoulos {[at]} gmail {[dot]} com
+ */
 class WekaAssociationRulesSparkReducer extends java.io.Serializable{
   
-  
+  /**Takes two mutable HashMaps as parameters, merges them and returns the result
+   * 
+   * Order is not important
+   * @param rulesMapA the first HashMap
+   * @param rulesMapB the second HashMap
+   * @return the merged HashMap
+   * */
   def reduce(rulesMapA:HashMap[String,UpdatableRule],rulesMapB:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
     println(rulesMapA.isEmpty+" "+rulesMapA.keys.size)
     println(rulesMapB.isEmpty+" "+rulesMapB.keys.size)
@@ -31,7 +40,7 @@ class WekaAssociationRulesSparkReducer extends java.io.Serializable{
       }
     }
     }
-   // exit(0)
+
     return rulesMapA1
   }
 

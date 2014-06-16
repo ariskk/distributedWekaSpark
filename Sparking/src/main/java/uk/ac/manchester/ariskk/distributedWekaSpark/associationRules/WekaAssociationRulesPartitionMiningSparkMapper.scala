@@ -112,5 +112,66 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
    // println(hash.isEmpty+" "+hash.keys.size)
     return hash
   }
+    
+    
+    
+    
+    def map(rows:Array[Instance]):HashMap[String,UpdatableRule]={
+     
+     for (x <-rows){
+       inst.add(x)
+      }
+
+    asl.setMinMetric(0.90)
+    asl.setLowerBoundMinSupport(0.1)
+   // asl.setFindAllRulesForSupportLevel(true)
+ //   asl.setDelta(0.)
+    asl.setNumRulesToFind(10)
+    asl.buildAssociations(inst)
+    
+
+    
+    println(asl.getAssociationRules().getRules().size)
+    ruleList=asl.getAssociationRules().getRules()
+
+
+    val hash=new HashMap[String,UpdatableRule]
+    for(x<-0 to ruleList.size()-1){
+      //
+      val newRule=new UpdatableRule(ruleList.get(x))
+      newRule.setConsequenceSupport(0);newRule.setPremiseSupport(0);newRule.setSupportCount(0);newRule.setTransactions(0)
+      hash+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() -> newRule)
+     }
+
+   // println(hash.isEmpty+" "+hash.keys.size)
+    return hash
+  }
+    
+    
+    def map(instances:Instances):HashMap[String,UpdatableRule]={
+
+
+    asl.setMinMetric(0.90)
+    asl.setLowerBoundMinSupport(0.1)
+    //hacky shit about attribute
+    asl.setNumRulesToFind(10)
+    asl.buildAssociations(instances)
+
+    
+    println(asl.getAssociationRules().getRules().size)
+    ruleList=asl.getAssociationRules().getRules()
+
+
+    val hash=new HashMap[String,UpdatableRule]
+    for(x<-0 to ruleList.size()-1){
+      //
+      val newRule=new UpdatableRule(ruleList.get(x))
+      newRule.setConsequenceSupport(0);newRule.setPremiseSupport(0);newRule.setSupportCount(0);newRule.setTransactions(0)
+      hash+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() -> newRule)
+     }
+
+   // println(hash.isEmpty+" "+hash.keys.size)
+    return hash
+  }
 
 }

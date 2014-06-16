@@ -55,10 +55,7 @@ import weka.classifiers.bayes.BayesNet
 import weka.classifiers.functions.SGD
 import weka.classifiers.trees.RandomTree
 import weka.classifiers.rules.DecisionTable
-import weka.classifiers.rules.JRip
-import weka.classifiers.`lazy`.KStar
-import weka.classifiers.trees.HoeffdingTree
-import weka.classifiers.trees.REPTree
+
 
 
 
@@ -100,8 +97,8 @@ object distributedWekaSpark {
       val randomChunks=optionsHandler.getNumberOfRandomChunks
       var names=new ArrayList[String]
       val folds=optionsHandler.getNumFolds
-      val headerJobOptions=null
-       // Utils.splitOptions("-N first-last")
+      val headerJobOptions=Utils.splitOptions("-N first-last")
+       
       val namesPath=optionsHandler.getNamesPath
       
       
@@ -121,21 +118,62 @@ object distributedWekaSpark {
        println(namesfromfile.collect.mkString(""))
    
        
-       val names1=new ArrayList[String];//for (i <- 0 to 9){names.add("at"+i)}   
-       names=utils.getNamesFromString(namesfromfile.collect.mkString(""))
-       // val names1=utils.getNamesFromString(optionsHandler.getNames.mkString(""))
+        //val names1=new ArrayList[String];for (i <- 0 to 216){names1.add("at"+i)}   
+        names=utils.getNamesFromString(namesfromfile.collect.mkString(""))
+      //  val names1=utils.getNamesFromString(optionsHandler.getNames.mkString(""))
        //headers
         
         val headerjob=new CSVToArffHeaderSparkJob
-        val headers=headerjob.buildHeaders(headerJobOptions,names1,numberOfAttributes,dataset)
+        val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
+       // headers.
         println(headers)
-        headers.setClassIndex(11)
-         
+      //  headers.setClassIndex(11)
+      
+        
+        
+     
+        
+        
+        
+        
+       
        var m_rowparser=new CSVToARFFHeaderMapTask()
        var dat=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
        var dat3=dataset2.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
        var dat2=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers))
        dat2.cache
+       
+       
+       
+       
+      val rulejob=new WekaAssociationRulesSparkJob
+      val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
+      val rulesA=rulejob.findAssociationRules(headers, dat2, 0.1, 1, 1)
+      val rulesB=rulejob.findAssociationRules(headers, dat,0.1, 1, 1)
+      val array=new Array[UpdatableRule](rules.keys.size)
+      var j=0
+      rules.foreach{ 
+        keyv => 
+
+          array(j)=keyv._2
+        j+=1
+       }
+       Sorting.quickSort(array)
+       val fullsupport=new Array[String](array.length)
+       val lesssupport=new Array[String](array.length)
+       var i=0;var o=0;
+       array.foreach{x =>
+         x.getTransactions match{
+           case  n if n>2500 => fullsupport(i)=x.getRuleString;i+=1
+           case _ =>   lesssupport(o)=x.getRuleString;o+=1
+         }}
+        println("\n Full Support \n")
+        fullsupport.foreach{x => if(x!=null)println(x)} 
+        println("\n Less support \n")
+        lesssupport.foreach{x => if(x!=null)println(x)}
+          
+   
+   exit(0)
        
        val classifierfold=new WekaClassifierFoldBasedSparkJob
        val classf1=classifierfold.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, "default", 11)
@@ -169,7 +207,7 @@ object distributedWekaSpark {
        println(evalJ.displayEval(e1))
        println(evalJ.displayEval(e2))
       // println(evalJ.displayEval(e3))
-       val ttest=new REPTree
+       val ttest=new NaiveBayes
        ttest.buildClassifier(dat3.first)
        
        val e4=new Evaluation(dat3.first)
@@ -220,30 +258,6 @@ object distributedWekaSpark {
       exit(0)
       
       
-      val rulejob=new WekaAssociationRulesSparkJob
-      val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
-      
-      val array=new Array[UpdatableRule](rules.keys.size)
-      var j=0
-      rules.foreach{ 
-        keyv => 
-
-          array(j)=keyv._2
-        j+=1
-       }
-       Sorting.quickSort(array)
-       val fullsupport=new Array[String](array.length)
-       val lesssupport=new Array[String](array.length)
-       var i=0;var o=0;
-       array.foreach{x =>
-         x.getTransactions match{
-           case  n if n>2500 => fullsupport(i)=x.getRuleString;i+=1
-           case _ =>   lesssupport(o)=x.getRuleString;o+=1
-         }}
-        println("\n Full Support \n")
-        fullsupport.foreach{x => if(x!=null)println(x)} 
-        println("\n Less support \n")
-        lesssupport.foreach{x => if(x!=null)println(x)}
    }
    
      

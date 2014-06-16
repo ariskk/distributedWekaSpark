@@ -48,7 +48,6 @@ class WekaClassifierSparkJob extends java.io.Serializable {
    * @param classifierOptions are options for the classifier
    * @return a trained classifier 
    */
-  
    def buildClassifier (dataset:RDD[Array[Instance]],metaLearner:String,classifierToTrain:String,headers:Instances,
                         parserOptions:Array[String],classifierOptions:Array[String]) (implicit d: DummyImplicit): Classifier = {
        
@@ -69,7 +68,6 @@ class WekaClassifierSparkJob extends java.io.Serializable {
    * @param classifierOptions are options for the classifier
    * @return a trained classifier 
    */
-   
     def buildClassifier (dataset:RDD[Instances],metaLearner:String,classifierToTrain:String,headers:Instances,
                          parserOptions:Array[String],classifierOptions:Array[String])(implicit d1: DummyImplicit, d2: DummyImplicit) : Classifier = {
        
