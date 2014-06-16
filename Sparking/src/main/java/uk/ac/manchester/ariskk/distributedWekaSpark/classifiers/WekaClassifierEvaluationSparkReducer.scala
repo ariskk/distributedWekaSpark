@@ -9,7 +9,7 @@ import weka.distributed.CSVToARFFHeaderReduceTask
 import weka.distributed.CSVToARFFHeaderMapTask
 
 
-/**Classifier evaluation Reduce tasks
+/**Classifier evaluation Reduce task
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)*/
 class WekaClassifierEvaluationSparkReducer  extends java.io.Serializable {

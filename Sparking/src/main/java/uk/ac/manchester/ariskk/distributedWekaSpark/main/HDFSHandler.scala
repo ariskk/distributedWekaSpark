@@ -25,7 +25,7 @@ import java.io.ObjectInputStream
 
 /**A class to handle HDFS i/o
  * 
- * Contains methods to read/write RDDs as well as serialize/deserialize any other type of class
+ * Contains methods to read/write RDDs as well as serialize/deserialize any other type of class 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com) 
  */
 class HDFSHandler (sc:SparkContext) {

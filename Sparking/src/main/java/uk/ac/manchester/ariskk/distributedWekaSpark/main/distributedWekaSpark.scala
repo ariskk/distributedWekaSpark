@@ -45,6 +45,20 @@ import scala.util.Sorting
 import weka.core.Instances
 import weka.distributed.CSVToARFFHeaderMapTask
 import weka.classifiers.trees.J48
+import uk.ac.manchester.ariskk.distributedWekaSpark.wekaRDDs.WekaInstancesRDDBuilder
+import weka.clusterers.Canopy
+import uk.ac.manchester.ariskk.distributedWekaSpark.wekaRDDs.WekaInstanceArrayRDDBuilder
+import uk.ac.manchester.ariskk.distributedWekaSpark.classifiers.WekaClassifierSparkJob
+import weka.classifiers.evaluation.Evaluation
+import weka.classifiers.bayes.NaiveBayes
+import weka.classifiers.bayes.BayesNet
+import weka.classifiers.functions.SGD
+import weka.classifiers.trees.RandomTree
+import weka.classifiers.rules.DecisionTable
+import weka.classifiers.rules.JRip
+import weka.classifiers.`lazy`.KStar
+import weka.classifiers.trees.HoeffdingTree
+import weka.classifiers.trees.REPTree
 
 
 
@@ -72,23 +86,16 @@ object distributedWekaSpark {
      
      
      
-      val teststring="asdasdadkjsljflksdjflk;sjfslkafjslkfjskljfal;fjskljflkjfslka;jfasfjkldsjfkjoiucjndhjf"
-        
-      hdfshandler.saveObjectToHDFS(teststring, "hdfs://sandbox.hortonworks.com:8020/user/weka/", null)
-      
-    //  exit(0)
-     
-     
       
       
      
       ///Input Parameters . ToDo: accept params as args(0), args(1) etc from command line , 
       val master=optionsHandler.getMaster
-      val hdfsPath=optionsHandler.getHdfsPath
+      val hdfsPath=optionsHandler.getHdfsDatasetInputPath
       val numberOfPartitions=optionsHandler.getNumberOfPartitions
       val numberOfAttributes=optionsHandler.getNumberOfAttributes
       val classifierToTrain=optionsHandler.getClassifier //this must done in-Weka somehow
-      val metaL="default"  //default is weka.classifiers.meta.Vote
+      val metaL=optionsHandler.getMetaLearner  //default is weka.classifiers.meta.Vote
       val classAtt=optionsHandler.getClassIndex
       val randomChunks=optionsHandler.getNumberOfRandomChunks
       var names=new ArrayList[String]
@@ -103,30 +110,65 @@ object distributedWekaSpark {
      
       
       
-     // System.exit(0)
+
       
       //Load Dataset and cache. ToDo: global caching strategy   -data.persist(StorageLevel.MEMORY_AND_DISK)
        var dataset=hdfshandler.loadRDDFromHDFS(hdfsPath, numberOfPartitions)
+       var dataset2=hdfshandler.loadRDDFromHDFS(hdfsPath, 1)
        dataset.cache()
        //glom? here on not?
        val namesfromfile=hdfshandler.loadRDDFromHDFS(namesPath,1)
        println(namesfromfile.collect.mkString(""))
    
+       
        val names1=new ArrayList[String];//for (i <- 0 to 9){names.add("at"+i)}   
        names=utils.getNamesFromString(namesfromfile.collect.mkString(""))
-      // val names1=utils.getNamesFromString(optionsHandler.getNames.mkString(""))
+       // val names1=utils.getNamesFromString(optionsHandler.getNames.mkString(""))
        //headers
+        
         val headerjob=new CSVToArffHeaderSparkJob
         val headers=headerjob.buildHeaders(headerJobOptions,names1,numberOfAttributes,dataset)
         println(headers)
-        
-            
+        headers.setClassIndex(11)
+         
        var m_rowparser=new CSVToARFFHeaderMapTask()
-       var dat=dataset.glom.map(new WekaInstancesRDDBuilder().mappy(_,headers))
-       dat.cache
+       var dat=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
+       var dat3=dataset2.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
+       var dat2=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers))
+       
+       
+       val classifierj=new WekaClassifierSparkJob
+      // val classu=classifierj.buildClassifier(dat,"weka.classifiers.meta.Bagging", classifierToTrain,  headers,  null, null)
+       val classu1=classifierj.buildClassifier(dat2,"default", classifierToTrain,  headers,  null, null)
+       val classu2=classifierj.buildClassifier(dataset, "default", classifierToTrain, headers,  null, null)
+      // println(classu)
+       println(classu1)
+       println(classu2)
+       
+       val evalJ=new WekaClassifierEvaluationSparkJob
+       val e1=evalJ.evaluateClassifier(classu1, headers, dataset, 11)
+       val e2=evalJ.evaluateClassifier(classu2, headers, dat2, 11)
+     //  val e3=evalJ.evaluateClassifier(classu, headers, dat, 11)
+       println(evalJ.displayEval(e1))
+       println(evalJ.displayEval(e2))
+      // println(evalJ.displayEval(e3))
+       val ttest=new REPTree
+       ttest.buildClassifier(dat3.first)
+       
+       val e4=new Evaluation(dat3.first)
+      // e4.evaluateModel(x$1, x$2, x$3)
+       e4.evaluateModel(ttest, dat3.first, null)
+       evalJ.displayEval(e4)
+       
+       
+       exit(0)
+       
+       
        var classifier=dat.map(x=> new TestClassifierMapper().map(x)).collect
        classifier.foreach{x => println(x)}
      
+       
+       
     // exit(0)
       // hdfshandler.saveToHDFS(headers, "user/weka/testhdfs.txt", "testtext")
        
@@ -148,7 +190,7 @@ object distributedWekaSpark {
   
 //      //build a classifier+ evaluate
       val classifierjob=new WekaClassifierSparkJob
-      val classifier2=classifierjob.buildClassifier(metaL,classifierToTrain,classAtt,headers,dataset,null,optionsHandler.getWekaOptions) 
+      val classifier2=classifierjob.buildClassifier(dataset,metaL,classifierToTrain,headers,null,optionsHandler.getWekaOptions) 
       println(classifier2)
 //      val evaluationJob=new WekaClassifierEvaluationSparkJob
 //      val eval2=evaluationJob.evaluateClassifier(classifier2, headers, dataset,classAtt)

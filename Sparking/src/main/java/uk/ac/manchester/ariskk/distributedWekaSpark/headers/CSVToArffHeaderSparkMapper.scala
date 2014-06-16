@@ -24,7 +24,7 @@ class CSVToArffHeaderSparkMapper (options:Array[String]) extends java.io.Seriali
   
 /**   Spark  wrapper for CSVToArffMapTask base task
  *    
- *    @param rows an RDD or HadoopRDD partition
+ *    @param rows an RDD or HadoopRDD partition in Array[String] format
  *    @param names is a list with the attributes names
  *    @return a Header for the processed partition     
  */

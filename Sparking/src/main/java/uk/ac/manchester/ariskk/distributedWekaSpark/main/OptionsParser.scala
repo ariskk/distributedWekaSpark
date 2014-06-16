@@ -12,14 +12,21 @@ import weka.distributed.DistributedWekaException
  */
 class OptionsParser (options:String) {
   
-  //String containing user provided options of the format "-option-type optionValue"
-   val split=Utils.splitOptions(options)
+  //String containing user provided options of the format "-option-type1 optionValue1 -option-type2 optionValue2"
+  val split=Utils.splitOptions(options)
   
   /**Get a string that describes the user requested task.eg: classification,clustering etc ++*/
   def getTask():String={
     val task=Utils.getOption("task",split)
     if(task=="") throw new DistributedWekaException("Unrecognised Task Identifier!")
     return task
+  }
+  
+  /**Get a string that describes the type of the dataset to process. Options: Instances, ArrayInstance, ArrayString*/
+  def getDatasetType():String={
+    val dstype=Utils.getOption("dataset-type",split)
+    if (dstype=="") return "Instances"
+    else return dstype
   }
   
   //will be removed
@@ -101,7 +108,7 @@ class OptionsParser (options:String) {
   /**Number of folds in case of cross-validation*/
   def getNumFolds():Int={
     val folds=Utils.getOption("num-folds",split)
-    if(folds=="") return 1
+    if(folds=="") return 4
     else return folds.toInt
   }
   
@@ -123,7 +130,7 @@ class OptionsParser (options:String) {
   /**Get a string that contains the name of the user requested classifier*/
   def getClassifier():String={
     val classifier=Utils.getOption("classifier",split)
-    if (classifier=="")return "weka.classifiers.bayes.NaiveBayes"
+    if (classifier=="")return "weka.classifiers.trees.LMT"
     else return classifier
   }
   

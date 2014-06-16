@@ -9,6 +9,7 @@ import weka.distributed.CSVToARFFHeaderReduceTask._
 import weka.distributed.CSVToARFFHeaderReduceTask
 import weka.classifiers.SingleClassifierEnhancer
 import weka.core.Utils
+import weka.core.Instance
 
 /**Mapper implementation for WekaClassifierSpark job 
  * 
@@ -20,7 +21,7 @@ import weka.core.Utils
  *  @param classifierToTrain is the requested base classifier
  *  @param two option strings for parser/classifier
  *  @param header is the header file for the job */
-class WekaClassifierSparkMapper (classIndex:Int,metaLearner:String,classifierToTrain:String,classifierOptions:Array[String],
+class WekaClassifierSparkMapper (metaLearner:String,classifierToTrain:String,classifierOptions:Array[String],
                                   rowparserOptions:Array[String],header:Instances) extends java.io.Serializable{
 
     //Initialize the parser and the Base Map task(It processes a set of instances and produces a classifier)
@@ -46,17 +47,17 @@ class WekaClassifierSparkMapper (classIndex:Int,metaLearner:String,classifierToT
     
   
     //Remove the summary from the headers. Set the class attribute
-    val strippedHeader:Instances=CSVToARFFHeaderReduceTask.stripSummaryAtts(header)
-    strippedHeader.setClassIndex(classIndex)
+    val strippedHeader:Instances=CSVToARFFHeaderReduceTask.stripSummaryAtts(header) //clean-up headers should be set at this point
+    //strippedHeader.setClassIndex(classIndex) //clean-up
     m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
     m_task.setup(strippedHeader)
   
   
   
   //true in make instance means classifier is updateable
-  /**Map task for training classifiers
+  /**Map task for training a classifier using an Array[String] (String represents a line of a  csv file)
    * 
-   * @param rows is a dataset partition
+   * @param rows is a dataset partition in Array[String] format
    * @return a trained classifier on the provided parition
    */
    def map(rows:Array[String]): Classifier={
@@ -67,5 +68,30 @@ class WekaClassifierSparkMapper (classIndex:Int,metaLearner:String,classifierToT
        m_task.finalizeTask()
     return m_task.getClassifier()        //he also saves number of instances (for voting) in the same file. must check reducer
    } 
-
+   
+ /**Map task for training classifiers using an Array[Instance]
+   * 
+   * @param rows is a dataset partition in Array[Instance] format
+   * @return a trained classifier on the provided parition
+   */
+   def map(rows:Array[Instance]):Classifier={
+     for(x<-rows){
+       m_task.processInstance(x)
+       }
+     m_task.finalizeTask
+     return m_task.getClassifier()
+   }
+   
+  /**Map task for training classifiers using an Instances object
+   * 
+   * @param instances is a dataset partition as
+   * @return a trained classifier on the provided parition
+   */
+   def map(instances:Instances):Classifier={
+     //m_task.setInstances(instances)
+     m_task.finalizeTask
+     return m_task.getClassifier()
+   }
+   
+ 
 }

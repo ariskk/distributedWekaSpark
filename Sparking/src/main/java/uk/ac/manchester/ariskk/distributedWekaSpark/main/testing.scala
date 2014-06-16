@@ -11,22 +11,14 @@ import weka.associations.FPGrowth
 import uk.ac.manchester.ariskk.distributedWekaSpark.associationRules.UpdatableRule
 import scala.collection.mutable.HashMap
 import weka.core.converters.CSVLoader
-import weka.core.converters.ConverterUtils.DataSource;
+import weka.core.converters.ConverterUtils.DataSource
 import scala.util.matching.Regex
+import weka.clusterers.Canopy
 
 object testing {
 
   def main(args: Array[String]): Unit = {
-//    
-//    class UpdatableSupportRule (initRule:AssociationRule){
-//      val rule:AssociationRule=initRule
-//      var support:Int=rule.getTotalSupport()
-//      
-//      def getSup():Int=return support
-//      def setSup(sup:Int):Unit={support=sup}
-//      def getRuleString():String=return rule.toString()
-//    }
-    
+
     val hashi=new HashMap[String,Int]()
     hashi+=("add" -> 5)
     hashi+=("dad" -> 7)
@@ -63,8 +55,7 @@ object testing {
       println(rul.getConsequenceSupport+" "+rul.getPremiseSupport+" "+rul.getSupportCount+" "+rul.getTransactions)
       exit(0)
 
-    
-    
+      
 //     
 //    val hashmap=new HashMap[String,UpdatableRule]
 //    for(x<- 0 to rules.size()-1){hashmap.put(rules.get(x).getPremise()+" "+rules.get(x).getConsequence(),new UpdatableRule(rules.get(x)))}

@@ -6,6 +6,7 @@ import weka.core.Instances
 import weka.classifiers.evaluation.Evaluation
 import weka.core.Attribute
 import java.util.ArrayList
+import weka.core.Instance
 
 /**Spark Job for running an evaluation job on a trained classifier or regressor
  * 
@@ -14,17 +15,49 @@ import java.util.ArrayList
 class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
   
   
-  /** Evaluate the provided clasisifer or regressor
+  /** Evaluate the provided clasisifer or regressor (dataset provided as String (csv rows))
    *  
    *  @param classifier is the trained classifier
    *  @param headers is the headers object
-   *  @param dataset is an RDD representation of the dataset
+   *  @param dataset is an RDD[String] representation of the dataset
    *  @param the class index
    *  @return an Evaluation object
    */
   def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[String],classIndex:Int): Evaluation={
     
      val eval=dataset.glom.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex).map(_))
+                          .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_,_))
+    return eval
+  }
+  
+   /** Evaluate the provided clasisifer or regressor (dataset provided as an Array of Instances)
+   *  
+   *  @param classifier is the trained classifier
+   *  @param headers is the headers object
+   *  @param dataset is an RDD[Array[Instance]] representation of the dataset
+   *  @param the class index
+   *  @return an Evaluation object
+   */
+  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[Array[Instance]],classIndex:Int)
+                                                               (implicit d1: DummyImplicit, d2: DummyImplicit): Evaluation={
+    
+     val eval=dataset.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex).map(_))
+                          .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_,_))
+    return eval
+  }
+  
+   /** Evaluate the provided clasisifer or regressor (dataset provided as a single Instances object)
+   *  
+   *  @param classifier is the trained classifier
+   *  @param headers is the headers object
+   *  @param dataset is an RDD[Instances] representation of the dataset
+   *  @param the class index
+   *  @return an Evaluation object
+   */
+  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[Instances],classIndex:Int)
+                                                                              (implicit d: DummyImplicit): Evaluation={
+    
+     val eval=dataset.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex).map(_))
                           .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_,_))
     return eval
   }

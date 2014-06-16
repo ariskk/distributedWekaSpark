@@ -24,7 +24,7 @@ import org.apache.spark.SparkContext
  * it configures and initialized the execution of the task
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  * */
-class TaskConfiguration (sc:SparkContext,task:String,options:OptionsParser,dataset:RDD[String]){
+class TaskConfiguration (sc:SparkContext,task:String,options:OptionsParser,dataset:RDD[String],dstype:String){
   
      val utils=new wekaSparkUtils
      val hdfsHandler=new HDFSHandler(sc)
@@ -60,7 +60,7 @@ class TaskConfiguration (sc:SparkContext,task:String,options:OptionsParser,datas
       val headers=buildHeaders
       headers.setClassIndex(options.getClassIndex)
       val classifierjob=new WekaClassifierSparkJob
-      classifier=classifierjob.buildClassifier(options.getMetaLearner, options.getClassifier, options.getClassIndex, headers, dataset, null, options.getWekaOptions)
+      classifier=classifierjob.buildClassifier(dataset,options.getMetaLearner, options.getClassifier, headers,  null, options.getWekaOptions)
       println(classifier)
       hdfsHandler.saveObjectToHDFS(classifier, options.getHdfsOutputPath, null)
       //classifierjob.buildClassifier(metaLearner, classifierToTrain, classIndex, headers, dataset, parserOptions, classifierOptions)
