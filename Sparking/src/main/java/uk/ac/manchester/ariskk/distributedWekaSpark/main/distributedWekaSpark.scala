@@ -55,6 +55,7 @@ import weka.classifiers.bayes.BayesNet
 import weka.classifiers.functions.SGD
 import weka.classifiers.trees.RandomTree
 import weka.classifiers.rules.DecisionTable
+import org.apache.spark.storage.StorageLevel
 
 
 
@@ -76,7 +77,10 @@ object distributedWekaSpark {
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
       val utils=new wekaSparkUtils
-      //val task=new TaskConfiguration(optionsHandler.getTask,optionsHandler)
+      //var data=hdfshandler.loadRDDFromHDFS(optionsHandler.getHdfsDatasetInputPath, optionsHandler.getNumberOfPartitions)
+     // data.persist(optionsHandler.getCachingStrategy)
+      //convert dataset either here or in Task.config
+      //val task=new TaskConfiguration(sc,optionsHandler.getTask,optionsHandler,data,optionsHandler.getDatasetType)
       
      
      
@@ -112,7 +116,9 @@ object distributedWekaSpark {
       //Load Dataset and cache. ToDo: global caching strategy   -data.persist(StorageLevel.MEMORY_AND_DISK)
        var dataset=hdfshandler.loadRDDFromHDFS(hdfsPath, numberOfPartitions)
        var dataset2=hdfshandler.loadRDDFromHDFS(hdfsPath, 1)
-       dataset.cache()
+       dataset.persist(optionsHandler.getCachingStrategy)
+       
+       
        //glom? here on not?
        val namesfromfile=hdfshandler.loadRDDFromHDFS(namesPath,1)
        println(namesfromfile.collect.mkString(""))

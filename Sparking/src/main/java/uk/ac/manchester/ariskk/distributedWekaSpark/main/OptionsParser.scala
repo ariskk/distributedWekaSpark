@@ -5,6 +5,7 @@ import java.util.ArrayList
 import weka.distributed.DistributedWekaException
 import weka.core.Utils
 import weka.distributed.DistributedWekaException
+import org.apache.spark.storage.StorageLevel
 
 /**Class that parses the String of user-provided options and has methods to return ind
  * 
@@ -27,6 +28,22 @@ class OptionsParser (options:String) {
     val dstype=Utils.getOption("dataset-type",split)
     if (dstype=="") return "Instances"
     else return dstype
+  }
+  
+  /**Get the user requested caching strategy*/
+  def getCachingStrategy():StorageLevel={
+    val strategy=Utils.getOption("caching",split)
+    strategy match {
+      case "MEMORY_ONLY" => return StorageLevel.MEMORY_ONLY
+      case "MEMORY_AND_DISK" => return StorageLevel.MEMORY_AND_DISK
+      case "MEMORY_ONLY_SER" => return StorageLevel.MEMORY_ONLY_SER
+      case "MEMORY_AND_DISK_SER" => return StorageLevel.MEMORY_AND_DISK_SER
+      case "DISK_ONLY" => return StorageLevel.DISK_ONLY
+      case "MEMORY_ONLY_2" => return StorageLevel.MEMORY_ONLY_2
+      case "MEMORY_AND_DISK_2" => return StorageLevel.MEMORY_AND_DISK_2
+      case _ => println("Not recognised or supported caching strategy requested! Will use MEMORY_AND_DISK instead"); return StorageLevel.MEMORY_AND_DISK
+    }
+    
   }
   
   //will be removed

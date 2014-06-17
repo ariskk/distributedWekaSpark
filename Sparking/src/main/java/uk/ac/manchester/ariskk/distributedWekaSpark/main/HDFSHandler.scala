@@ -43,8 +43,8 @@ class HDFSHandler (sc:SparkContext) {
   }
   
    /**Loads a file from HDFS as an RDD*/
-  def loadRDDFromHDFS(path:String, splits:Int):RDD[String]={
-   return sc.textFile(path, splits)
+  def loadRDDFromHDFS(path:String, partitions:Int):RDD[String]={
+   return sc.textFile(path, partitions)
  }
   
    /**Serializes and Saves an object to HDFS*/
