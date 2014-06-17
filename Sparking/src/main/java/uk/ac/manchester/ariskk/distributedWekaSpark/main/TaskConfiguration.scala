@@ -28,6 +28,15 @@ class TaskConfiguration (sc:SparkContext,task:String,options:OptionsParser,datas
   
      val utils=new wekaSparkUtils
      val hdfsHandler=new HDFSHandler(sc)
+     var data=dataset
+     //caching here or in main? maybe rename??
+     options.getDatasetType match {
+       case "ArrayString" =>
+       case "ArrayInstance" => 
+       case "Instances"=>
+       case _ => println("Unrecognised or Unsupported input format, will use Array[String] instead")
+       
+     }
      
      task match  {
        case "buildHeaders" => buildHeaders

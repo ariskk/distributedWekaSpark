@@ -84,13 +84,13 @@ object distributedWekaSpark {
       
      
      
-     
+     //exit(0)
      //Dummy test-suite
      
       
       
      
-      ///Input Parameters . ToDo: accept params as args(0), args(1) etc from command line , 
+      ///Input Parameters 
       val master=optionsHandler.getMaster
       val hdfsPath=optionsHandler.getHdfsDatasetInputPath
       val numberOfPartitions=optionsHandler.getNumberOfPartitions
