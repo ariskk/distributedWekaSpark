@@ -27,7 +27,7 @@ import weka.core.Instance
  * it configures and initialized the execution of the task
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  * */
-class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset:RDD[String], dstype:String){
+class TaskExecutor (sc:SparkContext, options:OptionsParser, dataset:RDD[String]) extends java.io.Serializable{
   
      val utils=new wekaSparkUtils
      val hdfsHandler=new HDFSHandler(sc)
@@ -35,15 +35,9 @@ class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset
      var dataInstances:RDD[Instances]=null
      var headers:Instances=null
      //caching here or in main? maybe rename??
-     options.getDatasetType match {
-       case "ArrayString" => println("Using RDD[String]")
-       case "ArrayInstance" => 
-       case "Instances"=>
-       case _ => println("Unrecognised or Unsupported input format, will use Array[String] instead")
-       
-     }
      
-     task match  {
+     
+     options.getTask match  {
        case "buildHeaders" => buildHeaders
        case "buildClassifier" => buildClassifier
        case "buildClassifierEvaluation"=> buildClassifierEvaluation
@@ -58,7 +52,7 @@ class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset
     def buildHeaders():Instances={
       if(options.getHdfsHeadersInputPath==""){
       val headerjob=new CSVToArffHeaderSparkJob
-      headers=headerjob.buildHeaders(options.getWekaOptions,utils.getNamesFromString(options.getNames.mkString("")), options.getNumberOfAttributes, dataset)
+      headers=headerjob.buildHeaders(options.getParserOptions,utils.getNamesFromString(options.getNames), options.getNumberOfAttributes, dataset)
       println(headers)
       hdfsHandler.saveObjectToHDFS(headers, options.getHdfsOutputPath, null)}
       else{
@@ -75,9 +69,9 @@ class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset
       headers.setClassIndex(options.getClassIndex)
       val classifierjob=new WekaClassifierSparkJob
       options.getDatasetType match{
-        case "ArrayInstance" => classifier=classifierjob.buildClassifier(dataArrayInstance,options.getMetaLearner, options.getClassifier, headers,  null, options.getWekaOptions)
-        case "Instances"     => classifier=classifierjob.buildClassifier(dataInstances,options.getMetaLearner, options.getClassifier, headers,  null, options.getWekaOptions) 
-        case _               => classifier=classifierjob.buildClassifier(dataset,options.getMetaLearner, options.getClassifier, headers,null, options.getWekaOptions)
+        case "ArrayInstance" => println("ArrayInstance");classifier=classifierjob.buildClassifier(dataArrayInstance,options.getMetaLearner, options.getClassifier, headers,  options.getParserOptions, options.getWekaOptions)
+        case "Instances"     => println("Instances");classifier=classifierjob.buildClassifier(dataInstances,options.getMetaLearner, options.getClassifier, headers,  options.getParserOptions, options.getWekaOptions) 
+        case "ArrayString"  => println("ArrayString");classifier=classifierjob.buildClassifier(dataset,options.getMetaLearner, options.getClassifier, headers,options.getParserOptions, options.getWekaOptions)
       }
       println(classifier)
       hdfsHandler.saveObjectToHDFS(classifier, options.getHdfsOutputPath, null)
@@ -100,10 +94,10 @@ class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset
       options.getDatasetType match{
         case "ArrayInstance" => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataArrayInstance, options.getClassIndex) 
         case "Instances"     => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataInstances, options.getClassIndex) 
-        case _               => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex) 
+        case "ArrayString"   => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex) 
       }
-      evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
-       println(evaluation)
+      //evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
+      evaluationJob.displayEval(evaluation)
       hdfsHandler.saveObjectToHDFS(evaluation, options.getHdfsOutputPath, null)
       return evaluation
     }
@@ -118,7 +112,7 @@ class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset
        options.getDatasetType match{
         case "ArrayInstance" => classifier=foldJob.buildFoldBasedModel(dataArrayInstance,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
         case "Instances"     => classifier=foldJob.buildFoldBasedModel(dataInstances,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
-        case _               => classifier=foldJob.buildFoldBasedModel(dataset,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
+        case "ArrayString"   => classifier=foldJob.buildFoldBasedModel(dataset,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
       }
       //classifier=foldJob.buildFoldBasedModel(dataset, headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
       println(classifier)
@@ -140,7 +134,7 @@ class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset
       options.getDatasetType match{
         case "ArrayInstance" => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataArrayInstance, options.getClassIndex) 
         case "Instances"     => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataInstances, options.getClassIndex) 
-        case _               => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex) 
+        case "ArrayString"              => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex) 
       }
       //evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
       evalFoldJob.displayEval(evaluation)  
@@ -157,7 +151,7 @@ class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset
       options.getDatasetType match {
         case "ArrayInstance" => clusterer=clustererJob.buildClusterer(dataArrayInstance, headers, "Canopy", null )
         case "Instances"     => clusterer=clustererJob.buildClusterer(dataInstances, headers, "Canopy", null )
-        case _               => clusterer=clustererJob.buildClusterer(dataset,headers, "Canopy", null )
+        case "ArrayString"      => clusterer=clustererJob.buildClusterer(dataset,headers, "Canopy", null )
       }
       
       
@@ -178,13 +172,14 @@ class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset
       options.getDatasetType match {
         case "ArrayInstance" => rules=associationRulesJob.findAssociationRules(dataArrayInstance,headers,  0, 0, 0)
         case "Instances"     => rules=associationRulesJob.findAssociationRules(dataInstances,headers,  0, 0, 0)
-        case  _              => rules=associationRulesJob.findAssociationRules(dataset,headers,  0, 0, 0)
+        case  "ArrayString"  => rules=associationRulesJob.findAssociationRules(dataset,headers,  0, 0, 0)
       }
       
      
      // associationRulesJob.findAssociationRules(headers, dataset, minSupport, minConfidence, minLift)
       rules.foreach{rule=> println(rule)} //++must sort and output in levels etc
       hdfsHandler.saveObjectToHDFS(rules, options.getHdfsOutputPath, null)
+      associationRulesJob.displayRules(rules)
       return rules
     }
     
@@ -192,6 +187,7 @@ class TaskExecutor (sc:SparkContext, task:String, options:OptionsParser, dataset
       options.getDatasetType match {
         case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers)); dataset.unpersist()
         case "Instances" => dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers)); dataset.unpersist()
+        case "ArrayString" => println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
       }
     }
     

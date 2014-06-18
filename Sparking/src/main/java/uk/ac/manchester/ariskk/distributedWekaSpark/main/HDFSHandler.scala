@@ -28,7 +28,7 @@ import java.io.ObjectInputStream
  * Contains methods to read/write RDDs as well as serialize/deserialize any other type of class 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com) 
  */
-class HDFSHandler (sc:SparkContext) {
+class HDFSHandler (sc:SparkContext) extends java.io.Serializable{
   
 //maybe singleton
   

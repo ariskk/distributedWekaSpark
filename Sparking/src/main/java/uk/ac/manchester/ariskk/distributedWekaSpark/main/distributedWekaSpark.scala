@@ -67,11 +67,23 @@ import org.apache.spark.storage.StorageLevel
  *   ToDo: user-interface, option parser and loader-saver for persistence  */
 
 
-object distributedWekaSpark {
+object distributedWekaSpark extends java.io.Serializable{
    def main(args : Array[String]){
        
-     val options=new OptionsParser(args.mkString(" "))
-       
+      println(args.mkString(" "))
+        val options=new OptionsParser(args.mkString(" "))
+      
+        println(options.getNumberOfPartitions)
+        println(options.getNumberOfAttributes)
+        println(options.getDatasetType)
+        println(options.getHdfsDatasetInputPath)
+        println(options.getCachingStrategy.description)
+         
+        
+//      val opt=new OptionsParser("-weka-options \"-depth 3 -N 7 -M 12 \" -parser-options \"-N first-last \"  " ) 
+
+      
+      
       //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
       val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(options.getMaster).set("spark.executor.memory","1g")
       val sc=new SparkContext(conf)
@@ -80,11 +92,11 @@ object distributedWekaSpark {
       var data=hdfshandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
       data.persist(options.getCachingStrategy)
       //convert dataset either here or in Task.config
-      //val task=new TaskExecutor(sc,optionsHandler.getTask,optionsHandler,data,optionsHandler.getDatasetType)
+      val task=new TaskExecutor(sc,options,data)
       
+      exit(0)
      
-     
-     //exit(0)
+   
      //Dummy test-suite
      
       
@@ -101,7 +113,7 @@ object distributedWekaSpark {
       val randomChunks=options.getNumberOfRandomChunks
       var names=new ArrayList[String]
       val folds=options.getNumFolds
-      val headerJobOptions=Utils.splitOptions("-N first-last")
+     // val headerJobOptions=Utils.splitOptions("-N first-last")
        
       val namesPath=options.getNamesPath
       
@@ -124,13 +136,14 @@ object distributedWekaSpark {
        println(namesfromfile.collect.mkString(""))
    
        
-        //val names1=new ArrayList[String];for (i <- 0 to 216){names1.add("at"+i)}   
+        val names1=new ArrayList[String];for (i <- 0 to 11){names1.add("at"+i)}   
         names=utils.getNamesFromString(namesfromfile.collect.mkString(""))
       //  val names1=utils.getNamesFromString(optionsHandler.getNames.mkString(""))
        //headers
         
         val headerjob=new CSVToArffHeaderSparkJob
-        val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
+        val headers=headerjob.buildHeaders(null,names1,numberOfAttributes,dataset)
+        headers.setClassIndex(11)
        // headers.
         println(headers)
       //  headers.setClassIndex(11)
@@ -144,61 +157,62 @@ object distributedWekaSpark {
         
        
        var m_rowparser=new CSVToARFFHeaderMapTask()
-       var dat=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
-       var dat3=dataset2.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
+       //var dat=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
+       //var dat3=dataset2.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
        var dat2=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers))
        dat2.cache
        
-       
-       
-       
-      val rulejob=new WekaAssociationRulesSparkJob
-      val rules=rulejob.findAssociationRules(dataset,headers,  0.1, 1, 1)
-      val rulesA=rulejob.findAssociationRules(dat2,headers,  0.1, 1, 1)
-      val rulesB=rulejob.findAssociationRules(dat,headers, 0.1, 1, 1)
-      val array=new Array[UpdatableRule](rules.keys.size)
-      var j=0
-      rules.foreach{ 
-        keyv => 
-
-          array(j)=keyv._2
-        j+=1
-       }
-       Sorting.quickSort(array)
-       val fullsupport=new Array[String](array.length)
-       val lesssupport=new Array[String](array.length)
-       var i=0;var o=0;
-       array.foreach{x =>
-         x.getTransactions match{
-           case  n if n>2500 => fullsupport(i)=x.getRuleString;i+=1
-           case _ =>   lesssupport(o)=x.getRuleString;o+=1
-         }}
-        println("\n Full Support \n")
-        fullsupport.foreach{x => if(x!=null)println(x)} 
-        println("\n Less support \n")
-        lesssupport.foreach{x => if(x!=null)println(x)}
-          
-   
-   exit(0)
-       
-       val classifierfold=new WekaClassifierFoldBasedSparkJob
-       val classf1=classifierfold.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, "default", 11)
-       println("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
-       val classf2=classifierfold.buildFoldBasedModel(dat2, headers, folds, classifierToTrain, "default", 11)
-       println("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+//       
+//       
+//       
+//      val rulejob=new WekaAssociationRulesSparkJob
+//      val rules=rulejob.findAssociationRules(dataset,headers,  0.1, 1, 1)
+//      val rulesA=rulejob.findAssociationRules(dat2,headers,  0.1, 1, 1)
+//      val rulesB=rulejob.findAssociationRules(dat,headers, 0.1, 1, 1)
+//      val array=new Array[UpdatableRule](rules.keys.size)
+//      var j=0
+//      rules.foreach{ 
+//        keyv => 
+//
+//          array(j)=keyv._2
+//        j+=1
+//       }
+//       Sorting.quickSort(array)
+//       val fullsupport=new Array[String](array.length)
+//       val lesssupport=new Array[String](array.length)
+//       var i=0;var o=0;
+//       array.foreach{x =>
+//         x.getTransactions match{
+//           case  n if n>2500 => fullsupport(i)=x.getRuleString;i+=1
+//           case _ =>   lesssupport(o)=x.getRuleString;o+=1
+//         }}
+//        println("\n Full Support \n")
+//        fullsupport.foreach{x => if(x!=null)println(x)} 
+//        println("\n Less support \n")
+//        lesssupport.foreach{x => if(x!=null)println(x)}
+//          
+//   
+//   exit(0)
+//       
+//       val classifierfold=new WekaClassifierFoldBasedSparkJob
+//       val classf1=classifierfold.buildFoldBasedModel(dataset, headers, folds, classifierToTrain, "default", 11)
+//       println("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+//       val classf2=classifierfold.buildFoldBasedModel(dat2, headers, folds, classifierToTrain, "default", 11)
+//       println("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
       // val classf3=classifierfold.buildFoldBasedModel(dat, headers, folds, classifierToTrain, "default", 11)
       // println(classf1)
       // println(classf2)
      //  println(classf3)
-       val evalJ1=new WekaClassifierEvaluationSparkJob
-       val e11=evalJ1.evaluateClassifier(classf1, headers, dataset, 11)
-       val e21=evalJ1.evaluateClassifier(classf2, headers, dat2, 11)
-       evalJ1.displayEval(e11)
-       evalJ1.displayEval(e21)
-       
-       exit(0)
+//       val evalJ1=new WekaClassifierEvaluationSparkJob
+//       val e11=evalJ1.evaluateClassifier(classf1, headers, dataset, 11)
+//       val e21=evalJ1.evaluateClassifier(classf2, headers, dat2, 11)
+//       evalJ1.displayEval(e11)
+//       evalJ1.displayEval(e21)
+//       
+//       exit(0)
        
        val classifierj=new WekaClassifierSparkJob
+       
       // val classu=classifierj.buildClassifier(dat,"weka.classifiers.meta.Bagging", classifierToTrain,  headers,  null, null)
        val classu1=classifierj.buildClassifier(dat2,"default", classifierToTrain,  headers,  null, null)
        val classu2=classifierj.buildClassifier(dataset, "default", classifierToTrain, headers,  null, null)
@@ -214,19 +228,19 @@ object distributedWekaSpark {
        println(evalJ.displayEval(e2))
       // println(evalJ.displayEval(e3))
        val ttest=new NaiveBayes
-       ttest.buildClassifier(dat3.first)
+      // ttest.buildClassifier(dat3.first)
        
-       val e4=new Evaluation(dat3.first)
+     //  val e4=new Evaluation(dat3.first)
       // e4.evaluateModel(x$1, x$2, x$3)
-       e4.evaluateModel(ttest, dat3.first, null)
-       evalJ.displayEval(e4)
+     //  e4.evaluateModel(ttest, dat3.first, null)
+      // evalJ.displayEval(e4)
        
        
        exit(0)
        
        
-       var classifier=dat.map(x=> new TestClassifierMapper().map(x)).collect
-       classifier.foreach{x => println(x)}
+      // var classifier=dat.map(x=> new TestClassifierMapper().map(x)).collect
+      // classifier.foreach{x => println(x)}
      
        
        

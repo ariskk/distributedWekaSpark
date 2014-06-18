@@ -16,6 +16,7 @@ class wekaSparkUtils {
   
   def getNamesFromString(str:String):ArrayList[String]={
     val list=new ArrayList[String]
+    if(str==null)return list
     val nm=str.split(",")
     for(i<-0 to nm.length-1){list.add(nm(i))}
     return list

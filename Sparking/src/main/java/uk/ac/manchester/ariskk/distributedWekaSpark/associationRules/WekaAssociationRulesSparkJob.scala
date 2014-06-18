@@ -72,6 +72,10 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
     return finalRules
   }
   
+   /**Method that sorts a set of rules based on the desired metric and displays the results
+    * 
+    * @param rules is the HashMap that contains the rules (returned by the Job)
+    * */
    def displayRules(rules:HashMap[String,UpdatableRule]):Unit={
      val array=new Array[UpdatableRule](rules.keys.size)
      var j=0

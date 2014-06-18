@@ -29,7 +29,7 @@ class WekaClassifierSparkJob extends java.io.Serializable {
    * @return a trained classifier 
    */
   def buildClassifier (dataset:RDD[String],metaLearner:String,classifierToTrain:String,headers:Instances,
-                       parserOptions:Array[String],classifierOptions:Array[String]) : Classifier = {
+                                      parserOptions:Array[String],classifierOptions:Array[String]) : Classifier = {
        
      
        //compute the classifier: map produces a classifier for each partition and reduce aggregates the partition classifiers to a single output
@@ -50,7 +50,7 @@ class WekaClassifierSparkJob extends java.io.Serializable {
    */
    def buildClassifier (dataset:RDD[Array[Instance]],metaLearner:String,classifierToTrain:String,headers:Instances,
                         parserOptions:Array[String],classifierOptions:Array[String]) (implicit d: DummyImplicit): Classifier = {
-       
+       //
      
        //compute the classifier: map produces a classifier for each partition and reduce aggregates the partition classifiers to a single output
       val classifier=dataset.map(new WekaClassifierSparkMapper(metaLearner,classifierToTrain,classifierOptions,parserOptions,headers).map(_))
@@ -59,7 +59,7 @@ class WekaClassifierSparkJob extends java.io.Serializable {
       return classifier
   }
    
-   /**Build and return the provided classifier
+   /**Builds and returns the provided classifier
    * 
    * @param classifierToTrain is a string representing the classifier and the containing package ex: weka.classifiers.trees.J48
    * @param headers is the header file of the dataset
@@ -69,8 +69,8 @@ class WekaClassifierSparkJob extends java.io.Serializable {
    * @return a trained classifier 
    */
     def buildClassifier (dataset:RDD[Instances],metaLearner:String,classifierToTrain:String,headers:Instances,
-                         parserOptions:Array[String],classifierOptions:Array[String])(implicit d1: DummyImplicit, d2: DummyImplicit) : Classifier = {
-       
+                         parserOptions:Array[String],classifierOptions:Array[String]) (implicit d1: DummyImplicit, d2: DummyImplicit): Classifier = {
+       //
      
        //compute the classifier: map produces a classifier for each partition (Instances) and reduce aggregates the partition classifiers to a single output
       val classifier=dataset.map(new WekaClassifierSparkMapper(metaLearner,classifierToTrain,classifierOptions,parserOptions,headers).map(_))
