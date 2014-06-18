@@ -5,6 +5,7 @@ import weka.core.Instances
 import org.apache.spark.rdd.RDD
 import scala.collection.mutable.HashMap
 import weka.core.Instance
+import scala.util.Sorting
 
 /**This job executes a core package associator (FPGrowth and Apriori supported thus far) against a dataset
  * 
@@ -22,7 +23,7 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
    * @param minSupport/confidence/lift user thresholds that the generated rules must meet
    * @return a HashMap containing the rules
    */
-  def findAssociationRules (headers:Instances,dataset:RDD[String],minSupport:Double,minConfidence:Double,minLift:Double):HashMap[String,UpdatableRule]={
+  def findAssociationRules (dataset:RDD[String],headers:Instances,minSupport:Double,minConfidence:Double,minLift:Double):HashMap[String,UpdatableRule]={
     
      val candidateRules=dataset.glom.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,null).map(_))
                                     .reduce(new WekaAssociationRulesSparkReducer().reduce(_,_))
@@ -40,7 +41,7 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
    * @param minSupport/confidence/lift user thresholds that the generated rules must meet
    * @return a HashMap containing the rules
    */
-  def findAssociationRules (headers:Instances,dataset:RDD[Array[Instance]],minSupport:Double,minConfidence:Double,minLift:Double)
+  def findAssociationRules (dataset:RDD[Array[Instance]],headers:Instances,minSupport:Double,minConfidence:Double,minLift:Double)
                                                                                           (implicit d: DummyImplicit):HashMap[String,UpdatableRule]={
     
      val candidateRules=dataset.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,null).map(_))
@@ -59,7 +60,7 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
    * @param minSupport/confidence/lift user thresholds that the generated rules must meet
    * @return a HashMap containing the rules
    */
-  def findAssociationRules (headers:Instances,dataset:RDD[Instances],minSupport:Double,minConfidence:Double,minLift:Double)
+  def findAssociationRules (dataset:RDD[Instances],headers:Instances,minSupport:Double,minConfidence:Double,minLift:Double)
                                                                           (implicit d1: DummyImplicit, d2:DummyImplicit):HashMap[String,UpdatableRule]={
     
      val candidateRules=dataset.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,null).map(_))
@@ -70,4 +71,31 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
    
     return finalRules
   }
+  
+   def displayRules(rules:HashMap[String,UpdatableRule]):Unit={
+     val array=new Array[UpdatableRule](rules.keys.size)
+     var j=0
+     rules.foreach{ 
+       keyv => 
+          array(j)=keyv._2
+          j+=1
+      }
+       Sorting.quickSort(array)
+       val fullsupport=new Array[String](array.length)
+       val lesssupport=new Array[String](array.length)
+       var i=0;var o=0;
+       
+       array.foreach{x =>
+         x.getTransactions match{
+           //need something to define full, 80% etc support
+           case  n if n>2500 => fullsupport(i)=x.getRuleString;i+=1
+           case _ =>   lesssupport(o)=x.getRuleString;o+=1
+         }}
+        println("\n Full Support \n")
+        fullsupport.foreach{x => if(x!=null)println(x)} 
+        println("\n Less support \n")
+        lesssupport.foreach{x => if(x!=null)println(x)}
+     
+     
+   }
 }

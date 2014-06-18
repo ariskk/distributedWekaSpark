@@ -70,17 +70,17 @@ import org.apache.spark.storage.StorageLevel
 object distributedWekaSpark {
    def main(args : Array[String]){
        
-     val optionsHandler=new OptionsParser(args.mkString(" "))
+     val options=new OptionsParser(args.mkString(" "))
        
       //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
-      val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(optionsHandler.getMaster).set("spark.executor.memory","1g")
+      val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(options.getMaster).set("spark.executor.memory","1g")
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
       val utils=new wekaSparkUtils
-      //var data=hdfshandler.loadRDDFromHDFS(optionsHandler.getHdfsDatasetInputPath, optionsHandler.getNumberOfPartitions)
-     // data.persist(optionsHandler.getCachingStrategy)
+      var data=hdfshandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
+      data.persist(options.getCachingStrategy)
       //convert dataset either here or in Task.config
-      //val task=new TaskConfiguration(sc,optionsHandler.getTask,optionsHandler,data,optionsHandler.getDatasetType)
+      //val task=new TaskExecutor(sc,optionsHandler.getTask,optionsHandler,data,optionsHandler.getDatasetType)
       
      
      
@@ -91,19 +91,19 @@ object distributedWekaSpark {
       
      
       ///Input Parameters 
-      val master=optionsHandler.getMaster
-      val hdfsPath=optionsHandler.getHdfsDatasetInputPath
-      val numberOfPartitions=optionsHandler.getNumberOfPartitions
-      val numberOfAttributes=optionsHandler.getNumberOfAttributes
-      val classifierToTrain=optionsHandler.getClassifier //this must done in-Weka somehow
-      val metaL=optionsHandler.getMetaLearner  //default is weka.classifiers.meta.Vote
-      val classAtt=optionsHandler.getClassIndex
-      val randomChunks=optionsHandler.getNumberOfRandomChunks
+      val master=options.getMaster
+      val hdfsPath=options.getHdfsDatasetInputPath
+      val numberOfPartitions=options.getNumberOfPartitions
+      val numberOfAttributes=options.getNumberOfAttributes
+      val classifierToTrain=options.getClassifier //this must done in-Weka somehow
+      val metaL=options.getMetaLearner  //default is weka.classifiers.meta.Vote
+      val classAtt=options.getClassIndex
+      val randomChunks=options.getNumberOfRandomChunks
       var names=new ArrayList[String]
-      val folds=optionsHandler.getNumFolds
+      val folds=options.getNumFolds
       val headerJobOptions=Utils.splitOptions("-N first-last")
        
-      val namesPath=optionsHandler.getNamesPath
+      val namesPath=options.getNamesPath
       
       
       
@@ -116,7 +116,7 @@ object distributedWekaSpark {
       //Load Dataset and cache. ToDo: global caching strategy   -data.persist(StorageLevel.MEMORY_AND_DISK)
        var dataset=hdfshandler.loadRDDFromHDFS(hdfsPath, numberOfPartitions)
        var dataset2=hdfshandler.loadRDDFromHDFS(hdfsPath, 1)
-       dataset.persist(optionsHandler.getCachingStrategy)
+       dataset.persist(options.getCachingStrategy)
        
        
        //glom? here on not?
@@ -153,9 +153,9 @@ object distributedWekaSpark {
        
        
       val rulejob=new WekaAssociationRulesSparkJob
-      val rules=rulejob.findAssociationRules(headers, dataset, 0.1, 1, 1)
-      val rulesA=rulejob.findAssociationRules(headers, dat2, 0.1, 1, 1)
-      val rulesB=rulejob.findAssociationRules(headers, dat,0.1, 1, 1)
+      val rules=rulejob.findAssociationRules(dataset,headers,  0.1, 1, 1)
+      val rulesA=rulejob.findAssociationRules(dat2,headers,  0.1, 1, 1)
+      val rulesB=rulejob.findAssociationRules(dat,headers, 0.1, 1, 1)
       val array=new Array[UpdatableRule](rules.keys.size)
       var j=0
       rules.foreach{ 
@@ -251,7 +251,7 @@ object distributedWekaSpark {
   
 //      //build a classifier+ evaluate
       val classifierjob=new WekaClassifierSparkJob
-      val classifier2=classifierjob.buildClassifier(dataset,metaL,classifierToTrain,headers,null,optionsHandler.getWekaOptions) 
+      val classifier2=classifierjob.buildClassifier(dataset,metaL,classifierToTrain,headers,null,options.getWekaOptions) 
       println(classifier2)
 //      val evaluationJob=new WekaClassifierEvaluationSparkJob
 //      val eval2=evaluationJob.evaluateClassifier(classifier2, headers, dataset,classAtt)
