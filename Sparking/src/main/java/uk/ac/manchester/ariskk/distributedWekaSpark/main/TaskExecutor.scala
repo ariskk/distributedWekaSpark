@@ -48,11 +48,14 @@ import weka.core.Instance
  * it configures and initialized the execution of the task
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  * */
-class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser, dataset:RDD[String]) extends java.io.Serializable{
+class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java.io.Serializable{
   
      val utils=new wekaSparkUtils
-     //val hdfsHandler=new HDFSHandler(sc)
+     val caching=options.getCachingStrategy
      val datasetType=options.getDatasetType
+     var dataset=hdfsHandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
+     dataset.persist(caching)
+     
      var dataArrayInstance:RDD[Array[Instance]]=null
      var dataInstances:RDD[Instances]=null
      var headers:Instances=null
@@ -73,9 +76,15 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser, dataset:RDD[
      }
        
     def buildHeaders():Instances={
-      if(options.getHdfsHeadersInputPath==""){
       val headerjob=new CSVToArffHeaderSparkJob
-      headers=headerjob.buildHeaders(options.getParserOptions,utils.getNamesFromString(options.getNames), options.getNumberOfAttributes, dataset)
+      
+      if(options.getHdfsHeadersInputPath==""){
+      var names=options.getNames
+      val path=options.getNamesPath
+      if(path!=""){
+      names=hdfsHandler.loadRDDFromHDFS(path,1).collect.mkString("")
+      }
+      headers=headerjob.buildHeaders(options.getParserOptions,utils.getNamesFromString(names), options.getNumberOfAttributes, dataset)
       println(headers)
       hdfsHandler.saveObjectToHDFS(headers, options.getHdfsOutputPath, null)}
       else{
@@ -174,7 +183,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser, dataset:RDD[
       datasetType match {
         case "ArrayInstance" => clusterer=clustererJob.buildClusterer(dataArrayInstance, headers, "Canopy", null )
         case "Instances"     => clusterer=clustererJob.buildClusterer(dataInstances, headers, "Canopy", null )
-        case "ArrayString"      => clusterer=clustererJob.buildClusterer(dataset,headers, "Canopy", null )
+        case "ArrayString"   => clusterer=clustererJob.buildClusterer(dataset,headers, "Canopy", null )
       }
       
       
@@ -193,23 +202,23 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser, dataset:RDD[
       buildRDD
       val associationRulesJob=new WekaAssociationRulesSparkJob
       datasetType match {
-        case "ArrayInstance" => rules=associationRulesJob.findAssociationRules(dataArrayInstance,headers,  0, 0, 0)
-        case "Instances"     => rules=associationRulesJob.findAssociationRules(dataInstances,headers,  0, 0, 0)
-        case  "ArrayString"  => rules=associationRulesJob.findAssociationRules(dataset,headers,  0, 0, 0)
+        case "ArrayInstance" => rules=associationRulesJob.findAssociationRules(dataArrayInstance,headers,  0.1, 1, 1)
+        case "Instances"     => rules=associationRulesJob.findAssociationRules(dataInstances,headers,  0.1, 1, 1)
+        case  "ArrayString"  => rules=associationRulesJob.findAssociationRules(dataset,headers,  0.1, 1, 1)
       }
       
      
      // associationRulesJob.findAssociationRules(headers, dataset, minSupport, minConfidence, minLift)
-      rules.foreach{rule=> println(rule)} //++must sort and output in levels etc
+      
       hdfsHandler.saveObjectToHDFS(rules, options.getHdfsOutputPath, null)
       associationRulesJob.displayRules(rules)
       return rules
     }
-    
+    //what happens if I persist dataset before/after I persist the others????
     def buildRDD():Unit={
       datasetType match {
-        case "ArrayInstance" => {dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers)); dataset.unpersist()}
-        case "Instances" => {dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers)); dataset.unpersist()}
+        case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers))
+        case "Instances" => dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
         case "ArrayString" => println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
       }
     }

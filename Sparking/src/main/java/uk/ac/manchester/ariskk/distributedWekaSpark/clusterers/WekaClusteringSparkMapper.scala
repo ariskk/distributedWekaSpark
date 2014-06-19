@@ -6,6 +6,8 @@ import weka.distributed.CSVToARFFHeaderReduceTask
 import weka.core.Instances
 import weka.clusterers.SimpleKMeans
 import weka.filters.unsupervised.instance.ReservoirSample
+import weka.clusterers.Canopy
+import weka.core.Instance
 
 class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
   
@@ -16,12 +18,13 @@ class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
     m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
   
     
-    //Convert text to clusterer as in classifiers
-    val clusterer=new SimpleKMeans
+    //Convert text to clusterer as in classifiers: Only Canopy currently supported
+    
+    val clusterer=new Canopy
     
     
-  def map(rows:Array[String]):Clusterer={
-    val reservoir=new ReservoirSample
+  def map(rows:Array[String]):Canopy={
+    
     
     for(x<-rows){
       val inst=m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))
@@ -31,7 +34,26 @@ class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
      clusterer.buildClusterer(header)
     //finalize tasks (build for batch no-op for incremental
     
-    return null
+    return clusterer
+  }
+   
+   def map(rows:Array[Instance]):Canopy={
+    
+     for(x<-rows){
+      header.add(x)
+      //add a reservoir. if updatable update else in the finalise. finaleze calls buildClusterer
+     }
+     clusterer.buildClusterer(header)
+     //finalize tasks (build for batch no-op for incremental
+    
+    return clusterer
+  }
+   
+   def map(instances:Instances):Canopy={
+    
+     clusterer.buildClusterer(instances)
+
+    return clusterer
   }
 
 }

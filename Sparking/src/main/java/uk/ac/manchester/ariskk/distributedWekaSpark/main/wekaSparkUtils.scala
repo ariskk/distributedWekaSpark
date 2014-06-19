@@ -22,6 +22,7 @@ class wekaSparkUtils extends java.io.Serializable{
     return list
   }
    
+  
   def convertDeserializedObjectToInstances(obj:Object):Instances={
     return obj.asInstanceOf[Instances]
   }

@@ -80,13 +80,13 @@ class OptionsParser (options:String) extends java.io.Serializable{
   /**HDFS path to the dataset*/
   def getHdfsDatasetInputPath():String={
     val hdfsPath=Utils.getOption("hdfs-dataset-path",split)
-    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/record1.csv"
+    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/supermarket.csv"
     return hdfsPath
   }
   
     /**Returns an hdfs path to the names file*/
   def getNamesPath():String={
-    val namespath=Utils.getOption("names-path",split)
+    val namespath=Utils.getOption("hdfs-names-path",split)
     if (namespath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/namessupermarket"
     else return namespath
   }
@@ -116,7 +116,7 @@ class OptionsParser (options:String) extends java.io.Serializable{
   /**Number of partitions the RDD should have*/
   def getNumberOfPartitions():Int={
     val partitions=Utils.getOption("num-of-partitions",split)
-    if(partitions=="") return  4
+    if(partitions=="") return  2
     return partitions.toInt
   }
   
@@ -137,8 +137,9 @@ class OptionsParser (options:String) extends java.io.Serializable{
   /**Index of the class attribute*/
   def getClassIndex():Int={
     val index=Utils.getOption("class-index",split)
-    if(index=="") return getNumberOfAttributes-1
-    else return index.toInt
+    //THis will not work!!!! get option can be called once and was called right above
+    //if(index=="") return getNumberOfAttributes-1
+    return index.toInt
   }
   
   /**Number of folds in case of cross-validation*/
@@ -152,7 +153,7 @@ class OptionsParser (options:String) extends java.io.Serializable{
   def getNames():String={
   val names=Utils.getOption("names",split)
   if (names=="") return null
-  else return names
+  return names
   }
   
 
@@ -171,6 +172,23 @@ class OptionsParser (options:String) extends java.io.Serializable{
     return meta
   }
   
+  def getRuleLearner():String={
+    val ruleL=Utils.getOption("rule-learner",split)
+    if (ruleL=="") return "weka.associations.FPGrowth"
+    return ruleL
+  }
+  
+  def getClusterer():String={
+    val clust=Utils.getOption("clusterer",split)
+    if (clust=="") return "weka.clusterer.Canopy"
+    return clust
+  }
+  
+  def getNumberOfClusters():Int={
+    val clusters=Utils.getOption("num-clusters",split)
+    if (clusters=="") return 0
+    return clusters.toInt
+  }
   
     /**Return Weka related options (the rest of the options will be returned as well but will be ignored)*/
   def getWekaOptions():Array[String]={
