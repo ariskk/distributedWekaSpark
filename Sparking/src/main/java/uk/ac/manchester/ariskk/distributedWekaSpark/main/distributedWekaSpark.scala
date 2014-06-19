@@ -73,11 +73,13 @@ object distributedWekaSpark extends java.io.Serializable{
       println(args.mkString(" "))
         val options=new OptionsParser(args.mkString(" "))
       
-        println(options.getNumberOfPartitions)
-        println(options.getNumberOfAttributes)
-        println(options.getDatasetType)
-        println(options.getHdfsDatasetInputPath)
-        println(options.getCachingStrategy.description)
+//        println(options.getNumberOfPartitions)
+//        println(options.getNumberOfAttributes)
+//        println(options.getDatasetType)
+//        println(options.getDatasetType)
+//        println(options.getHdfsDatasetInputPath)
+//        println(options.getHdfsDatasetInputPath)
+//        println(options.getCachingStrategy.description)
          
         
 //      val opt=new OptionsParser("-weka-options \"-depth 3 -N 7 -M 12 \" -parser-options \"-N first-last \"  " ) 
@@ -92,9 +94,9 @@ object distributedWekaSpark extends java.io.Serializable{
       var data=hdfshandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
       data.persist(options.getCachingStrategy)
       //convert dataset either here or in Task.config
-      val task=new TaskExecutor(sc,options,data)
+       val task=new TaskExecutor(hdfshandler,options,data)
       
-      exit(0)
+       exit(0)
      
    
      //Dummy test-suite

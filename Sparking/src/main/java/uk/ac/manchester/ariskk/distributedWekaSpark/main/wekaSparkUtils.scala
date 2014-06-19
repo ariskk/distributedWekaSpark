@@ -10,7 +10,7 @@ import weka.clusterers.Clusterer
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
-class wekaSparkUtils {
+class wekaSparkUtils extends java.io.Serializable{
 
   
   

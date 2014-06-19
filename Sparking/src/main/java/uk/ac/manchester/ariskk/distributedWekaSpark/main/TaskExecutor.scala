@@ -1,3 +1,24 @@
+/*
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ *    distributedWekaSpark.scala
+ *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *
+ */
+
 package uk.ac.manchester.ariskk.distributedWekaSpark.main
 
 import uk.ac.manchester.ariskk.distributedWekaSpark.headers.CSVToArffHeaderSparkJob
@@ -27,13 +48,15 @@ import weka.core.Instance
  * it configures and initialized the execution of the task
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  * */
-class TaskExecutor (sc:SparkContext, options:OptionsParser, dataset:RDD[String]) extends java.io.Serializable{
+class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser, dataset:RDD[String]) extends java.io.Serializable{
   
      val utils=new wekaSparkUtils
-     val hdfsHandler=new HDFSHandler(sc)
+     //val hdfsHandler=new HDFSHandler(sc)
+     val datasetType=options.getDatasetType
      var dataArrayInstance:RDD[Array[Instance]]=null
      var dataInstances:RDD[Instances]=null
      var headers:Instances=null
+     
      //caching here or in main? maybe rename??
      
      
@@ -68,7 +91,7 @@ class TaskExecutor (sc:SparkContext, options:OptionsParser, dataset:RDD[String])
       buildRDD
       headers.setClassIndex(options.getClassIndex)
       val classifierjob=new WekaClassifierSparkJob
-      options.getDatasetType match{
+      datasetType match{
         case "ArrayInstance" => println("ArrayInstance");classifier=classifierjob.buildClassifier(dataArrayInstance,options.getMetaLearner, options.getClassifier, headers,  options.getParserOptions, options.getWekaOptions)
         case "Instances"     => println("Instances");classifier=classifierjob.buildClassifier(dataInstances,options.getMetaLearner, options.getClassifier, headers,  options.getParserOptions, options.getWekaOptions) 
         case "ArrayString"  => println("ArrayString");classifier=classifierjob.buildClassifier(dataset,options.getMetaLearner, options.getClassifier, headers,options.getParserOptions, options.getWekaOptions)
@@ -91,7 +114,7 @@ class TaskExecutor (sc:SparkContext, options:OptionsParser, dataset:RDD[String])
       if(options.getHdfsClassifierInputPath!=""){buildRDD}
       val classifier=buildClassifier
       val evaluationJob=new WekaClassifierEvaluationSparkJob
-      options.getDatasetType match{
+      datasetType match{
         case "ArrayInstance" => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataArrayInstance, options.getClassIndex) 
         case "Instances"     => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataInstances, options.getClassIndex) 
         case "ArrayString"   => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex) 
@@ -109,7 +132,7 @@ class TaskExecutor (sc:SparkContext, options:OptionsParser, dataset:RDD[String])
       buildRDD
       headers.setClassIndex(options.getClassIndex)
       val foldJob=new WekaClassifierFoldBasedSparkJob
-       options.getDatasetType match{
+       datasetType match{
         case "ArrayInstance" => classifier=foldJob.buildFoldBasedModel(dataArrayInstance,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
         case "Instances"     => classifier=foldJob.buildFoldBasedModel(dataInstances,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
         case "ArrayString"   => classifier=foldJob.buildFoldBasedModel(dataset,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
@@ -131,7 +154,7 @@ class TaskExecutor (sc:SparkContext, options:OptionsParser, dataset:RDD[String])
       if(options.getHdfsClassifierInputPath!=""){buildRDD}
       val classifier=buildFoldBasedClassifier
       val evalFoldJob=new WekaClassifierEvaluationSparkJob
-      options.getDatasetType match{
+      datasetType match{
         case "ArrayInstance" => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataArrayInstance, options.getClassIndex) 
         case "Instances"     => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataInstances, options.getClassIndex) 
         case "ArrayString"              => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex) 
@@ -148,7 +171,7 @@ class TaskExecutor (sc:SparkContext, options:OptionsParser, dataset:RDD[String])
       val headers=buildHeaders
       buildRDD
       val clustererJob=new WekaClustererSparkJob
-      options.getDatasetType match {
+      datasetType match {
         case "ArrayInstance" => clusterer=clustererJob.buildClusterer(dataArrayInstance, headers, "Canopy", null )
         case "Instances"     => clusterer=clustererJob.buildClusterer(dataInstances, headers, "Canopy", null )
         case "ArrayString"      => clusterer=clustererJob.buildClusterer(dataset,headers, "Canopy", null )
@@ -169,7 +192,7 @@ class TaskExecutor (sc:SparkContext, options:OptionsParser, dataset:RDD[String])
       val headers=buildHeaders
       buildRDD
       val associationRulesJob=new WekaAssociationRulesSparkJob
-      options.getDatasetType match {
+      datasetType match {
         case "ArrayInstance" => rules=associationRulesJob.findAssociationRules(dataArrayInstance,headers,  0, 0, 0)
         case "Instances"     => rules=associationRulesJob.findAssociationRules(dataInstances,headers,  0, 0, 0)
         case  "ArrayString"  => rules=associationRulesJob.findAssociationRules(dataset,headers,  0, 0, 0)
@@ -184,9 +207,9 @@ class TaskExecutor (sc:SparkContext, options:OptionsParser, dataset:RDD[String])
     }
     
     def buildRDD():Unit={
-      options.getDatasetType match {
-        case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers)); dataset.unpersist()
-        case "Instances" => dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers)); dataset.unpersist()
+      datasetType match {
+        case "ArrayInstance" => {dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers)); dataset.unpersist()}
+        case "Instances" => {dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers)); dataset.unpersist()}
         case "ArrayString" => println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
       }
     }
