@@ -73,30 +73,19 @@ object distributedWekaSpark extends java.io.Serializable{
       println(args.mkString(" "))
         val options=new OptionsParser(args.mkString(" "))
       
-//        println(options.getNumberOfPartitions)
-//        println(options.getNumberOfAttributes)
-//        println(options.getDatasetType)
-//        println(options.getDatasetType)
-//        println(options.getHdfsDatasetInputPath)
-//        println(options.getHdfsDatasetInputPath)
-//        println(options.getCachingStrategy.description)
-         
-        
-//      val opt=new OptionsParser("-weka-options \"-depth 3 -N 7 -M 12 \" -parser-options \"-N first-last \"  " ) 
 
-      
       
       //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
       val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(options.getMaster).set("spark.executor.memory","1g")
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
       val utils=new wekaSparkUtils
-      var data=hdfshandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
-      data.persist(options.getCachingStrategy)
+      //var data=hdfshandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
+     // data.persist(options.getCachingStrategy)
       //convert dataset either here or in Task.config
-       val task=new TaskExecutor(hdfshandler,options,data)
+      val task=new TaskExecutor(hdfshandler,options)
       
-       exit(0)
+      exit(0)
      
    
      //Dummy test-suite
@@ -115,7 +104,7 @@ object distributedWekaSpark extends java.io.Serializable{
       val randomChunks=options.getNumberOfRandomChunks
       var names=new ArrayList[String]
       val folds=options.getNumFolds
-     // val headerJobOptions=Utils.splitOptions("-N first-last")
+      val headerJobOptions=Utils.splitOptions("-N first-last")
        
       val namesPath=options.getNamesPath
       
@@ -144,55 +133,51 @@ object distributedWekaSpark extends java.io.Serializable{
        //headers
         
         val headerjob=new CSVToArffHeaderSparkJob
-        val headers=headerjob.buildHeaders(null,names1,numberOfAttributes,dataset)
-        headers.setClassIndex(11)
-       // headers.
+        val headers=headerjob.buildHeaders(headerJobOptions,names,numberOfAttributes,dataset)
+       // headers.setClassIndex(11)
+
         println(headers)
-      //  headers.setClassIndex(11)
-      
-        
-        
      
-        
+
         
         
         
        
        var m_rowparser=new CSVToARFFHeaderMapTask()
-       //var dat=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
+       var dat=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
        //var dat3=dataset2.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
        var dat2=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers))
        dat2.cache
        
-//       
-//       
-//       
-//      val rulejob=new WekaAssociationRulesSparkJob
-//      val rules=rulejob.findAssociationRules(dataset,headers,  0.1, 1, 1)
-//      val rulesA=rulejob.findAssociationRules(dat2,headers,  0.1, 1, 1)
-//      val rulesB=rulejob.findAssociationRules(dat,headers, 0.1, 1, 1)
-//      val array=new Array[UpdatableRule](rules.keys.size)
-//      var j=0
-//      rules.foreach{ 
-//        keyv => 
-//
-//          array(j)=keyv._2
-//        j+=1
-//       }
-//       Sorting.quickSort(array)
-//       val fullsupport=new Array[String](array.length)
-//       val lesssupport=new Array[String](array.length)
-//       var i=0;var o=0;
-//       array.foreach{x =>
-//         x.getTransactions match{
-//           case  n if n>2500 => fullsupport(i)=x.getRuleString;i+=1
-//           case _ =>   lesssupport(o)=x.getRuleString;o+=1
-//         }}
-//        println("\n Full Support \n")
-//        fullsupport.foreach{x => if(x!=null)println(x)} 
-//        println("\n Less support \n")
-//        lesssupport.foreach{x => if(x!=null)println(x)}
-//          
+       
+       
+       
+      val rulejob=new WekaAssociationRulesSparkJob
+      val rules=rulejob.findAssociationRules(dataset,headers,  0.1, 1, 1)
+      val rulesA=rulejob.findAssociationRules(dat2,headers,  0.1, 1, 1)
+      val rulesB=rulejob.findAssociationRules(dat,headers, 0.1, 1, 1)
+      val array=new Array[UpdatableRule](rules.keys.size)
+      var j=0
+      rules.foreach{ 
+        keyv => 
+
+          array(j)=keyv._2
+        j+=1
+       }
+       Sorting.quickSort(array)
+       val fullsupport=new Array[String](array.length)
+       val lesssupport=new Array[String](array.length)
+       var i=0;var o=0;
+       array.foreach{x =>
+         x.getTransactions match{
+           case  n if n>3000 => fullsupport(i)=x.getRuleString;i+=1
+           case _ =>   lesssupport(o)=x.getRuleString;o+=1
+         }}
+        println("\n Full Support \n")
+        fullsupport.foreach{x => if(x!=null)println(x)} 
+        println("\n Less support \n")
+        lesssupport.foreach{x => if(x!=null)println(x)}
+          exit(0)
 //   
 //   exit(0)
 //       

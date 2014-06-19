@@ -39,24 +39,43 @@ class OptionsParser (options:String) extends java.io.Serializable{
   
   //String containing user provided options of the format "-option-type1 optionValue1 -option-type2 optionValue2"
   val split=Utils.splitOptions(options)
-  
+  val task=Utils.getOption("task",split)
+  val dstype=Utils.getOption("dataset-type",split)
+  val strategy=Utils.getOption("caching",split)
+  val master=Utils.getOption("master",split)
+  val hdfsPath=Utils.getOption("hdfs-dataset-path",split)
+  val namespath=Utils.getOption("hdfs-names-path",split)
+  val headersPath=Utils.getOption("hdfs-headers-path",split)
+  val classifierPath=Utils.getOption("hdfs-classifier-path",split) 
+  val outpath=Utils.getOption("hdfs-output-path",split)
+  val partitions=Utils.getOption("num-of-partitions",split)  
+  val chunks=Utils.getOption("num-random-chunks",split)
+  val atts=Utils.getOption("num-of-attributes",split)
+  val index=Utils.getOption("class-index",split)
+  val folds=Utils.getOption("num-folds",split)
+  val names=Utils.getOption("names",split)
+  val classifier=Utils.getOption("classifier",split)
+  val meta=Utils.getOption("meta",split)
+  val ruleL=Utils.getOption("rule-learner",split)
+  val clust=Utils.getOption("clusterer",split)
+  val clusters=Utils.getOption("num-clusters",split)
+  val wekaOpts=Utils.getOption("weka-options",split)
+  val parserOpts=Utils.getOption("parser-options",split)
+    
   /**Get a string that describes the user requested task.eg: classification,clustering etc ++*/
   def getTask():String={
-    val task=Utils.getOption("task",split)
     if(task=="") throw new DistributedWekaException("Empty Task Identifier!")
     return task
   }
   
   /**Get a string that describes the type of the dataset to process. Options: Instances, ArrayInstance, ArrayString*/
   def getDatasetType():String={
-    val dstype=Utils.getOption("dataset-type",split)
     if (dstype=="") return "ArrayString"
     return dstype
   }
   
   /**Get the user requested caching strategy*/
   def getCachingStrategy():StorageLevel={
-    val strategy=Utils.getOption("caching",split)
     strategy match {
       case "MEMORY_ONLY" => return StorageLevel.MEMORY_ONLY
       case "MEMORY_AND_DISK" => return StorageLevel.MEMORY_AND_DISK
@@ -72,71 +91,61 @@ class OptionsParser (options:String) extends java.io.Serializable{
 
   /**Spark Master adress*/
   def getMaster():String={
-    val master=Utils.getOption("master",split)
     if (master==""){println("Master not provided. The tasks will be executed locally.");return "local[4]"}
     else return master
   }
   
   /**HDFS path to the dataset*/
   def getHdfsDatasetInputPath():String={
-    val hdfsPath=Utils.getOption("hdfs-dataset-path",split)
-    if (hdfsPath=="")  return "hdfs://sandbox.hortonworks.com:8020/user/weka/supermarket.csv"
+    if (hdfsPath=="")  throw new Exception("No Path to the dataset was provided!")
     return hdfsPath
   }
   
     /**Returns an hdfs path to the names file*/
   def getNamesPath():String={
-    val namespath=Utils.getOption("hdfs-names-path",split)
-    if (namespath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/namessupermarket"
-    else return namespath
+    //if (namespath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/namessupermarket"
+    return namespath
   }
   
   def getHdfsHeadersInputPath():String={
-   val headersPath=Utils.getOption("hdfs-headers-path",split)
    return headersPath
-    
   }
+  
   def getHdfsClassifierInputPath():String={
-     val classifierPath=Utils.getOption("hdfs-classifier-path",split) 
-     return classifierPath
+   return classifierPath
   }
   
   def getHdfsClustererInputPath():String={
     return null
-    
-  }
+   }
   
   
   def getHdfsOutputPath():String={
-    val outpath=Utils.getOption("hdfs-output-path",split)
     if (outpath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/"
     return outpath
   }
   
   /**Number of partitions the RDD should have*/
   def getNumberOfPartitions():Int={
-    val partitions=Utils.getOption("num-of-partitions",split)
     if(partitions=="") return  2
     return partitions.toInt
   }
   
   /**Number of  Randomized/Stratified RDDs to produce from the dataset*/
   def getNumberOfRandomChunks():Int={
-    val chunks=Utils.getOption("num-random-chunks",split)
     if(chunks=="") return 4
     else return chunks.toInt   
   }
   
   /**Number of Attributes in the dataset*/
   def getNumberOfAttributes():Int={
-    val atts=Utils.getOption("num-of-attributes",split)
     if(atts=="") return 12
     else return atts.toInt
   }
   
   /**Index of the class attribute*/
   def getClassIndex():Int={
-    val index=Utils.getOption("class-index",split)
+   
     //THis will not work!!!! get option can be called once and was called right above
     //if(index=="") return getNumberOfAttributes-1
     return index.toInt
@@ -144,62 +153,54 @@ class OptionsParser (options:String) extends java.io.Serializable{
   
   /**Number of folds in case of cross-validation*/
   def getNumFolds():Int={
-    val folds=Utils.getOption("num-folds",split)
     if(folds=="") return 1
     else return folds.toInt
   }
   
   /**Get the attribute names if provided*/
   def getNames():String={
-  val names=Utils.getOption("names",split)
-  if (names=="") return null
-  return names
+    if (names=="") return null
+    return names
   }
   
 
 
   /**Get a string that contains the name of the user requested classifier*/
   def getClassifier():String={
-    val classifier=Utils.getOption("classifier",split)
     if (classifier=="")return "weka.classifiers.bayes.NaiveBayes"
     else return classifier
   }
   
   /**Get a string that contains the name of the user requestes meta learner */
   def getMetaLearner():String={
-    val meta=Utils.getOption("meta",split)
     if (meta=="") return "default"
     return meta
   }
   
   def getRuleLearner():String={
-    val ruleL=Utils.getOption("rule-learner",split)
     if (ruleL=="") return "weka.associations.FPGrowth"
     return ruleL
   }
   
   def getClusterer():String={
-    val clust=Utils.getOption("clusterer",split)
     if (clust=="") return "weka.clusterer.Canopy"
     return clust
   }
   
   def getNumberOfClusters():Int={
-    val clusters=Utils.getOption("num-clusters",split)
     if (clusters=="") return 0
     return clusters.toInt
   }
   
     /**Return Weka related options (the rest of the options will be returned as well but will be ignored)*/
   def getWekaOptions():Array[String]={
-    val wekaOpts=Utils.getOption("weka-options",split)
-      // scheme.setOptions(weka.core.Utils.splitOptions("-C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka.classifiers.
+    // scheme.setOptions(weka.core.Utils.splitOptions("-C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka.classifiers.
        //           functions.supportVector.PolyKernel -C 250007 -E 1.0\""));
     return Utils.splitOptions(wekaOpts)
   } 
 
   def getParserOptions():Array[String]={
-    val parserOpts=Utils.getOption("parser-options",split)
+   
     return Utils.splitOptions(parserOpts)
   }
   }
