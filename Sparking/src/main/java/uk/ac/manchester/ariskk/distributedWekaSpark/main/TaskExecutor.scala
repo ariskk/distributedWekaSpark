@@ -59,7 +59,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
      var dataArrayInstance:RDD[Array[Instance]]=null
      var dataInstances:RDD[Instances]=null
      var headers:Instances=null
-     val classIndex=options.getClassIndex
+     //val classIndex=
      //caching here or in main? maybe rename??
      
      
@@ -98,7 +98,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       if(options.getHdfsClassifierInputPath==""){
       val headers=buildHeaders
       buildRDD
-      headers.setClassIndex(classIndex)
+      headers.setClassIndex(options.getClassIndex)
       val classifierjob=new WekaClassifierSparkJob
       datasetType match{
         case "ArrayInstance" => println("ArrayInstance");classifier=classifierjob.buildClassifier(dataArrayInstance,options.getMetaLearner, options.getClassifier, headers,  options.getParserOptions, options.getWekaOptions)
@@ -119,7 +119,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
     def buildClassifierEvaluation():Evaluation={
       var evaluation:Evaluation=null
       val headers=buildHeaders
-      headers.setClassIndex(classIndex)
+      headers.setClassIndex(options.getClassIndex)
       if(options.getHdfsClassifierInputPath==""){buildRDD}
       val classifier=buildClassifier
       val evaluationJob=new WekaClassifierEvaluationSparkJob
@@ -139,7 +139,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       if(options.getHdfsClassifierInputPath==""){
       val headers=buildHeaders
       buildRDD
-      headers.setClassIndex(classIndex)
+      headers.setClassIndex(options.getClassIndex)
       val foldJob=new WekaClassifierFoldBasedSparkJob
        datasetType match{
         case "ArrayInstance" => classifier=foldJob.buildFoldBasedModel(dataArrayInstance,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
@@ -159,7 +159,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
     def buildFoldBasedClassifierEvaluation():Evaluation={
       var evaluation:Evaluation=null
       val headers=buildHeaders
-      headers.setClassIndex(classIndex)
+      headers.setClassIndex(options.getClassIndex)
       if(options.getHdfsClassifierInputPath!=""){buildRDD}
       val classifier=buildFoldBasedClassifier
       val evalFoldJob=new WekaClassifierEvaluationSparkJob
@@ -207,7 +207,6 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
         case  "ArrayString"  => rules=associationRulesJob.findAssociationRules(dataset,headers,  0.1, 1, 1)
       }
       
-     
      // associationRulesJob.findAssociationRules(headers, dataset, minSupport, minConfidence, minLift)
       
       hdfsHandler.saveObjectToHDFS(rules, options.getHdfsOutputPath, null)
@@ -219,7 +218,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       datasetType match {
         case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers))
         case "Instances" => dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
-        case "ArrayString" => println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        case "ArrayString" => println()
       }
     }
     

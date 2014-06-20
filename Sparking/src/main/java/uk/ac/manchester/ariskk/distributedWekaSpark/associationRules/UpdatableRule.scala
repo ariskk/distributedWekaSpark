@@ -3,7 +3,10 @@ package uk.ac.manchester.ariskk.distributedWekaSpark.associationRules
 import weka.associations.AssociationRule
 import weka.associations.Item
 
-
+/**Wrapper class for Weka's AssociationRule class that allows to update support,premise,consequence and transactions counts using aggregated partition values 
+ * 
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com) 
+ */
 class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ordered[UpdatableRule]{
   //To-Do : accept accuracies
   var support=rule.getTotalSupport()
@@ -11,7 +14,8 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   var consequence=rule.getConsequenceSupport()
   var transactions=rule.getTotalTransactions()
   val ruleID=rule.getPremise()+" "+rule.getConsequence()
-  
+  val premiseItems=rule.getPremise()
+  val consequenceItems=rule.getConsequence()
   //
   val premiseString=makeString(rule.getPremise().toArray)
   val consequeceString=makeString(rule.getConsequence().toArray)
