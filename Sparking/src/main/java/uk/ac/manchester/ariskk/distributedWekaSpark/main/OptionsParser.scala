@@ -91,7 +91,7 @@ class OptionsParser (options:String) extends java.io.Serializable{
 
   /**Spark Master adress*/
   def getMaster():String={
-    if (master==""){println("Master not provided. The tasks will be executed locally.");return "local[4]"}
+    if (master==""){println("Master not provided. The tasks will be executed locally.");return "local[*]"}
     else return master
   }
   

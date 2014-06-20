@@ -59,13 +59,13 @@
   	</dependency>
   	<dependency>
   		<groupId>nz.ac.waikato.cms.weka</groupId>
-  		<artifactId>weka-dev</artifactId>
-  		<version>3.7.11</version>
+  		<artifactId>distributedWekaBase</artifactId>
+  		<version>1.0.4</version>
   	</dependency>
   	<dependency>
   		<groupId>nz.ac.waikato.cms.weka</groupId>
-  		<artifactId>distributedWekaBase</artifactId>
-  		<version>1.0.4</version>
+  		<artifactId>weka-dev</artifactId>
+  		<version>3.7.11</version>
   	</dependency>
   </dependencies>
   <organization>

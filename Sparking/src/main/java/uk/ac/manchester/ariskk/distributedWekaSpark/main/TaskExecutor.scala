@@ -181,9 +181,9 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       buildRDD
       val clustererJob=new WekaClustererSparkJob
       datasetType match {
-        case "ArrayInstance" => clusterer=clustererJob.buildClusterer(dataArrayInstance, headers, "Canopy", null )
-        case "Instances"     => clusterer=clustererJob.buildClusterer(dataInstances, headers, "Canopy", null )
-        case "ArrayString"   => clusterer=clustererJob.buildClusterer(dataset,headers, "Canopy", null )
+        case "ArrayInstance" => clusterer=clustererJob.buildClusterer(dataArrayInstance, headers, "Canopy", null ,options.getNumberOfClusters)
+        case "Instances"     => clusterer=clustererJob.buildClusterer(dataInstances, headers, "Canopy", null ,options.getNumberOfClusters)
+        case "ArrayString"   => clusterer=clustererJob.buildClusterer(dataset,headers, "Canopy", null ,options.getNumberOfClusters)
       }
       
       
