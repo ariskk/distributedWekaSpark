@@ -14,10 +14,11 @@ class WekaInstanceArrayRDDBuilder(headers:Instances) extends java.io.Serializabl
   
   var m_rowparser=new CSVToARFFHeaderMapTask()
   val stripped= CSVToARFFHeaderReduceTask.stripSummaryAtts(headers) 
+  m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(stripped))
    
   def map(rows:Array[String]):Array[Instance]={
     
-     m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(stripped))
+     
      var instanceArray=new Array[Instance](rows.length)
      var j=0  
      for (x <- rows){

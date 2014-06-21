@@ -55,6 +55,8 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
      for (x <-rows){
        inst.add(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
       }
+     
+     println(inst.size)
     //asl.setNumRulesToFind(hashi.keys.size) 
     asl.setMinMetric(0.9)
     asl.setLowerBoundMinSupport(0.1)
@@ -107,10 +109,10 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
      for (x <-rows){
        inst.add(x)
       }
-    //asl.setNumRulesToFind(hashi.keys.size) 
+    println(inst.size)
     asl.setMinMetric(0.9)
-    asl.setLowerBoundMinSupport(0.08)
-   // asl.setDelta(0.1)
+    asl.setLowerBoundMinSupport(0.1)
+
  
     asl.setFindAllRulesForSupportLevel(true)
     asl.buildAssociations(inst)
@@ -148,6 +150,7 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
     def map(instances:Instances,hashi:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
      val hashy=hashi
 
+     println(instances.size)
     //asl.setNumRulesToFind(hashi.keys.size) 
     asl.setMinMetric(0.9)
     asl.setLowerBoundMinSupport(0.1)

@@ -170,7 +170,6 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       }
       //evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
       evalFoldJob.displayEval(evaluation)  
-      println(evaluation)
       hdfsHandler.saveObjectToHDFS(evaluation, options.getHdfsOutputPath, null)
       return evaluation
     }
@@ -218,7 +217,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       datasetType match {
         case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder(headers).map(_))
         case "Instances" => dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder(headers).map(_))
-        case "ArrayString" => println()
+        case "ArrayString" => 
       }
     }
     

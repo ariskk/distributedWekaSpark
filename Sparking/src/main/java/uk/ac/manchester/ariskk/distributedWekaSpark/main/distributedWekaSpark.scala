@@ -83,9 +83,11 @@ object distributedWekaSpark extends java.io.Serializable{
       //var data=hdfshandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
      // data.persist(options.getCachingStrategy)
       //convert dataset either here or in Task.config
-      val task=new TaskExecutor(hdfshandler,options)
       
-      exit(0)
+      
+        val task=new TaskExecutor(hdfshandler,options)
+      
+        exit(0)
      
    
      //Dummy test-suite
@@ -100,7 +102,7 @@ object distributedWekaSpark extends java.io.Serializable{
       val numberOfAttributes=options.getNumberOfAttributes
       val classifierToTrain=options.getClassifier //this must done in-Weka somehow
       val metaL=options.getMetaLearner  //default is weka.classifiers.meta.Vote
-      val classAtt=options.getClassIndex
+    //  val classAtt=options.getClassIndex
       val randomChunks=options.getNumberOfRandomChunks
       var names=new ArrayList[String]
       val folds=options.getNumFolds
@@ -143,10 +145,11 @@ object distributedWekaSpark extends java.io.Serializable{
         
         
        
-       var m_rowparser=new CSVToARFFHeaderMapTask()
-       var dat=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
+      // var m_rowparser=new CSVToARFFHeaderMapTask()
+        
+       var dat=dataset.glom.map(new WekaInstancesRDDBuilder(headers).map(_))
        //var dat3=dataset2.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
-       var dat2=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers))
+       var dat2=dataset.glom.map(new WekaInstanceArrayRDDBuilder(headers).map(_))
        dat2.cache
        
        
@@ -156,9 +159,9 @@ object distributedWekaSpark extends java.io.Serializable{
       val rules=rulejob.findAssociationRules(dataset,headers,  0.1, 1, 1)
       val rulesA=rulejob.findAssociationRules(dat2,headers,  0.1, 1, 1)
       val rulesB=rulejob.findAssociationRules(dat,headers, 0.1, 1, 1)
-      val array=new Array[UpdatableRule](rules.keys.size)
+      val array=new Array[UpdatableRule](rulesA.keys.size)
       var j=0
-      rules.foreach{ 
+      rulesA.foreach{ 
         keyv => 
 
           array(j)=keyv._2
@@ -177,6 +180,7 @@ object distributedWekaSpark extends java.io.Serializable{
         fullsupport.foreach{x => if(x!=null)println(x)} 
         println("\n Less support \n")
         lesssupport.foreach{x => if(x!=null)println(x)}
+        
           exit(0)
 //   
 //   exit(0)

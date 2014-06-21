@@ -45,7 +45,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
     
       val split=Utils.splitOptions("-N first-last")
        m_rowparser.setOptions(split)
-       println( m_rowparser.getOptions().mkString(" " ))
+     //  println( m_rowparser.getOptions().mkString(" " ))
      
    
      
@@ -74,14 +74,8 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
      for (x <-rows){
        inst.add(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
       }
-   // println(inst.size)
 
 
-//    println(asl.getOptions().mkString(" "))
-//    val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarketmod.arff"))   
-//    val instA=new Instances(source) 
-//    println(instA.equalHeadersMsg(inst))
-//    println(instA.equalHeaders(inst))
     asl.setMinMetric(0.90)
     asl.setLowerBoundMinSupport(0.1)
    // asl.setFindAllRulesForSupportLevel(true)
@@ -96,7 +90,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 //    ruleList=asl.asInstanceOf[FPGrowth].getAssociationRules().getRules() 
 //    }
 //    else{throw new DistributedWekaException("Unsupported AssociationRule Miner!")}
-    
+     println(inst.size)
     println(asl.getAssociationRules().getRules().size)
     ruleList=asl.getAssociationRules().getRules()
 
@@ -130,7 +124,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
     asl.buildAssociations(inst)
     
 
-    
+    println(inst.size)
     println(asl.getAssociationRules().getRules().size)
     ruleList=asl.getAssociationRules().getRules()
 
@@ -157,7 +151,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
     asl.setNumRulesToFind(10)
     asl.buildAssociations(instances)
 
-    
+    println(instances.size)
     println(asl.getAssociationRules().getRules().size)
     ruleList=asl.getAssociationRules().getRules()
 

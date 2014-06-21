@@ -3,6 +3,7 @@ package uk.ac.manchester.ariskk.distributedWekaSpark.wekaRDDs
 import weka.core.Instances
 import weka.distributed.CSVToARFFHeaderMapTask
 import weka.distributed.CSVToARFFHeaderReduceTask
+import weka.core.Utils
 
 /**Class that contains a map tasks which produces an Instances object from an Array[String]
  * 
@@ -12,10 +13,14 @@ class WekaInstancesRDDBuilder (headers:Instances) extends java.io.Serializable {
   
   var m_rowparser=new CSVToARFFHeaderMapTask()
   val stripped= CSVToARFFHeaderReduceTask.stripSummaryAtts(headers) 
+  m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(stripped))
+  
+  val split=Utils.splitOptions("-N first-last")
+  m_rowparser.setOptions(split)
    
   def map(rows:Array[String]):Instances={
      
-     m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(stripped))
+     
      var instances=new Instances(stripped)
        
        for (x <- rows){

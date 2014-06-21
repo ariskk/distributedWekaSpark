@@ -19,7 +19,6 @@ class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
   
     
     //Convert text to clusterer as in classifiers: Only Canopy currently supported
-    
     val clusterer=new Canopy
     
     
@@ -29,10 +28,10 @@ class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
     for(x<-rows){
       val inst=m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))
       header.add(inst)
-      //add a reservoir. if updatable update else in the finalise. finaleze calls buildClusterer
+      
      }
      clusterer.buildClusterer(header)
-    //finalize tasks (build for batch no-op for incremental
+
     
     return clusterer
   }
@@ -41,10 +40,10 @@ class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
     
      for(x<-rows){
       header.add(x)
-      //add a reservoir. if updatable update else in the finalise. finaleze calls buildClusterer
+     
      }
      clusterer.buildClusterer(header)
-     //finalize tasks (build for batch no-op for incremental
+     
     
     return clusterer
   }
@@ -52,7 +51,7 @@ class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
    def map(instances:Instances):Canopy={
     
      clusterer.buildClusterer(instances)
-
+     println(clusterer)
     return clusterer
   }
 

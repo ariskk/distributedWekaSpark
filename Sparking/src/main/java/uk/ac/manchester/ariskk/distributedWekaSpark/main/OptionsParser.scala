@@ -188,7 +188,7 @@ class OptionsParser (options:String) extends java.io.Serializable{
   }
   
   def getNumberOfClusters():Int={
-    if (clusters=="") return 0
+    if (clusters=="") return -1
     return clusters.toInt
   }
   
