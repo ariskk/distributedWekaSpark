@@ -8,13 +8,13 @@ import weka.distributed.CSVToARFFHeaderReduceTask
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
-class WekaInstancesRDDBuilder extends java.io.Serializable {
+class WekaInstancesRDDBuilder (headers:Instances) extends java.io.Serializable {
   
   var m_rowparser=new CSVToARFFHeaderMapTask()
-
+  val stripped= CSVToARFFHeaderReduceTask.stripSummaryAtts(headers) 
    
-  def map(rows:Array[String], head:Instances):Instances={
-     val stripped= CSVToARFFHeaderReduceTask.stripSummaryAtts(head) 
+  def map(rows:Array[String]):Instances={
+     
      m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(stripped))
      var instances=new Instances(stripped)
        

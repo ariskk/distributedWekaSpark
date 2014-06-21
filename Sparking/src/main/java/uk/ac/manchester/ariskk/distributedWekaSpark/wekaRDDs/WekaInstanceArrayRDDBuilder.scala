@@ -4,18 +4,19 @@ import weka.core.Instances
 import weka.distributed.CSVToARFFHeaderMapTask
 import weka.distributed.CSVToARFFHeaderReduceTask
 import weka.core.Instance
+import weka.core.Utils
 
 /**Class that contains a map that parses an Array[String] and produces an Array[Instance]
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
-class WekaInstanceArrayRDDBuilder extends java.io.Serializable {
+class WekaInstanceArrayRDDBuilder(headers:Instances) extends java.io.Serializable {
   
   var m_rowparser=new CSVToARFFHeaderMapTask()
-
+  val stripped= CSVToARFFHeaderReduceTask.stripSummaryAtts(headers) 
    
-  def map(rows:Array[String], head:Instances):Array[Instance]={
-     val stripped= CSVToARFFHeaderReduceTask.stripSummaryAtts(head) 
+  def map(rows:Array[String]):Array[Instance]={
+    
      m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(stripped))
      var instanceArray=new Array[Instance](rows.length)
      var j=0  

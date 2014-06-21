@@ -216,8 +216,8 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
     //what happens if I persist dataset before/after I persist the others????
     def buildRDD():Unit={
       datasetType match {
-        case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder().map(_,headers))
-        case "Instances" => dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder().map(_,headers))
+        case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder(headers).map(_))
+        case "Instances" => dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder(headers).map(_))
         case "ArrayString" => println()
       }
     }
