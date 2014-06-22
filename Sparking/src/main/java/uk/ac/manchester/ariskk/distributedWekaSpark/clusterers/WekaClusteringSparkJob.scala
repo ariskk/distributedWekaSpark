@@ -22,7 +22,7 @@ class WekaClustererSparkJob extends java.io.Serializable{
   def buildClusterer(dataset:RDD[String],header:Instances,clustererToTrain:String,options:Array[String],num:Int):Clusterer={
     
        val clusterer=dataset.glom.map(new WekaClusteringSparkMapper(header).map(_))
-                                 .reduce(new WekaClusteringSparkReducer().reduce(_,_,num))
+                                 .reduce(new WekaClusteringSparkReducer(header).reduce(_,_,num))
    return clusterer
   }
   
@@ -38,7 +38,7 @@ class WekaClustererSparkJob extends java.io.Serializable{
                                                                                       (implicit d: DummyImplicit):Clusterer={
     
        val clusterer=dataset.map(new WekaClusteringSparkMapper(header).map(_))
-                                 .reduce(new WekaClusteringSparkReducer().reduce(_,_,-1))
+                                 .reduce(new WekaClusteringSparkReducer(header).reduce(_,_,-1))
    return null
   }
   
@@ -54,7 +54,7 @@ class WekaClustererSparkJob extends java.io.Serializable{
                                                               (implicit d1:DummyImplicit, d2:DummyImplicit):Clusterer={
     
       val clusterer=dataset.map(new WekaClusteringSparkMapper(header).map(_))
-                                .reduce(new WekaClusteringSparkReducer().reduce(_,_,-1))
+                                .reduce(new WekaClusteringSparkReducer(header).reduce(_,_,-1))
    return null
   }
 

@@ -53,12 +53,19 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
      val utils=new wekaSparkUtils
      val caching=options.getCachingStrategy
      val datasetType=options.getDatasetType
+    
+     
      var dataset=hdfsHandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
      dataset.persist(caching)
      
      var dataArrayInstance:RDD[Array[Instance]]=null
      var dataInstances:RDD[Instances]=null
      var headers:Instances=null
+     
+     var randomFlag=false
+     //////////////Needs o finish
+     if(options.getNumberOfRandomChunks>0){randomFlag=true
+       dataset.repartition(options.getNumberOfRandomChunks);}
      //val classIndex=
      //caching here or in main? maybe rename??
      

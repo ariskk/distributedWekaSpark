@@ -8,8 +8,9 @@ import weka.core.EuclideanDistance
 import weka.core.ChebyshevDistance
 import weka.core.ManhattanDistance
 import weka.core.MinkowskiDistance
+import weka.core.Instances
 
-class WekaClusteringSparkReducer extends java.io.Serializable{
+class WekaClusteringSparkReducer(head:Instances) extends java.io.Serializable{
   
   
   def reduce(clustA:Canopy,clustB:Canopy,numofcanopies:Int):Canopy={
@@ -19,8 +20,8 @@ class WekaClusteringSparkReducer extends java.io.Serializable{
     list.add(clustB)
     val dist=new EuclideanDistance(clustA.getCanopies())
     
-    val aggregated=Canopy.aggregateCanopies(list, clustA.getActualT1(), clustA.getActualT2(), dist, null, clustA.getCanopies().size)
-
+    val aggregated=Canopy.aggregateCanopies(list, clustA.getActualT1(), clustA.getActualT2(), dist, null, 3)
+    println(aggregated)
     return aggregated
   }
 
