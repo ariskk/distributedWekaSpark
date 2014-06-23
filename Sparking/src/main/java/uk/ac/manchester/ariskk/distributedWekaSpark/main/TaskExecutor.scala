@@ -62,10 +62,11 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
      var dataInstances:RDD[Instances]=null
      var headers:Instances=null
      
+     var rddmadeflag=false
      var randomFlag=false
      //////////////Needs o finish
-     if(options.getNumberOfRandomChunks>0){randomFlag=true
-       dataset.repartition(options.getNumberOfRandomChunks);}
+//     if(options.getNumberOfRandomChunks>0){randomFlag=true
+//       dataset.repartition(options.getNumberOfRandomChunks);}
      //val classIndex=
      //caching here or in main? maybe rename??
      
@@ -221,11 +222,13 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
     }
     //what happens if I persist dataset before/after I persist the others????
     def buildRDD():Unit={
+      if(rddmadeflag==false){
       datasetType match {
-        case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder(headers).map(_))
+        case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder(headers).map(_));dataArrayInstance.persist(caching);
         case "Instances" => dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder(headers).map(_))
         case "ArrayString" => 
       }
+      rddmadeflag==true}
     }
     
 

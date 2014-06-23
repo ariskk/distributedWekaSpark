@@ -76,7 +76,7 @@ object distributedWekaSpark extends java.io.Serializable{
 
       
       //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
-      val conf=new SparkConf().setAppName("distributedWekaSpark").setMaster(options.getMaster).set("spark.executor.memory","1g")
+      val conf=new SparkConf().setMaster("local[*]").setAppName("distributedWekaSpark")//.setMaster(options.getMaster).set("spark.executor.memory","2G").set("total-executor-cores","8")
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
       val utils=new wekaSparkUtils

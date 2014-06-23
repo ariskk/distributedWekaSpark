@@ -15,8 +15,8 @@ class WekaInstancesRDDBuilder (headers:Instances) extends java.io.Serializable {
   val stripped= CSVToARFFHeaderReduceTask.stripSummaryAtts(headers) 
   m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(stripped))
   
-  val split=Utils.splitOptions("-N first-last")
-  m_rowparser.setOptions(split)
+  //val split=Utils.splitOptions("-N first-last")
+ // m_rowparser.setOptions(split)
    
   def map(rows:Array[String]):Instances={
      

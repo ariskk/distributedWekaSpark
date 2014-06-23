@@ -133,7 +133,7 @@ class OptionsParser (options:String) extends java.io.Serializable{
   
   /**Number of  Randomized/Stratified RDDs to produce from the dataset*/
   def getNumberOfRandomChunks():Int={
-    if(chunks=="") return 4
+    if(chunks=="") return 0
     else return chunks.toInt   
   }
   

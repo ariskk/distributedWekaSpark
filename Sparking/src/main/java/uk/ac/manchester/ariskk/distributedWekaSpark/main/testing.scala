@@ -24,6 +24,7 @@ import weka.core.ChebyshevDistance
 
 
 
+
 object testing {
 
   def main(args: Array[String]): Unit = {
@@ -41,7 +42,8 @@ object testing {
     val asl=new FPGrowth
     asl.setLowerBoundMinSupport(0.1)
     asl.buildAssociations(inst)
-     
+    
+ 
     val rules=asl.getAssociationRules().getRules()
     
     val rule=rules.get(0)

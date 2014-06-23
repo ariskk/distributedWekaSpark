@@ -59,7 +59,7 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
      println(inst.size)
     //asl.setNumRulesToFind(hashi.keys.size) 
     asl.setMinMetric(0.9)
-    asl.setLowerBoundMinSupport(0.1)
+    asl.setLowerBoundMinSupport(0.07)
    // asl.setDelta(0.1)
  
     asl.setFindAllRulesForSupportLevel(true)
