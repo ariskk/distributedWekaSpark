@@ -19,10 +19,10 @@ class WekaClustererSparkJob extends java.io.Serializable{
    * @param dataset to process
    * @return a weka clusterer
    */
-  def buildClusterer(dataset:RDD[String],header:Instances,clustererToTrain:String,options:Array[String],numClusters:Int):Clusterer={
+  def buildClusterer(dataset:RDD[String],header:Instances,clustererToTrain:String,options:Array[String],numClusters:Int,distanceMetric:String):Clusterer={
     
        val clusterer=dataset.glom.map(new WekaClusteringSparkMapper(header,options).map(_))
-                                 .reduce(new WekaClusteringSparkReducer(header,null).reduce(_,_,numClusters))
+                                 .reduce(new WekaClusteringSparkReducer(header,distanceMetric).reduce(_,_,numClusters))
    return clusterer
   }
   
@@ -34,11 +34,11 @@ class WekaClustererSparkJob extends java.io.Serializable{
    * @param dataset to process
    * @return a weka clusterer
    */
-  def buildClusterer(dataset:RDD[Array[Instance]],header:Instances,clustererToTrain:String,options:Array[String],numClusters:Int)
+  def buildClusterer(dataset:RDD[Array[Instance]],header:Instances,clustererToTrain:String,options:Array[String],numClusters:Int,distanceMetric:String)
                                                                                       (implicit d: DummyImplicit):Clusterer={
     
        val clusterer=dataset.map(new WekaClusteringSparkMapper(header,options).map(_))
-                                 .reduce(new WekaClusteringSparkReducer(header,null).reduce(_,_,numClusters))
+                                 .reduce(new WekaClusteringSparkReducer(header,distanceMetric).reduce(_,_,numClusters))
    return null
   }
   
@@ -50,11 +50,11 @@ class WekaClustererSparkJob extends java.io.Serializable{
    * @param dataset to process
    * @return a weka clusterer
    */
-  def buildClusterer(dataset:RDD[Instances],header:Instances,clustererToTrain:String,options:Array[String],numClusters:Int)
+  def buildClusterer(dataset:RDD[Instances],header:Instances,clustererToTrain:String,options:Array[String],numClusters:Int,distanceMetric:String)
                                                               (implicit d1:DummyImplicit, d2:DummyImplicit):Clusterer={
     
       val clusterer=dataset.map(new WekaClusteringSparkMapper(header,options).map(_))
-                                .reduce(new WekaClusteringSparkReducer(header,null).reduce(_,_,numClusters))
+                                .reduce(new WekaClusteringSparkReducer(header,distanceMetric).reduce(_,_,numClusters))
    return null
   }
 

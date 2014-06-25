@@ -21,6 +21,12 @@ import java.util.ArrayList
 import weka.core.EuclideanDistance
 import weka.filters.SimpleFilter
 import weka.core.ChebyshevDistance
+import weka.associations.ItemSet
+import weka.associations.Item
+import java.util.Collection
+import weka.associations.DefaultAssociationRule
+import weka.core.Instance
+import weka.core.DenseInstance
 
 
 
@@ -29,10 +35,7 @@ object testing {
 
   def main(args: Array[String]): Unit = {
 
-    val hashi=new HashMap[String,Int]()
-    hashi+=("add" -> 5)
-    hashi+=("dad" -> 7)
-    println(hashi("add")+" "+ hashi("dad"))
+   
     
     
     val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarket.arff"))
@@ -45,12 +48,49 @@ object testing {
     
  
     val rules=asl.getAssociationRules().getRules()
+    val ru=asl.getAssociationRules()
     
     val rule=rules.get(0)
-    val prem=rule.getPremise()
-   // val items=prem.
     
+    val prem=rule.getPremise().asInstanceOf[ArrayList[Item]]
     
+    val listk=new ArrayList[Object]
+    val listl=new ArrayList[BinaryItem]
+    for(i <- 0 to prem.size-1){listk.add(new BinaryItem(prem.get(i).getAttribute(),prem.get(i).getFrequency()))
+      println(prem.get(i).getAttribute())
+      listl.add(new BinaryItem(prem.get(i).getAttribute(),prem.get(i).getFrequency()))
+    }
+    listl.add(new BinaryItem(rule.getConsequence().asInstanceOf[ArrayList[Item]].get(0).getAttribute(),rule.getConsequence().asInstanceOf[ArrayList[Item]].get(0).getFrequency()))
+   // println(rule.getConsequence().asInstanceOf[ArrayList[Item]].get(0).getFrequency())
+   val bin=new weka.associations.FPGrowth.FrequentBinaryItemSet(listk.asInstanceOf[ArrayList[BinaryItem]],rule.getPremiseSupport())
+   val bin2=new weka.associations.FPGrowth.FrequentBinaryItemSet(listl,rule.getTotalSupport())
+   
+   val freq=new weka.associations.FPGrowth.FrequentItemSets(inst.size)
+   val in=new DenseInstance(4)
+   
+   freq.addItemSet(bin)
+  // freq.addItemSet(bin2)
+   
+  // ItemSet.upDateCounters(, inst)
+   FPGrowth.generateRulesBruteForce(freq, DefaultAssociationRule.METRIC_TYPE.CONFIDENCE, 0.9, inst.size, 1, inst.size)
+    
+   exit(0)
+    
+    var itemlist=rule.getConsequence().asInstanceOf[ArrayList[Item]]
+    itemlist.addAll(rule.getPremise())
+    val some=itemlist.toArray()
+    
+    val itemiseti=new ItemSet(10)
+    //itemiseti.setItem(x$1)
+    val listu=new ArrayList[Object]
+    listu.add(itemiseti)
+    ItemSet.upDateCounters(listu, inst)
+    println(listu.get(0))
+    val itemsets=ItemSet.singletons(inst)
+    for( i<-0 to itemsets.size-1) { if( itemsets.get(i).asInstanceOf[ItemSet].containedBy(inst.get(0))){println(i)}}
+     
+   // println(item.containedBy(inst.get(0))) ;exit(0)
+    exit(0)
 //    val bin=new BinaryItem(null,0)
 //    val its=new FrequentBinaryItemSet(null,10)
 //    val manyits=new FrequentItemSets(50)
@@ -74,7 +114,7 @@ object testing {
     val can2=new Canopy
     
     can2.buildClusterer(inst3)
-   
+    
    // val canopies=can.getCanopies()
    // println(canopies)
     val list=new ArrayList[Canopy]

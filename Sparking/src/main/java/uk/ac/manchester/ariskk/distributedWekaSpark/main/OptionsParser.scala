@@ -59,6 +59,7 @@ class OptionsParser (options:String) extends java.io.Serializable{
   val ruleL=Utils.getOption("rule-learner",split)
   val clust=Utils.getOption("clusterer",split)
   val clusters=Utils.getOption("num-clusters",split)
+  val distance=Utils.getOption("distance-metric",split)
   val wekaOpts=Utils.getOption("weka-options",split)
   val parserOpts=Utils.getOption("parser-options",split)
     
@@ -183,13 +184,17 @@ class OptionsParser (options:String) extends java.io.Serializable{
   }
   
   def getClusterer():String={
-    if (clust=="") return "weka.clusterer.Canopy"
+    if (clust=="") return "weka.clusterers.Canopy"
     return clust
   }
   
   def getNumberOfClusters():Int={
     if (clusters=="") return -1
     return clusters.toInt
+  }
+  
+  def getDistanceMetric():String={
+    return distance
   }
   
     /**Return Weka related options (the rest of the options will be returned as well but will be ignored)*/

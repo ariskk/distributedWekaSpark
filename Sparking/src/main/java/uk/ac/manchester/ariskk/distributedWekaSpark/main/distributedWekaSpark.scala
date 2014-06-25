@@ -56,6 +56,8 @@ import weka.classifiers.functions.SGD
 import weka.classifiers.trees.RandomTree
 import weka.classifiers.rules.DecisionTable
 import org.apache.spark.storage.StorageLevel
+import weka.clusterers.SimpleKMeans
+
 
 
 
@@ -76,10 +78,11 @@ object distributedWekaSpark extends java.io.Serializable{
 
       
       //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
-      val conf=new SparkConf().setMaster("local[*]").setAppName("distributedWekaSpark")//.setMaster(options.getMaster).set("spark.executor.memory","2G").set("total-executor-cores","8")
+      val conf=new SparkConf()//.setMaster("local[*]").setAppName("distributedWekaSpark")//.setMaster(options.getMaster).set("spark.executor.memory","2G").set("total-executor-cores","8")
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
       val utils=new wekaSparkUtils
+      
       //var data=hdfshandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
      // data.persist(options.getCachingStrategy)
       //convert dataset either here or in Task.config
@@ -92,6 +95,8 @@ object distributedWekaSpark extends java.io.Serializable{
    
      //Dummy test-suite
      
+      
+      
       
       
      

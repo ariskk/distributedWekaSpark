@@ -188,9 +188,9 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       buildRDD
       val clustererJob=new WekaClustererSparkJob
       datasetType match {
-        case "ArrayInstance" => clusterer=clustererJob.buildClusterer(dataArrayInstance, headers, "Canopy", null ,options.getNumberOfClusters)
-        case "Instances"     => clusterer=clustererJob.buildClusterer(dataInstances, headers, "Canopy", null ,options.getNumberOfClusters)
-        case "ArrayString"   => clusterer=clustererJob.buildClusterer(dataset,headers, "Canopy", null ,options.getNumberOfClusters)
+        case "ArrayInstance" => clusterer=clustererJob.buildClusterer(dataArrayInstance, headers, "Canopy", options.getWekaOptions ,options.getNumberOfClusters,options.getDistanceMetric)
+        case "Instances"     => clusterer=clustererJob.buildClusterer(dataInstances, headers, "Canopy", options.getWekaOptions ,options.getNumberOfClusters,options.getDistanceMetric)
+        case "ArrayString"   => clusterer=clustererJob.buildClusterer(dataset,headers, "Canopy", options.getWekaOptions ,options.getNumberOfClusters,options.getDistanceMetric)
       }
       
       
@@ -214,7 +214,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
         case  "ArrayString"  => rules=associationRulesJob.findAssociationRules(dataset,headers,  0.1, 1, 1)
       }
       
-     // associationRulesJob.findAssociationRules(headers, dataset, minSupport, minConfidence, minLift)
+    
       
       hdfsHandler.saveObjectToHDFS(rules, options.getHdfsOutputPath, null)
       associationRulesJob.displayRules(rules)
@@ -224,9 +224,9 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
     def buildRDD():Unit={
       if(rddmadeflag==false){
       datasetType match {
-        case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder(headers).map(_));dataArrayInstance.persist(caching);
+        case "ArrayInstance" => dataArrayInstance=dataset.glom.map(new WekaInstanceArrayRDDBuilder(headers).map(_))
         case "Instances" => dataInstances=dataset.glom.map(new WekaInstancesRDDBuilder(headers).map(_))
-        case "ArrayString" => 
+        case "ArrayString" => println("Using ArrayString")
       }
       rddmadeflag==true}
     }

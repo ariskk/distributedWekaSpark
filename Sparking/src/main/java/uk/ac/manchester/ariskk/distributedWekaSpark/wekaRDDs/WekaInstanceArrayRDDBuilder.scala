@@ -23,6 +23,7 @@ class WekaInstanceArrayRDDBuilder(headers:Instances) extends java.io.Serializabl
      var j=0  
      for (x <- rows){
          instanceArray(j)=m_rowparser.makeInstance(stripped, true, m_rowparser.parseRowOnly(x))
+         //println(instanceArray(j));exit(0)
          j+=1
       }
        return instanceArray

@@ -9,7 +9,7 @@ import weka.filters.unsupervised.instance.ReservoirSample
 import weka.clusterers.Canopy
 import weka.core.Instance
 
-class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
+class WekaClusteringSparkMapper (header:Instances,options:Array[String]) extends java.io.Serializable{
   
    var m_rowparser=new CSVToARFFHeaderMapTask()
    
@@ -20,13 +20,15 @@ class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
     
     //Convert text to clusterer as in classifiers: Only Canopy currently supported
     val clusterer=new Canopy
-    
+    clusterer.setOptions(options)
+
     
   def map(rows:Array[String]):Canopy={
     
     
     for(x<-rows){
       val inst=m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))
+      
       header.add(inst)
       
      }
@@ -51,7 +53,7 @@ class WekaClusteringSparkMapper (header:Instances) extends java.io.Serializable{
    def map(instances:Instances):Canopy={
     
      clusterer.buildClusterer(instances)
-     println(clusterer)
+    
     return clusterer
   }
 

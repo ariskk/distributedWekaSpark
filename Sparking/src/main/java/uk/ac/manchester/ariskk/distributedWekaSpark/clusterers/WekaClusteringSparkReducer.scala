@@ -19,7 +19,7 @@ class WekaClusteringSparkReducer(head:Instances,distance:String) extends java.io
     case "ManhattanDistance" => normalizedDistance=new ManhattanDistance
     case "MinKowskiDistance" => normalizedDistance=new MinkowskiDistance
     case "ChebyshenDistance" => normalizedDistance=new ChebyshevDistance
-    case _                   => normalizedDistance=new EuclideanDistance
+    case  _                   => normalizedDistance=new EuclideanDistance
   }
   
   def reduce(clustA:Canopy,clustB:Canopy,numofcanopies:Int):Canopy={
@@ -30,7 +30,7 @@ class WekaClusteringSparkReducer(head:Instances,distance:String) extends java.io
     //val dist=new distance(clustA.getCanopies())
     normalizedDistance.setInstances(clustA.getCanopies())
     val aggregated=Canopy.aggregateCanopies(list, clustA.getActualT1(), clustA.getActualT2(), normalizedDistance, null, numofcanopies)
-    println(aggregated)
+    //println(aggregated)
     return aggregated
   }
 
