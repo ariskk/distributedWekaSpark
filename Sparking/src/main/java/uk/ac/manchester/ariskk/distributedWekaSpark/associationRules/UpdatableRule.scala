@@ -5,6 +5,8 @@ import weka.associations.Item
 import java.util.Collection
 import java.util.ArrayList
 import weka.associations.BinaryItem
+import java.util.Collections
+import java.util.Arrays
 
 /**Wrapper class for Weka's AssociationRule class that allows to update support,premise,consequence and transactions counts using aggregated partition values 
  * 
@@ -16,7 +18,7 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   var premise=rule.getPremiseSupport()
   var consequence=rule.getConsequenceSupport()
   var transactions=rule.getTotalTransactions()
-  val ruleID=rule.getPremise()+" "+rule.getConsequence()
+  val ruleID=makeRuleID(rule.getPremise(), rule.getConsequence())
   val premiseItems=rule.getPremise.asInstanceOf[ArrayList[BinaryItem]]
   val consequenceItems=rule.getConsequence().asInstanceOf[ArrayList[BinaryItem]]
   //
@@ -76,6 +78,15 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   
   def compare(that:UpdatableRule):Int=(that.getConfidence) compare (this.getConfidence)
   
+  def makeRuleID(premise:Collection[Item],consequence:Collection[Item]):String={
+    var list=new ArrayList[String]
+    
+    list.addAll(premise.asInstanceOf[Collection[String]])
+    list.addAll(consequence.asInstanceOf[Collection[String]])
+    Arrays.sort(list.toArray())
+    println(list.toString)
+    return list.toString()
+  }
   
   //
   def makeString(arrObj:Array[Object]):String={

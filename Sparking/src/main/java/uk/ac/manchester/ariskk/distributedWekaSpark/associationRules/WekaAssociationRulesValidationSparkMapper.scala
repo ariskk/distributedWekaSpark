@@ -26,59 +26,49 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
      my_nom2.add("high")
      val att=new Attribute("total",my_nom2)
     
+     var strippedHeader=headers
+     strippedHeader.replaceAttributeAt(att, 216)  ///WHY IS THAT????? it does influence ArrayString but not the other two. weird
 
  
       //Initialize the parser
       var m_rowparser=new CSVToARFFHeaderMapTask()
        //val split=Utils.splitOptions("-N first-last")
       m_rowparser.setOptions(rowparserOptions)
-       
-     
+      //Remove the summary from the headers
+      strippedHeader=CSVToARFFHeaderReduceTask.stripSummaryAtts(strippedHeader)
+      m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
 
-       
-     var asl=new FPGrowth
-     var heady=headers
-     heady.replaceAttributeAt(att, 216)  ///WHY IS THAT?????
-  
-    //Remove the summary from the headers
-     var strippedHeader=CSVToARFFHeaderReduceTask.stripSummaryAtts(heady)
-     var inst=new Instances(strippedHeader,0)
-     m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
-     
-   //  println(strippedHeader)
-     
   def map(rows:Array[String],hashmap:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
-     val hashy=hashmap
-     
+ 
      for (x <-rows){
-      // inst.add(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
        var instance=m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))
-       
-       //inst.get(0).isMissing(prem.get(0).getAttribute()))
+
       // breakable{
        var bool=true
-       hashy.foreach {
+       hashmap.foreach {
          k =>
            bool=true 
-           //&&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getAttribute().index()
+
            k._2.addTransactions(1)
            if((!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute()))
                &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) k._2.addConsequenceSupport(1) //need smarter here
-           
+           //make it a while
+           breakable{
            for(x <-0 to k._2.getPremiseItems.size()-1){
            if(instance.isMissing(k._2.getPremiseItems.get(x).getAttribute())||
-               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) {bool=false}//break
+               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) break//{bool=false}//break
 
            }
 
-           if(bool){
+          // if(bool){//
            k._2.addPremiseSupport(1)
            if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())
                &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) {
              k._2.addSupportCount(1)
              }
+          // }//breakends
            }
-
+           
        }
       // }
        
@@ -86,126 +76,86 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
       }
      
 
-     
-////    asl.buildAssociations(inst)
-//
-//    ruleList=asl.getAssociationRules().getRules()
-//    val hashyB=new HashMap[String,UpdatableRule]
-//    var updatedRule:UpdatableRule=null
-//    
-//   // println(ruleList.size);exit(0)
-//    //val hash=new HashMap[String,UpdatableRule]
-////    for(i<- 0 to ruleList.size()-1){
-////      
-////      if((ruleList.get(i).getPremise().toString.contains("fruit=t, vegetables=t, biscuits=t, total=high"))){ println(ruleList.get(i)+"    "+ruleList.get(i).getTotalTransactions())}}
-////    val rand=new Random
-////    println(rand.nextInt)
-//  
-//    for(x<-0 to ruleList.size()-1){
-//      
-//       if(hashy.contains(ruleList.get(x).getPremise().toString+" "+ruleList.get(x).getConsequence().toString)){
-//         
-//         println("hooray")
-//        
-//        updatedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
-//        updatedRule.setConsequenceSupport(ruleList.get(x).getConsequenceSupport)
-//        updatedRule.setPremiseSupport(ruleList.get(x).getPremiseSupport)
-//        updatedRule.setSupportCount(ruleList.get(x).getTotalSupport())
-//        updatedRule.setTransactions(ruleList.get(x).getTotalTransactions())
-//        hashy+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence()->updatedRule)
-//        hashyB+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() ->updatedRule)
-//        updatedRule=null
-//      }
-//     }
-   // hashy.foreach{k=>println(k._2.getRuleString)}
-    return hashy
+    return hashmap
   }
 
     
-   def map(rows:Array[Instance],hashi:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
-     val hashy=hashi
+   def map(rows:Array[Instance],hashmap:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
+     //val hashy=hashi
      
-     for (x <-rows){
-       inst.add(x)
-      }
-    println(inst.size)
-    asl.setMinMetric(0.9)
-    asl.setLowerBoundMinSupport(0.1)
-    asl.setMaxNumberOfItems(4)
- 
-    asl.setFindAllRulesForSupportLevel(true)
-    asl.buildAssociations(inst)
-    
-    
-    println(asl.getAssociationRules().getRules().size)
-    ruleList=asl.getAssociationRules().getRules()
-    
-    val hashyB=new HashMap[String,UpdatableRule]
-    var updatedRule:UpdatableRule=null
+     for (instance <-rows){
+   
+       // breakable{
+       var bool=true
+       hashmap.foreach {
+         k =>
+           bool=true 
 
-  
-    for(x<-0 to ruleList.size()-1){
-      
-       if(hashy.contains(ruleList.get(x).getPremise().toString+" "+ruleList.get(x).getConsequence().toString)){
-         
-         println("hooray")
-        
-        updatedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
-        updatedRule.setConsequenceSupport(ruleList.get(x).getConsequenceSupport)
-        updatedRule.setPremiseSupport(ruleList.get(x).getPremiseSupport)
-        updatedRule.setSupportCount(ruleList.get(x).getTotalSupport())
-        updatedRule.setTransactions(ruleList.get(x).getTotalTransactions())
-        hashy+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence()->updatedRule)
-        hashyB+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() ->updatedRule)
-        updatedRule=null
-      }
-     }
+           k._2.addTransactions(1)
+           if((!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute()))
+               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) k._2.addConsequenceSupport(1) //need smarter here
+           //make it a while
+           breakable{
+           for(x <-0 to k._2.getPremiseItems.size()-1){
+           if(instance.isMissing(k._2.getPremiseItems.get(x).getAttribute())||
+               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) break//{bool=false}//break
 
-    return hashy
+           }
+
+          // if(bool){//
+           k._2.addPremiseSupport(1)
+           if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())
+               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) {
+             k._2.addSupportCount(1)
+             }
+          // }//breakends
+           }
+           
+       }
+      // }
+      }
+
+    return hashmap
   }
    
    
   
-    def map(instances:Instances,hashi:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
-     val hashy=hashi
+    def map(instances:Instances,hashmap:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
+    // val hashy=hashi
 
-     println(instances.size)
-    //asl.setNumRulesToFind(hashi.keys.size) 
-    asl.setMinMetric(0.9)
-    asl.setLowerBoundMinSupport(0.1)
-   // asl.setDelta(0.1)
- 
-    asl.setFindAllRulesForSupportLevel(true)
-    asl.buildAssociations(instances)
-    
-    
-    println(asl.getAssociationRules().getRules().size)
-    ruleList=asl.getAssociationRules().getRules()
-    
-    val hashyB=new HashMap[String,UpdatableRule]
-    var updatedRule:UpdatableRule=null
-
-  
-    for(x<-0 to ruleList.size()-1){
-      
-       if(hashy.contains(ruleList.get(x).getPremise().toString+" "+ruleList.get(x).getConsequence().toString)){
-         
-         println("hooray")
+      for(i <-0 to instances.size()-1){
+        var instance=instances.get(i)
         
-        updatedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
-        updatedRule.setConsequenceSupport(ruleList.get(x).getConsequenceSupport)
-        updatedRule.setPremiseSupport(ruleList.get(x).getPremiseSupport)
-        updatedRule.setSupportCount(ruleList.get(x).getTotalSupport())
-        updatedRule.setTransactions(ruleList.get(x).getTotalTransactions())
-        hashy+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence()->updatedRule)
-        hashyB+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() ->updatedRule)
-        updatedRule=null
-      }
-     }
+        // breakable{
+       var bool=true
+      hashmap.foreach {
+         k =>
+           bool=true 
 
-        
-     // println(hashy.isEmpty+" "+hashy.keys.size)
-    return hashy
+           k._2.addTransactions(1)
+           if((!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute()))
+               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) k._2.addConsequenceSupport(1) //need smarter here
+           //make it a while
+           breakable{
+           for(x <-0 to k._2.getPremiseItems.size()-1){
+           if(instance.isMissing(k._2.getPremiseItems.get(x).getAttribute())||
+               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) break//{bool=false}//break
+
+           }
+
+          // if(bool){//
+           k._2.addPremiseSupport(1)
+           if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())
+               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) {
+             k._2.addSupportCount(1)
+             }
+          // }//breakends
+           }
+           
+       }
+      // }
+       }
+     return hashmap
   }
     
     def updateHashMap():Unit={}
