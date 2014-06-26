@@ -85,21 +85,7 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
           j+=1
       }
        Sorting.quickSort(array)
-       val fullsupport=new Array[String](array.length)
-       val lesssupport=new Array[String](array.length)
-       var i=0;var o=0;
-       
-       array.foreach{x =>
-         x.getTransactions match{
-           //need something to define full, 80% etc support
-           case  n if n>2500 => fullsupport(i)=x.getRuleString;i+=1
-           case _ =>   lesssupport(o)=x.getRuleString;o+=1
-         }}
-        println("\n Full Support \n")
-        fullsupport.foreach{x => if(x!=null)println(x)} 
-        println("\n Less support \n")
-        lesssupport.foreach{x => if(x!=null)println(x)}
-     
+       array.foreach{rule => println(rule.getRuleString)}
      
    }
 }

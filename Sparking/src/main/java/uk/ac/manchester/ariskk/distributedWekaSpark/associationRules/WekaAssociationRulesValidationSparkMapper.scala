@@ -30,8 +30,8 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
  
       //Initialize the parser
       var m_rowparser=new CSVToARFFHeaderMapTask()
-      // val split=Utils.splitOptions("-N first-last")
-       m_rowparser.setOptions(rowparserOptions)
+       //val split=Utils.splitOptions("-N first-last")
+      m_rowparser.setOptions(rowparserOptions)
        
      
 
@@ -51,28 +51,34 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
      val hashy=hashmap
      
      for (x <-rows){
-       inst.add(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
+      // inst.add(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
        var instance=m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))
+       
        //inst.get(0).isMissing(prem.get(0).getAttribute()))
-       //breakable{
+      // breakable{
        var bool=true
        hashy.foreach {
          k =>
            bool=true 
-           
+           //&&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getAttribute().index()
            k._2.addTransactions(1)
-           if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())) k._2.addConsequenceSupport(1) //need smarter here
+           if((!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute()))
+               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) k._2.addConsequenceSupport(1) //need smarter here
+           
            for(x <-0 to k._2.getPremiseItems.size()-1){
-           if(instance.isMissing(k._2.getPremiseItems.get(x).getAttribute())) {bool=false}//break
+           if(instance.isMissing(k._2.getPremiseItems.get(x).getAttribute())||
+               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) {bool=false}//break
+
            }
+
            if(bool){
            k._2.addPremiseSupport(1)
-           if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())) {
+           if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())
+               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) {
              k._2.addSupportCount(1)
              }
-           //hashy+=(k._1 ->k._2)
            }
-          // println(k._2.getRuleString)
+
        }
       // }
        
@@ -111,7 +117,7 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
 //        updatedRule=null
 //      }
 //     }
-
+   // hashy.foreach{k=>println(k._2.getRuleString)}
     return hashy
   }
 
@@ -125,7 +131,7 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
     println(inst.size)
     asl.setMinMetric(0.9)
     asl.setLowerBoundMinSupport(0.1)
-
+    asl.setMaxNumberOfItems(4)
  
     asl.setFindAllRulesForSupportLevel(true)
     asl.buildAssociations(inst)
