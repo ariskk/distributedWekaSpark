@@ -31,7 +31,11 @@ class WekaRandomizedChunksSparkJob {
        if(!strippedHeaders.classAttribute().isNominal()) {
           m_rowParser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeaders))
           var randomGen=new Random(1L)
-          for(i<-1 to 10){randomGen.nextInt}  //throw away the first 10 numbers. They tend to be less random
+          //throw away the first 10 numbers. They tend to be less random
+          for(i<-1 to 10){randomGen.nextInt} 
+          //send each nominal value to partition based on a couter. 
+          //Example :value:a,b,c and 8 partitions {x,a},{x,a},{x,b}...{x,c} first a goes to part0 (i++), second a goes to part1, first b goes to part0 etc
+          //Or each value goes to random partition. Needs semantic checking
           //ToDo: find a way to ensure each chunk has similar class distribution
           //return random shuffling for nominal values as well in this version
           return dataset.repartition(numOfChunks)

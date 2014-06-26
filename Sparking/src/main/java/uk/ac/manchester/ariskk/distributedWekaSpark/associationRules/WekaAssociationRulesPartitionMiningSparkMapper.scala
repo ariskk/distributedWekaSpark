@@ -78,8 +78,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 
     asl.setMinMetric(0.90)
     asl.setLowerBoundMinSupport(0.1)
-   // asl.setFindAllRulesForSupportLevel(true)
- //   asl.setDelta(0.)
+ 
     asl.setNumRulesToFind(10)
     asl.buildAssociations(inst)
     
@@ -90,7 +89,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 //    ruleList=asl.asInstanceOf[FPGrowth].getAssociationRules().getRules() 
 //    }
 //    else{throw new DistributedWekaException("Unsupported AssociationRule Miner!")}
-     println(inst.size)
+    println(inst.size)
     println(asl.getAssociationRules().getRules().size)
     ruleList=asl.getAssociationRules().getRules()
 

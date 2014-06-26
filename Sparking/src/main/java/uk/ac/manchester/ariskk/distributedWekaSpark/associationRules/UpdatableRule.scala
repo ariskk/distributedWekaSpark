@@ -2,6 +2,9 @@ package uk.ac.manchester.ariskk.distributedWekaSpark.associationRules
 
 import weka.associations.AssociationRule
 import weka.associations.Item
+import java.util.Collection
+import java.util.ArrayList
+import weka.associations.BinaryItem
 
 /**Wrapper class for Weka's AssociationRule class that allows to update support,premise,consequence and transactions counts using aggregated partition values 
  * 
@@ -14,8 +17,8 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   var consequence=rule.getConsequenceSupport()
   var transactions=rule.getTotalTransactions()
   val ruleID=rule.getPremise()+" "+rule.getConsequence()
-  val premiseItems=rule.getPremise()
-  val consequenceItems=rule.getConsequence()
+  val premiseItems=rule.getPremise.asInstanceOf[ArrayList[BinaryItem]]
+  val consequenceItems=rule.getConsequence().asInstanceOf[ArrayList[BinaryItem]]
   //
   val premiseString=makeString(rule.getPremise().toArray)
   val consequeceString=makeString(rule.getConsequence().toArray)
@@ -24,10 +27,13 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   def getPremiseString:String=return premiseString
   def getConsequenceString:String=return consequeceString
   //
+  def getPremiseItems:ArrayList[BinaryItem]=return premiseItems
+  def getConsequenceItems:ArrayList[BinaryItem]=return consequenceItems
+  
   
   def getRule:String=return ruleID
   def getNumberOfItems:Int=return numOfItems
-  def getRuleString:String=return rule.getPremise()+" "+getPremiseSupport+" "+rule.getConsequence()+" "+getSupportCount+" conf:"+getCondidence+
+  def getRuleString:String=return rule.getPremise()+" "+getPremiseSupport+" "+rule.getConsequence()+" "+getSupportCount+" conf:"+getConfidence+
                                   " lift:"+getLift+" leverage:"+getLeverage+" conviction:"+getConviction
   
   def getSupportCount:Int=return support
@@ -52,7 +58,7 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   def getRuleSupport:Double=if(transactions>0)return round(support.toDouble/transactions.toDouble) else return 0
   
   
-  def getCondidence:Double=if(premise>0)return round(support.toDouble/premise.toDouble) else return 0
+  def getConfidence:Double=if(premise>0)return round(support.toDouble/premise.toDouble) else return 0
 
 
   def getLift:Double=if(premise*consequence>0)return round((support.toDouble*transactions.toDouble)/(premise.toDouble*consequence.toDouble)) else return 0
@@ -68,7 +74,7 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   
   def round(num:Double):Double=return BigDecimal(num).setScale(4, BigDecimal.RoundingMode.HALF_UP).toDouble
   
-  def compare(that:UpdatableRule):Int=(that.getCondidence) compare (this.getCondidence)
+  def compare(that:UpdatableRule):Int=(that.getConfidence) compare (this.getConfidence)
   
   
   //

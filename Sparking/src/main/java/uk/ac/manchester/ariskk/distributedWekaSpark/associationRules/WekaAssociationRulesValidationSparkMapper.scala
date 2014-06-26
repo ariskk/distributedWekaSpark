@@ -15,26 +15,24 @@ import weka.associations.DefaultAssociationRule
 import weka.associations.Apriori
 import scala.util.Random
 import weka.core.Instance
+import scala.util.control.Breaks._
 
 class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:String,rowparserOptions:Array[String]) extends java.io.Serializable{
     var ruleList:List[AssociationRule]=null
 
-    
-    var my_nom2=new ArrayList[String](2)
+     //dummy for supermarket only
+     var my_nom2=new ArrayList[String](2)
      my_nom2.add("low")
      my_nom2.add("high")
      val att=new Attribute("total",my_nom2)
     
 
-
-    //Initialize the parser
+ 
+      //Initialize the parser
       var m_rowparser=new CSVToARFFHeaderMapTask()
-     // m_rowparser.setOptions(rowparserOptions)
-    
-    
-      val split=Utils.splitOptions("-N first-last")
-       m_rowparser.setOptions(split)
-       println( m_rowparser.getOptions().mkString(" " ))
+      // val split=Utils.splitOptions("-N first-last")
+       m_rowparser.setOptions(rowparserOptions)
+       
      
 
        
@@ -49,56 +47,71 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
      
    //  println(strippedHeader)
      
-  def map(rows:Array[String],hashi:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
-     val hashy=hashi
+  def map(rows:Array[String],hashmap:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
+     val hashy=hashmap
      
      for (x <-rows){
        inst.add(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
+       var instance=m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))
+       //inst.get(0).isMissing(prem.get(0).getAttribute()))
+       //breakable{
+       var bool=true
+       hashy.foreach {
+         k =>
+           bool=true 
+           
+           k._2.addTransactions(1)
+           if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())) k._2.addConsequenceSupport(1) //need smarter here
+           for(x <-0 to k._2.getPremiseItems.size()-1){
+           if(instance.isMissing(k._2.getPremiseItems.get(x).getAttribute())) {bool=false}//break
+           }
+           if(bool){
+           k._2.addPremiseSupport(1)
+           if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())) {
+             k._2.addSupportCount(1)
+             }
+           //hashy+=(k._1 ->k._2)
+           }
+          // println(k._2.getRuleString)
+       }
+      // }
+       
+       
       }
      
-     println(inst.size)
-    //asl.setNumRulesToFind(hashi.keys.size) 
-    asl.setMinMetric(0.9)
-    asl.setLowerBoundMinSupport(0.07)
-   // asl.setDelta(0.1)
- 
-    asl.setFindAllRulesForSupportLevel(true)
-    asl.buildAssociations(inst)
-    
-    
-    println(asl.getAssociationRules().getRules().size)
-    ruleList=asl.getAssociationRules().getRules()
-    
-    val hashyB=new HashMap[String,UpdatableRule]
-    var updatedRule:UpdatableRule=null
-    
-   // println(ruleList.size);exit(0)
-    //val hash=new HashMap[String,UpdatableRule]
-//    for(i<- 0 to ruleList.size()-1){
-//      
-//      if((ruleList.get(i).getPremise().toString.contains("fruit=t, vegetables=t, biscuits=t, total=high"))){ println(ruleList.get(i)+"    "+ruleList.get(i).getTotalTransactions())}}
-//    val rand=new Random
-//    println(rand.nextInt)
-  
-    for(x<-0 to ruleList.size()-1){
-      
-       if(hashy.contains(ruleList.get(x).getPremise().toString+" "+ruleList.get(x).getConsequence().toString)){
-         
-         println("hooray")
-        
-        updatedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
-        updatedRule.setConsequenceSupport(ruleList.get(x).getConsequenceSupport)
-        updatedRule.setPremiseSupport(ruleList.get(x).getPremiseSupport)
-        updatedRule.setSupportCount(ruleList.get(x).getTotalSupport())
-        updatedRule.setTransactions(ruleList.get(x).getTotalTransactions())
-        hashy+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence()->updatedRule)
-        hashyB+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() ->updatedRule)
-        updatedRule=null
-      }
-     }
 
-        
-     // println(hashy.isEmpty+" "+hashy.keys.size)
+     
+////    asl.buildAssociations(inst)
+//
+//    ruleList=asl.getAssociationRules().getRules()
+//    val hashyB=new HashMap[String,UpdatableRule]
+//    var updatedRule:UpdatableRule=null
+//    
+//   // println(ruleList.size);exit(0)
+//    //val hash=new HashMap[String,UpdatableRule]
+////    for(i<- 0 to ruleList.size()-1){
+////      
+////      if((ruleList.get(i).getPremise().toString.contains("fruit=t, vegetables=t, biscuits=t, total=high"))){ println(ruleList.get(i)+"    "+ruleList.get(i).getTotalTransactions())}}
+////    val rand=new Random
+////    println(rand.nextInt)
+//  
+//    for(x<-0 to ruleList.size()-1){
+//      
+//       if(hashy.contains(ruleList.get(x).getPremise().toString+" "+ruleList.get(x).getConsequence().toString)){
+//         
+//         println("hooray")
+//        
+//        updatedRule=hashy(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence())
+//        updatedRule.setConsequenceSupport(ruleList.get(x).getConsequenceSupport)
+//        updatedRule.setPremiseSupport(ruleList.get(x).getPremiseSupport)
+//        updatedRule.setSupportCount(ruleList.get(x).getTotalSupport())
+//        updatedRule.setTransactions(ruleList.get(x).getTotalTransactions())
+//        hashy+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence()->updatedRule)
+//        hashyB+=(ruleList.get(x).getPremise()+" "+ruleList.get(x).getConsequence() ->updatedRule)
+//        updatedRule=null
+//      }
+//     }
+
     return hashy
   }
 
