@@ -62,6 +62,8 @@ class OptionsParser (options:String) extends java.io.Serializable{
   val distance=Utils.getOption("distance-metric",split)
   val wekaOpts=Utils.getOption("weka-options",split)
   val parserOpts=Utils.getOption("parser-options",split)
+  val compress=Utils.getOption("compress",split)
+  val kryo=Utils.getOption("kryo",split)
     
   /**Get a string that describes the user requested task.eg: classification,clustering etc ++*/
   def getTask():String={
@@ -85,9 +87,20 @@ class OptionsParser (options:String) extends java.io.Serializable{
       case "DISK_ONLY" => return StorageLevel.DISK_ONLY
       case "MEMORY_ONLY_2" => return StorageLevel.MEMORY_ONLY_2
       case "MEMORY_AND_DISK_2" => return StorageLevel.MEMORY_AND_DISK_2
+      case "OFF_HEAP" => return StorageLevel.OFF_HEAP
       case _ => println("Not recognised or supported caching strategy requested! Will use MEMORY_AND_DISK instead"); return StorageLevel.MEMORY_AND_DISK
     }
     
+  }
+  
+  def useCompression():Boolean={
+    if(compress=="y")return true
+    return false
+  }
+  
+  def useKryo():Boolean={
+    if(kryo=="y") return true
+    return false
   }
 
   /**Spark Master adress*/

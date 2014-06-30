@@ -57,7 +57,12 @@ import weka.classifiers.trees.RandomTree
 import weka.classifiers.rules.DecisionTable
 import org.apache.spark.storage.StorageLevel
 import weka.clusterers.SimpleKMeans
-
+import org.apache.spark.serializer.KryoRegistrator
+import com.esotericsoftware.kryo.Kryo
+import uk.ac.manchester.ariskk.distributedWekaSpark.headers.CSVToArffHeaderSparkMapper
+import uk.ac.manchester.ariskk.distributedWekaSpark.headers.CSVToArffHeaderSparkReducer
+import com.esotericsoftware.minlog.Log
+import com.esotericsoftware.minlog.Log._
 
 
 
@@ -71,14 +76,24 @@ import weka.clusterers.SimpleKMeans
 
 object distributedWekaSpark extends java.io.Serializable{
    def main(args : Array[String]){
-       
+     
+
+     
       println(args.mkString(" "))
-        val options=new OptionsParser(args.mkString(" "))
-      
+      val options=new OptionsParser(args.mkString(" "))
+      //Log.set(LEVEL_DEBUG)
 
       
       //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
       val conf=new SparkConf()//.setMaster("local[*]").setAppName("distributedWekaSpark")//.setMaster(options.getMaster).set("spark.executor.memory","2G").set("total-executor-cores","8")
+     
+      if(options.useCompression){
+      conf.set("spark.rdd.compress","true")}
+      
+      if(options.useKryo){
+      conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      conf.set("spark.kryo.registrator", "uk.ac.manchester.ariskk.distributedWekaSpark.kryo.WekaSparkKryoRegistrator")
+      }
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
       val utils=new wekaSparkUtils
@@ -86,8 +101,8 @@ object distributedWekaSpark extends java.io.Serializable{
       //var data=hdfshandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
      // data.persist(options.getCachingStrategy)
       //convert dataset either here or in Task.config
-      
-      
+     
+    
         val task=new TaskExecutor(hdfshandler,options)
       
         exit(0)
@@ -127,6 +142,7 @@ object distributedWekaSpark extends java.io.Serializable{
        var dataset=hdfshandler.loadRDDFromHDFS(hdfsPath, numberOfPartitions)
        var dataset2=hdfshandler.loadRDDFromHDFS(hdfsPath, 1)
        dataset.persist(options.getCachingStrategy)
+       
        
        
        //glom? here on not?

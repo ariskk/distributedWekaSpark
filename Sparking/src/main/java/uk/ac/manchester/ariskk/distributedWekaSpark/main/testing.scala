@@ -27,7 +27,8 @@ import java.util.Collection
 import weka.associations.DefaultAssociationRule
 import weka.core.Instance
 import weka.core.DenseInstance
-
+import weka.core.FastVector
+import scala.util.control.Breaks._
 
 
 
@@ -35,7 +36,13 @@ object testing {
 
   def main(args: Array[String]): Unit = {
 
-   
+   breakable {
+   for(i <-0 to 2){
+     
+     if(i==1) break
+     println("shit")
+   }
+   }
     
     
     val source = new BufferedReader( new FileReader("/home/weka/Documents/weka-3-7-10/data/supermarket.arff"))
@@ -52,25 +59,50 @@ object testing {
     
     val rule=rules.get(0)
     
-    val prem=rule.getPremise().asInstanceOf[ArrayList[Item]]
-    
-    val listk=new ArrayList[Object]
-    val listl=new ArrayList[BinaryItem]
-    for(i <- 0 to prem.size-1){listk.add(new BinaryItem(prem.get(i).getAttribute(),prem.get(i).getFrequency()))
-      println(prem.get(i).getAttribute())
-      listl.add(new BinaryItem(prem.get(i).getAttribute(),prem.get(i).getFrequency()))
-    }
-    listl.add(new BinaryItem(rule.getConsequence().asInstanceOf[ArrayList[Item]].get(0).getAttribute(),rule.getConsequence().asInstanceOf[ArrayList[Item]].get(0).getFrequency()))
+    val prem=rule.getPremise.asInstanceOf[ArrayList[BinaryItem]]
+    println(prem); 
+    val con=rule.getConsequence().asInstanceOf[ArrayList[BinaryItem]]
+    con.addAll(prem)
+    //val iii=new ItemSet(prem)
+  
+//    val listk=new ArrayList[Object]
+//    val listl=new ArrayList[BinaryItem]
+//    for(i <- 0 to prem.size-1){listk.add(new BinaryItem(prem.get(i).getAttribute(),prem.get(i).getFrequency()))
+//      println(prem.get(i).getAttribute())
+//      listl.add(new BinaryItem(prem.get(i).getAttribute(),prem.get(i).getFrequency()))
+//    }
+//    listl.add(new BinaryItem(rule.getConsequence().asInstanceOf[ArrayList[Item]].get(0).getAttribute(),rule.getConsequence().asInstanceOf[ArrayList[Item]].get(0).getFrequency()))
    // println(rule.getConsequence().asInstanceOf[ArrayList[Item]].get(0).getFrequency())
-   val bin=new weka.associations.FPGrowth.FrequentBinaryItemSet(listk.asInstanceOf[ArrayList[BinaryItem]],rule.getPremiseSupport())
-   val bin2=new weka.associations.FPGrowth.FrequentBinaryItemSet(listl,rule.getTotalSupport())
+   val premset=new weka.associations.FPGrowth.FrequentBinaryItemSet(prem,rule.getPremiseSupport())
+   val conset=new weka.associations.FPGrowth.FrequentBinaryItemSet(con,rule.getTotalSupport())
    
+   //inst.
+   println(inst.get(0).isMissing(prem.get(0).getAttribute()))
+
+  // println(inst.get(0).((prem.get(2).getAttribute().index()))
+   println(inst.get(0).value(prem.get(3).getAttribute().index()))
+   println(prem.get(3).getValueIndex().toDouble)
+   if(inst.get(0).value(prem.get(3).getAttribute().index())==prem.get(3).getValueIndex().toDouble){println("sdjlkjlsjld")}
+   println("adsda")
+   println(inst.get(0).attribute(prem.get(3).getAttribute().index).weight())
+   println(prem.get(3).getAttribute().weight())
+   exit(0)
+   println(inst.get(0).isMissing(inst.get(0).attribute(81)))
+   println(prem.get(0).getAttribute())
    val freq=new weka.associations.FPGrowth.FrequentItemSets(inst.size)
-   val in=new DenseInstance(4)
+  
    
-   freq.addItemSet(bin)
-  // freq.addItemSet(bin2)
-   
+   freq.addItemSet(premset)
+   freq.addItemSet(conset)
+   println(prem)
+   val setList=new ArrayList[Object]
+    setList.add(premset)
+    setList.add(conset)
+    ItemSet.upDateCounters(setList, inst)
+    
+    val it=new ItemSet(9)
+    it.upDateCounter(inst.get(0))
+   println(prem)
   // ItemSet.upDateCounters(, inst)
    FPGrowth.generateRulesBruteForce(freq, DefaultAssociationRule.METRIC_TYPE.CONFIDENCE, 0.9, inst.size, 1, inst.size)
     
