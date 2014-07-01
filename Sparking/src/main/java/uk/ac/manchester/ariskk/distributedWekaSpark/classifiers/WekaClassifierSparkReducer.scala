@@ -14,7 +14,7 @@
  */
 
 /*
- *    distributedWekaSpark.scala
+ *    WekaClassifierSparkReducer.scala
  *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
  *
  */
