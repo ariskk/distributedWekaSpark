@@ -44,9 +44,9 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
    * @param minSupport/confidence/lift user thresholds that the generated rules must meet
    * @return a HashMap containing the rules
    */
-  def findAssociationRules (dataset:RDD[String],headers:Instances,minSupport:Double,minConfidence:Double,minLift:Double):HashMap[String,UpdatableRule]={
+  def findAssociationRules (dataset:RDD[String],headers:Instances,parserOptions:Array[String],wekaOptions:Array[String]):HashMap[String,UpdatableRule]={
     
-     val candidateRules=dataset.glom.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,null).map(_))
+     val candidateRules=dataset.glom.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,parserOptions,wekaOptions).map(_))
                                     .reduce(new WekaAssociationRulesSparkReducer().reduce(_,_))
 
      val finalRules=dataset.glom.map(new WekaAssociationRulesValidationSparkMapper(headers,null,null).map(_,candidateRules))
@@ -62,10 +62,10 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
    * @param minSupport/confidence/lift user thresholds that the generated rules must meet
    * @return a HashMap containing the rules
    */
-  def findAssociationRules (dataset:RDD[Array[Instance]],headers:Instances,minSupport:Double,minConfidence:Double,minLift:Double)
+  def findAssociationRules (dataset:RDD[Array[Instance]],headers:Instances,parserOptions:Array[String],wekaOptions:Array[String])
                                                                                           (implicit d: DummyImplicit):HashMap[String,UpdatableRule]={
     
-     val candidateRules=dataset.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,null).map(_))
+     val candidateRules=dataset.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,parserOptions,wekaOptions).map(_))
                                     .reduce(new WekaAssociationRulesSparkReducer().reduce(_,_))
 
      val finalRules=dataset.map(new WekaAssociationRulesValidationSparkMapper(headers,null,null).map(_,candidateRules))
@@ -81,10 +81,10 @@ class WekaAssociationRulesSparkJob extends java.io.Serializable{
    * @param minSupport/confidence/lift user thresholds that the generated rules must meet
    * @return a HashMap containing the rules
    */
-  def findAssociationRules (dataset:RDD[Instances],headers:Instances,minSupport:Double,minConfidence:Double,minLift:Double)
+  def findAssociationRules (dataset:RDD[Instances],headers:Instances,parserOptions:Array[String],wekaOptions:Array[String])
                                                                           (implicit d1: DummyImplicit, d2:DummyImplicit):HashMap[String,UpdatableRule]={
     
-     val candidateRules=dataset.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,null).map(_))
+     val candidateRules=dataset.map(new WekaAssociationRulesPartitionMiningSparkMapper(headers,null,parserOptions,wekaOptions).map(_))
                                     .reduce(new WekaAssociationRulesSparkReducer().reduce(_,_))
 
      val finalRules=dataset.map(new WekaAssociationRulesValidationSparkMapper(headers,null,null).map(_,candidateRules))

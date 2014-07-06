@@ -64,6 +64,8 @@ class OptionsParser (options:String) extends java.io.Serializable{
   val parserOpts=Utils.getOption("parser-options",split)
   val compress=Utils.getOption("compress",split)
   val kryo=Utils.getOption("kryo",split)
+  
+
     
   /**Get a string that describes the user requested task.eg: classification,clustering etc ++*/
   def getTask():String={

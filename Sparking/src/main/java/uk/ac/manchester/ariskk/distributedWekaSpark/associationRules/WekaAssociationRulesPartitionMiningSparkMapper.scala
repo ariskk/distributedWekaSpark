@@ -47,7 +47,7 @@ import org.apache.spark.SparkContext
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
-class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner:String,rowparserOptions:Array[String]) extends java.io.Serializable{
+class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner:String,rowparserOptions:Array[String],ruleMinerOptions:Array[String]) extends java.io.Serializable{
     
     var ruleList:List[AssociationRule]=null
 
@@ -65,7 +65,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
     
     
       val split=Utils.splitOptions("-N first-last")
-       m_rowparser.setOptions(split)
+       m_rowparser.setOptions(rowparserOptions)
      //  println( m_rowparser.getOptions().mkString(" " ))
      
    
@@ -80,6 +80,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 //    else if(cla.isInstanceOf[FPGrowth]){asl=new FPGrowth}
        
      var asl=new FPGrowth
+     asl.setOptions(ruleMinerOptions)
      var heady=headers
    //  heady.replaceAttributeAt(att, 216)  ///WHY IS THAT?????
      
@@ -97,10 +98,10 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
       }
 
 
-    asl.setMinMetric(0.90)
-    asl.setLowerBoundMinSupport(0.1)
- 
-    asl.setNumRulesToFind(10)
+   // asl.setMinMetric(0.90)
+   // asl.setLowerBoundMinSupport(0.001)
+    
+   // asl.setNumRulesToFind(10)
     asl.buildAssociations(inst)
     
     
@@ -138,10 +139,10 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
        inst.add(x)
       }
 
-    asl.setMinMetric(0.90)
-    asl.setLowerBoundMinSupport(0.1)
+   /// asl.setMinMetric(0.90)
+   // asl.setLowerBoundMinSupport(0.1)
     //hacky trick about attribute
-    asl.setNumRulesToFind(10)
+   // asl.setNumRulesToFind(10)
     asl.buildAssociations(inst)
     
 
@@ -165,10 +166,10 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
     def map(instances:Instances):HashMap[String,UpdatableRule]={
 
 
-    asl.setMinMetric(0.90)
-    asl.setLowerBoundMinSupport(0.1)
+   /// asl.setMinMetric(0.90)
+   /// asl.setLowerBoundMinSupport(0.1)
     //hacky trick about attribute
-    asl.setNumRulesToFind(10)
+  //  asl.setNumRulesToFind(10)
     asl.buildAssociations(instances)
 
     println(instances.size)

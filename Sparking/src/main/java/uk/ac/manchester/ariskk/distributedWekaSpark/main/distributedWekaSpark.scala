@@ -179,9 +179,9 @@ object distributedWekaSpark extends java.io.Serializable{
        
        
       val rulejob=new WekaAssociationRulesSparkJob
-      val rules=rulejob.findAssociationRules(dataset,headers,  0.1, 1, 1)
-      val rulesA=rulejob.findAssociationRules(dat2,headers,  0.1, 1, 1)
-      val rulesB=rulejob.findAssociationRules(dat,headers, 0.1, 1, 1)
+      val rules=rulejob.findAssociationRules(dataset,headers,options.getParserOptions,options.getWekaOptions)
+      val rulesA=rulejob.findAssociationRules(dat2,headers, options.getParserOptions,options.getWekaOptions)
+      val rulesB=rulejob.findAssociationRules(dat,headers, options.getParserOptions,options.getWekaOptions)
       val array=new Array[UpdatableRule](rulesA.keys.size)
       var j=0
       rulesA.foreach{ 

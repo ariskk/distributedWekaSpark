@@ -209,9 +209,9 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       buildRDD
       val associationRulesJob=new WekaAssociationRulesSparkJob
       datasetType match {
-        case "ArrayInstance" => rules=associationRulesJob.findAssociationRules(dataArrayInstance,headers,  0.1, 1, 1)
-        case "Instances"     => rules=associationRulesJob.findAssociationRules(dataInstances,headers,  0.1, 1, 1)
-        case  "ArrayString"  => rules=associationRulesJob.findAssociationRules(dataset,headers,  0.1, 1, 1)
+        case "ArrayInstance" => rules=associationRulesJob.findAssociationRules(dataArrayInstance,headers,options.getParserOptions,options.getWekaOptions)
+        case "Instances"     => rules=associationRulesJob.findAssociationRules(dataInstances,headers,options.getParserOptions,options.getWekaOptions)
+        case  "ArrayString"  => rules=associationRulesJob.findAssociationRules(dataset,headers, options.getParserOptions,options.getWekaOptions)
       }
       
     
