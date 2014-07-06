@@ -81,11 +81,11 @@ object distributedWekaSpark extends java.io.Serializable{
      
       println(args.mkString(" "))
       val options=new OptionsParser(args.mkString(" "))
-      //Log.set(LEVEL_DEBUG)
+     // Log.set(LEVEL_TRACE)
 
       
       //Configuration of Context - need to check that at a large scale: spark seems to add a context by default
-      val conf=new SparkConf()//.setMaster("local[*]").setAppName("distributedWekaSpark")//.setMaster(options.getMaster).set("spark.executor.memory","2G").set("total-executor-cores","8")
+      val conf=new SparkConf().setMaster("local[*]").setAppName("distributedWekaSpark")//.setMaster(options.getMaster).set("spark.executor.memory","2G").set("total-executor-cores","8")
      
       if(options.useCompression){
       conf.set("spark.rdd.compress","true")}
@@ -94,6 +94,7 @@ object distributedWekaSpark extends java.io.Serializable{
       conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       conf.set("spark.kryo.registrator", "uk.ac.manchester.ariskk.distributedWekaSpark.kryo.WekaSparkKryoRegistrator")
       }
+      
       val sc=new SparkContext(conf)
       val hdfshandler=new HDFSHandler(sc)
       val utils=new wekaSparkUtils
@@ -132,7 +133,8 @@ object distributedWekaSpark extends java.io.Serializable{
       
       
       
-     
+     //val cf=new CSVToARFFHeaderMapTask
+    
      
       
       

@@ -48,7 +48,7 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
      val att=new Attribute("total",my_nom2)
     
      var strippedHeader=headers
-     strippedHeader.replaceAttributeAt(att, 216)  ///WHY IS THAT????? it does influence ArrayString but not the other two. weird
+    // strippedHeader.replaceAttributeAt(att, 216)  ///WHY IS THAT????? it does influence ArrayString but not the other two. weird
 
  
       //Initialize the parser

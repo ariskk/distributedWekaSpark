@@ -81,8 +81,8 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
        
      var asl=new FPGrowth
      var heady=headers
-     heady.replaceAttributeAt(att, 216)  ///WHY IS THAT?????
-  
+   //  heady.replaceAttributeAt(att, 216)  ///WHY IS THAT?????
+     
     //Remove the summary from the headers
      var strippedHeader=CSVToARFFHeaderReduceTask.stripSummaryAtts(heady)
      var inst=new Instances(strippedHeader,0)

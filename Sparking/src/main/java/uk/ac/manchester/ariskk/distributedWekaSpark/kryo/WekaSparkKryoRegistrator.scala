@@ -41,6 +41,8 @@ import weka.core.Instance
 import weka.core.Instances
 import weka.distributed.CSVToARFFHeaderMapTask
 import weka.distributed.CSVToARFFHeaderReduceTask
+import weka.core.DenseInstance
+import weka.core.ProtectedProperties
 
 class WekaSparkKryoRegistrator extends KryoRegistrator{
   
@@ -51,10 +53,13 @@ class WekaSparkKryoRegistrator extends KryoRegistrator{
         kryo.register(classOf[CSVToARFFHeaderReduceTask])
         kryo.register(classOf[CSVToARFFHeaderMapTask])
         kryo.register(classOf[ArrayList[Instances]])
-        kryo.register(classOf[Instances])
+        kryo.register(classOf[Instances],new InstancesSerializer)
         kryo.register(classOf[Instance])
-        kryo.register(classOf[Attribute])
+        kryo.register(classOf[Attribute],new AttributeSerializer(kryo,classOf[Attribute]))
         kryo.register(classOf[AbstractList[Any]])
+        kryo.register(classOf[DenseInstance],new DenseInstanceSerializer)
+        kryo.register(classOf[ProtectedProperties],new ProtectedPropertiesSerializer(kryo,classOf[ProtectedProperties]))
+     
   }
 
 }
