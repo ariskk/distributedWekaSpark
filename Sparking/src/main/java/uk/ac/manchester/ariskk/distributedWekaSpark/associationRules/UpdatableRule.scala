@@ -102,9 +102,12 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   def makeRuleID(premise:Collection[Item],consequence:Collection[Item]):String={
     var list=new ArrayList[String]
     
-    list.addAll(premise.asInstanceOf[Collection[String]])
+   list.addAll(premise.asInstanceOf[Collection[String]])
     list.addAll(consequence.asInstanceOf[Collection[String]])
-    Arrays.sort(list.toArray())
+    //list.addAll(premise)
+    //list.addAll(consequence)
+    Collections.sort(list)
+   // Arrays.sort(list.toArray())
     println(list.toString)
     return list.toString()
   }
