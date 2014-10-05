@@ -15,7 +15,7 @@
 
 /*
  *    WekaClassifierEvaluationSparkJob.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -44,9 +44,9 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
    *  @param the class index
    *  @return an Evaluation object
    */
-  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[String],classIndex:Int): Evaluation={
+  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[String],classIndex:Int,parserOpts:Array[String]): Evaluation={
     
-     val eval=dataset.glom.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex).map(_))
+     val eval=dataset.glom.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex,parserOpts).map(_))
                           .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_,_))
     return eval
   }
@@ -59,10 +59,10 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
    *  @param the class index
    *  @return an Evaluation object
    */
-  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[Array[Instance]],classIndex:Int)
+  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[Array[Instance]],classIndex:Int,parserOpts:Array[String])
                                                                (implicit d1: DummyImplicit, d2: DummyImplicit): Evaluation={
     
-     val eval=dataset.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex).map(_))
+     val eval=dataset.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex,parserOpts).map(_))
                           .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_,_))
     return eval
   }
@@ -75,10 +75,10 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
    *  @param the class indexsingle 
    *  @return an Evaluation object
    */
-  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[Instances],classIndex:Int)
+  def evaluateClassifier (classifier:Classifier,headers:Instances,dataset:RDD[Instances],classIndex:Int,parserOpts:Array[String])
                                                                               (implicit d: DummyImplicit): Evaluation={
     
-     val eval=dataset.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex).map(_))
+     val eval=dataset.map(new WekaClassifierEvaluationSparkMapper(headers,classifier,classIndex,parserOpts).map(_))
                           .reduce(new WekaClassifierEvaluationSparkReducer().reduce(_,_))
     return eval
   }
@@ -131,7 +131,8 @@ class WekaClassifierEvaluationSparkJob extends java.io.Serializable{
   }
   
   /** A method to display the evaluation results
-    *  
+   *  
+    * Can be further extended 
     *   @param an Evaluation object
     */
   def displayEval(aggregated:Evaluation):Unit={

@@ -15,7 +15,7 @@
 
 /*
  *    WekaClassifierFoldBasedEvaluationSparkMapper.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -32,16 +32,16 @@ import weka.distributed.WekaClassifierEvaluationReduceTask
 import weka.core.Instance
 
 
-/**Mapper taks for fold-based evaluation
+/**Mapper task for fold-based evaluation
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
 class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:Classifier,folds:Int,classIndex:Int) extends java.io.Serializable {
 
-   //ToDo: isupdatable, forced trained, documentation ++ why so slow?
+   //ToDo: isupdatable, forced trained
   
    
-   var m_combiner=new WekaClassifierEvaluationReduceTask ////is this?
+   var m_combiner=new WekaClassifierEvaluationReduceTask
    
    //Initialize a container for the WekaBase tasks
    var m_tasks=new ArrayList[WekaClassifierEvaluationMapTask]
@@ -63,7 +63,7 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
    m_tasks.get(i).setFoldNumber(i+1)
    m_tasks.get(i).setTotalNumFolds(folds)
    //Compute priors for the evaluation tasks
-   m_tasks.get(i).setup(strippedHeaders, computePriors(), computePriorsCount(), seed, 0) //last is predFrac and is used to compute AUC/AuPRC ?? setbatch trained incremental ??
+   m_tasks.get(i).setup(strippedHeaders, computePriors(), computePriorsCount(), seed, 0) //last is predFrac and is used to compute AUC/AuPRC
    }
   
    
@@ -76,8 +76,7 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
    val evals=new ArrayList[Evaluation]
    for(i<-0 to rows.length-1){
      for(j<-0 to folds-1){
-       //m_task checks if instance is in the fold set. no need to check here
-      
+      //m_task checks if instance is in the fold set. no need to check here
       m_tasks.get(j).processInstance(m_rowparser.makeInstance(strippedHeaders, true, m_rowparser.parseRowOnly(rows(i))))
       }
     }
@@ -85,7 +84,7 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
       m_tasks.get(j).finalizeTask()
       evals.add(m_tasks.get(j).getEvaluation())
     }
-    return m_combiner.aggregate(evals)   //needs semantic checking
+    return m_combiner.aggregate(evals) //++
   }
    
    /**Fold-based Evaluation Mapper. Accepts the dataset in Array[Instance] format
@@ -105,7 +104,7 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
       m_tasks.get(j).finalizeTask()
       evals.add(m_tasks.get(j).getEvaluation())
     }
-    return m_combiner.aggregate(evals)   //needs semantic checking
+    return m_combiner.aggregate(evals)   //++
   }
   
   /**Fold-based Evaluation Mapper. Accepts the dataset as an Instances object
@@ -117,15 +116,15 @@ class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:
    val evals=new ArrayList[Evaluation]
    
      for(j<-0 to folds-1){
-       //m_task checks if instance is in the fold set. no need to check here
-     // m_tasks.get(j).setInstances(instances)
+      //m_task checks if instance is in the fold set. no need to check here
+     // m_tasks.get(j).setInstances(instances)  NOT YET IMPLEMENTED IN THE BASE TASKS.
       }
     
     for(j<-0 to folds-1){
       m_tasks.get(j).finalizeTask()
       evals.add(m_tasks.get(j).getEvaluation())
     }
-    return m_combiner.aggregate(evals)   //needs semantic checking
+    return m_combiner.aggregate(evals)   //++
   }
   
   

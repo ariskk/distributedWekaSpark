@@ -15,7 +15,7 @@
 
 /*
  *    OptionsParser.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -34,7 +34,6 @@ import org.apache.spark.storage.StorageLevel
  */
 class OptionsParser (options:String) extends java.io.Serializable{
   
-  //!!!!Utils.getOption(...) can be called ONLY ONCE. the next time it returns empry!!!
   
   
   //String containing user provided options of the format "-option-type1 optionValue1 -option-type2 optionValue2"
@@ -54,6 +53,7 @@ class OptionsParser (options:String) extends java.io.Serializable{
   val index=Utils.getOption("class-index",split)
   val folds=Utils.getOption("num-folds",split)
   val names=Utils.getOption("names",split)
+  val headers=Utils.getOption("gen-header",split)
   val classifier=Utils.getOption("classifier",split)
   val meta=Utils.getOption("meta",split)
   val ruleL=Utils.getOption("rule-learner",split)
@@ -64,7 +64,10 @@ class OptionsParser (options:String) extends java.io.Serializable{
   val parserOpts=Utils.getOption("parser-options",split)
   val compress=Utils.getOption("compress",split)
   val kryo=Utils.getOption("kryo",split)
-  
+  val cacheFraction=Utils.getOption("cache-fraction",split)
+  val overhead=Utils.getOption("overhead",split)
+  val localityDelay=Utils.getOption("locality-wait",split)
+  val memory=Utils.getOption("cluster-memory",split)
 
     
   /**Get a string that describes the user requested task.eg: classification,clustering etc ++*/
@@ -90,16 +93,18 @@ class OptionsParser (options:String) extends java.io.Serializable{
       case "MEMORY_ONLY_2" => return StorageLevel.MEMORY_ONLY_2
       case "MEMORY_AND_DISK_2" => return StorageLevel.MEMORY_AND_DISK_2
       case "OFF_HEAP" => return StorageLevel.OFF_HEAP
-      case _ => println("Not recognised or supported caching strategy requested! Will use MEMORY_AND_DISK instead"); return StorageLevel.MEMORY_AND_DISK
+      case _ =>  return null
     }
     
   }
   
+  /**Compress the RDDs */
   def useCompression():Boolean={
     if(compress=="y")return true
     return false
   }
   
+  /**Use Kryo serialisation*/
   def useKryo():Boolean={
     if(kryo=="y") return true
     return false
@@ -119,23 +124,25 @@ class OptionsParser (options:String) extends java.io.Serializable{
   
     /**Returns an hdfs path to the names file*/
   def getNamesPath():String={
-    //if (namespath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/namessupermarket"
     return namespath
   }
   
+  /**Returns an hdfs path to the headers file*/
   def getHdfsHeadersInputPath():String={
    return headersPath
   }
   
+  /**Returns an hdfs path to a pre-built weka classifier*/
   def getHdfsClassifierInputPath():String={
    return classifierPath
   }
   
+  /**Returns an hdfs path to a pre-built weka clusterer*/
   def getHdfsClustererInputPath():String={
     return null
    }
   
-  
+  /**Path to save the output */
   def getHdfsOutputPath():String={
     if (outpath=="") return "hdfs://sandbox.hortonworks.com:8020/user/weka/"
     return outpath
@@ -143,7 +150,7 @@ class OptionsParser (options:String) extends java.io.Serializable{
   
   /**Number of partitions the RDD should have*/
   def getNumberOfPartitions():Int={
-    if(partitions=="") return  2
+    if(partitions=="") return  0
     return partitions.toInt
   }
   
@@ -161,9 +168,6 @@ class OptionsParser (options:String) extends java.io.Serializable{
   
   /**Index of the class attribute*/
   def getClassIndex():Int={
-   
-    //THis will not work!!!! get option can be called once and was called right above
-    //if(index=="") return getNumberOfAttributes-1
     return index.toInt
   }
   
@@ -179,49 +183,80 @@ class OptionsParser (options:String) extends java.io.Serializable{
     return names
   }
   
+  /**Whether or not to generate header statistics (may not be needed for numeric attributes)*/
+ def generateHeaderStatistics():Boolean={
+   if(headers=="y")return true
+   return false
+ }
 
-
-  /**Get a string that contains the name of the user requested classifier*/
+  /**Get a string that contains the name of the user requested classifier. Default: NaiveBayes*/
   def getClassifier():String={
     if (classifier=="")return "weka.classifiers.bayes.NaiveBayes"
     else return classifier
   }
   
-  /**Get a string that contains the name of the user requestes meta learner */
+  /**Get a string that contains the name of the user requested meta-learner */
   def getMetaLearner():String={
     if (meta=="") return "default"
     return meta
   }
   
+  /**Get a string that contains the name of the user requested assoc learner*/
   def getRuleLearner():String={
     if (ruleL=="") return "weka.associations.FPGrowth"
     return ruleL
   }
   
+  /**Get a string that contains the name of the user requested clusterer*/
   def getClusterer():String={
     if (clust=="") return "weka.clusterers.Canopy"
     return clust
   }
   
+  /**Get the user requested number of clusters*/
   def getNumberOfClusters():Int={
     if (clusters=="") return -1
     return clusters.toInt
   }
   
+  /**Get the user requested distance metric */
   def getDistanceMetric():String={
     return distance
   }
   
-    /**Return Weka related options (the rest of the options will be returned as well but will be ignored)*/
+   /**Return Weka related options (the rest of the options will be returned as well but will be ignored)*/
   def getWekaOptions():Array[String]={
-    // scheme.setOptions(weka.core.Utils.splitOptions("-C 1.0 -L 0.0010 -P 1.0E-12 -N 0 -V -1 -W 1 -K \"weka.classifiers.
-       //           functions.supportVector.PolyKernel -C 250007 -E 1.0\""));
     return Utils.splitOptions(wekaOpts)
   } 
 
+  /**Returns the parser options*/
   def getParserOptions():Array[String]={
-   
-    return Utils.splitOptions(parserOpts)
+   return Utils.splitOptions(parserOpts)
+  }
+  
+  /**Heap cache fraction to user */
+  def getHeapCacheFraction():Double={
+    if(cacheFraction=="")return 0.6
+    return cacheFraction.toDouble
+  }
+  
+  /**Overhead of an RDD in comparison with the on-disk raw data */
+  def getOverhead():Double={
+    if(overhead=="")return 5
+    return overhead.toDouble
+  }
+  
+  /**Get the user requested locality delay*/
+  def getLocalityDelay:String={
+    if(localityDelay=="")return "3000"
+    else return localityDelay
+  }
+  
+  /**Cluster-wide main memory (++)*/
+  def getClusterMemory:Double={
+    if(memory=="")return 0
+    else return memory.toDouble
+    
   }
   }
   

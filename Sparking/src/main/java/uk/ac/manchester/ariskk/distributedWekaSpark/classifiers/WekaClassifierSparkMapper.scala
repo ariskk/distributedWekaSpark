@@ -15,7 +15,7 @@
 
 /*
  *    WekaClassifierSparkMapper.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -31,6 +31,7 @@ import weka.distributed.CSVToARFFHeaderReduceTask
 import weka.classifiers.SingleClassifierEnhancer
 import weka.core.Utils
 import weka.core.Instance
+import weka.classifiers.meta.FilteredClassifier
 
 /**Mapper implementation for WekaClassifierSpark job 
  * 
@@ -55,6 +56,8 @@ class WekaClassifierSparkMapper (metaLearner:String,classifierToTrain:String,cla
     val obj=Class.forName(classifierToTrain).newInstance()
     val cla=obj.asInstanceOf[Classifier]
     
+    //val classifier=obj.asInstanceOf[]
+   
     //Check if a custom MetaLearner is requested
     if(metaLearner!="default"){
 	    val obj2=Class.forName(metaLearner).newInstance()
@@ -65,7 +68,7 @@ class WekaClassifierSparkMapper (metaLearner:String,classifierToTrain:String,cla
     else{
         m_task.setClassifier(cla) 
     }
-    
+
   
     //Remove the summary from the headers. Set the class attribute
     val strippedHeader:Instances=CSVToARFFHeaderReduceTask.stripSummaryAtts(header) //clean-up headers should be set at this point
@@ -79,11 +82,10 @@ class WekaClassifierSparkMapper (metaLearner:String,classifierToTrain:String,cla
   /**Map task for training a classifier using an Array[String] (String represents a line of a  csv file)
    * 
    * @param rows is a dataset partition in Array[String] format
-   * @return a trained classifier on the provided parition
+   * @return a trained classifier on the provided partition
    */
    def map(rows:Array[String]): Classifier={
-     for(x <- rows){
-     
+     for(x <- rows){     
        m_task.processInstance(m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x)))
        }                                    //ToDo:many options here: updatable/not, batch/not, forced
        m_task.finalizeTask()

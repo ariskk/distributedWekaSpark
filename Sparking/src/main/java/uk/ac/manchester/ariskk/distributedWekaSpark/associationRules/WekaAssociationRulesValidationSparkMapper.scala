@@ -15,7 +15,7 @@
 
 /*
  *    WekaAssociationRulesValidationSparkMapper.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -41,30 +41,19 @@ import scala.util.control.Breaks._
 class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:String,rowparserOptions:Array[String]) extends java.io.Serializable{
     var ruleList:List[AssociationRule]=null
 
-     //dummy for supermarket only
-     var my_nom2=new ArrayList[String](2)
-     my_nom2.add("low")
-     my_nom2.add("high")
-     val att=new Attribute("total",my_nom2)
-    
-     var strippedHeader=headers
-    // strippedHeader.replaceAttributeAt(att, 216)  ///WHY IS THAT????? it does influence ArrayString but not the other two. weird
+    var strippedHeader=headers
 
- 
-      //Initialize the parser
-      var m_rowparser=new CSVToARFFHeaderMapTask()
-       //val split=Utils.splitOptions("-N first-last")
-      m_rowparser.setOptions(rowparserOptions)
-      //Remove the summary from the headers
-      strippedHeader=CSVToARFFHeaderReduceTask.stripSummaryAtts(strippedHeader)
-      m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
+     //set options and remove summary stats
+     var m_rowparser=new CSVToARFFHeaderMapTask()
+     m_rowparser.setOptions(rowparserOptions)
+     strippedHeader=CSVToARFFHeaderReduceTask.stripSummaryAtts(strippedHeader)
+     m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
 
   def map(rows:Array[String],hashmap:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
  
      for (x <-rows){
        var instance=m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))
 
-      // breakable{
        var bool=true
        hashmap.foreach {
          k =>
@@ -72,68 +61,48 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
 
            k._2.addTransactions(1)
            if((!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute()))
-               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) k._2.addConsequenceSupport(1) //need smarter here
-           //make it a while
+               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) k._2.addConsequenceSupport(1) 
            breakable{
            for(x <-0 to k._2.getPremiseItems.size()-1){
            if(instance.isMissing(k._2.getPremiseItems.get(x).getAttribute())||
-               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) break//{bool=false}//break
+               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) break
 
            }
 
-          // if(bool){//
            k._2.addPremiseSupport(1)
            if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())
                &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) {
              k._2.addSupportCount(1)
              }
-          // }//breakends
-           }
-           
+           }          
        }
-      // }
-       
-       
+        
       }
-     
 
     return hashmap
   }
 
     
    def map(rows:Array[Instance],hashmap:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
-     //val hashy=hashi
      
      for (instance <-rows){
-   
-       // breakable{
-       var bool=true
        hashmap.foreach {
          k =>
-           bool=true 
-
            k._2.addTransactions(1)
            if((!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute()))
                &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) k._2.addConsequenceSupport(1) //need smarter here
-           //make it a while
            breakable{
            for(x <-0 to k._2.getPremiseItems.size()-1){
            if(instance.isMissing(k._2.getPremiseItems.get(x).getAttribute())||
-               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) break//{bool=false}//break
-
+               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) break
            }
-
-          // if(bool){//
            k._2.addPremiseSupport(1)
            if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())
                &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) {
              k._2.addSupportCount(1)
              }
-          // }//breakends
-           }
-           
+           }    
        }
-      // }
       }
 
     return hashmap
@@ -142,42 +111,30 @@ class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:Str
    
   
     def map(instances:Instances,hashmap:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
-    // val hashy=hashi
 
       for(i <-0 to instances.size()-1){
         var instance=instances.get(i)
-        
-        // breakable{
-       var bool=true
+
       hashmap.foreach {
          k =>
-           bool=true 
-
            k._2.addTransactions(1)
            if((!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute()))
-               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) k._2.addConsequenceSupport(1) //need smarter here
-           //make it a while
+               &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) k._2.addConsequenceSupport(1)
            breakable{
            for(x <-0 to k._2.getPremiseItems.size()-1){
            if(instance.isMissing(k._2.getPremiseItems.get(x).getAttribute())||
-               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) break//{bool=false}//break
+               instance.value(k._2.getPremiseItems.get(x).getAttribute().index)!=k._2.getPremiseItems.get(x).getValueIndex().toDouble) break
 
            }
-
-          // if(bool){//
            k._2.addPremiseSupport(1)
            if(!instance.isMissing(k._2.getConsequenceItems.get(0).getAttribute())
                &&instance.value(k._2.getConsequenceItems.get(0).getAttribute().index)==k._2.getConsequenceItems.get(0).getValueIndex().toDouble) {
              k._2.addSupportCount(1)
              }
-          // }//breakends
-           }
-           
+           }     
        }
-      // }
        }
      return hashmap
   }
     
-    def updateHashMap():Unit={}
 }

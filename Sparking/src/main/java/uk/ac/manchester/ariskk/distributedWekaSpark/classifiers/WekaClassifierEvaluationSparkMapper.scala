@@ -15,7 +15,7 @@
 
 /*
  *    WekaClassifierEvaluationSparkMapper.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -31,16 +31,17 @@ import weka.core.Instance
 
 /**Mapper implementation of the Classifier Evaluation Job
  * 
- * Has Mappers to process datasets in three different formats: Array[String], Array[Instace], Instances
+ * Contains Mappers to process datasets in three different formats: Array[String], Array[Instace], Instances
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
-class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifier,classIndex:Int) extends java.io.Serializable {
+class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifier,classIndex:Int,rowparserOptions:Array[String]) extends java.io.Serializable {
   
    //Initialize distributedWekaBase Evaluation map task and csv_rowparser in case the dataset is in String format
    var m_task=new WekaClassifierEvaluationMapTask
    var m_rowparser=new CSVToARFFHeaderMapTask()
-   var strippedHeaders=CSVToARFFHeaderReduceTask.stripSummaryAtts(headers) //cleanup: this has to be done at task config
-   strippedHeaders.setClassIndex(classIndex) // same
+   m_rowparser.setOptions(rowparserOptions)
+   var strippedHeaders=CSVToARFFHeaderReduceTask.stripSummaryAtts(headers)
+   strippedHeaders.setClassIndex(classIndex)
    m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeaders))
    
    //Set-up map task
@@ -48,7 +49,7 @@ class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifie
    val seed=1L //random seed
    val classAttSummaryName = CSVToARFFHeaderMapTask.ARFF_SUMMARY_ATTRIBUTE_PREFIX + classAtt.name()
    val summaryClassAtt=headers.attribute(classAttSummaryName)
-   m_task.setup(strippedHeaders, computePriors(), computePriorsCount(), seed, 0) //last is predFrac and is used to compute AUC/AuPRC ??
+   m_task.setup(strippedHeaders, computePriors(), computePriorsCount(), seed, 0) //last is predFrac and is used to compute AUC/AuPRC 
    m_task.setClassifier(classifier)
    m_task.setTotalNumFolds(1)
    
@@ -98,7 +99,9 @@ class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifie
    
 
     
-    /**Computes priors for each attribute (frequency counts for nominal values or sum of target for numeric)*/
+    /**Computes priors for each attribute (frequency counts for nominal values or sum of target for numeric)
+     * 
+     * */
     def computePriors (): Array[Double]={ 
       if(classAtt.isNominal()){
         val priorsNom=new Array[Double](classAtt.numValues())

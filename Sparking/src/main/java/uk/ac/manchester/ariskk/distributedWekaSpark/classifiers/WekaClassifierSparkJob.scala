@@ -15,7 +15,7 @@
 
 /*
  *    WekaClassifierSparkJob.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -53,7 +53,7 @@ class WekaClassifierSparkJob extends java.io.Serializable {
                                       parserOptions:Array[String],classifierOptions:Array[String]) : Classifier = {
        
      
-       //compute the classifier: map produces a classifier for each partition and reduce aggregates the partition classifiers to a single output
+      
       val classifier=dataset.glom.map(new WekaClassifierSparkMapper(metaLearner,classifierToTrain,classifierOptions,parserOptions,headers).map(_))
                                   .reduce(new WekaClassifierSparkReducer(null).reduce(_,_))
                                   
@@ -71,9 +71,8 @@ class WekaClassifierSparkJob extends java.io.Serializable {
    */
    def buildClassifier (dataset:RDD[Array[Instance]],metaLearner:String,classifierToTrain:String,headers:Instances,
                         parserOptions:Array[String],classifierOptions:Array[String]) (implicit d: DummyImplicit): Classifier = {
-       //
-     println("111111111111111111111111111111111111")
-       //compute the classifier: map produces a classifier for each partition and reduce aggregates the partition classifiers to a single output
+    
+      
       val classifier=dataset.map(new WekaClassifierSparkMapper(metaLearner,classifierToTrain,classifierOptions,parserOptions,headers).map(_))
                                   .reduce(new WekaClassifierSparkReducer(null).reduce(_,_))
                                   
@@ -91,9 +90,7 @@ class WekaClassifierSparkJob extends java.io.Serializable {
    */
     def buildClassifier (dataset:RDD[Instances],metaLearner:String,classifierToTrain:String,headers:Instances,
                          parserOptions:Array[String],classifierOptions:Array[String]) (implicit d1: DummyImplicit, d2: DummyImplicit): Classifier = {
-       //
-     
-       //compute the classifier: map produces a classifier for each partition (Instances) and reduce aggregates the partition classifiers to a single output
+       
       val classifier=dataset.map(new WekaClassifierSparkMapper(metaLearner,classifierToTrain,classifierOptions,parserOptions,headers).map(_))
                                   .reduce(new WekaClassifierSparkReducer(null).reduce(_,_))
                                   

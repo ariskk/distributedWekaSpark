@@ -15,7 +15,7 @@
 
 /*
  *    WekaClusteringSparkJob.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -28,6 +28,7 @@ import weka.core.Instance
 
 /**Spark Job for building Weka's Clusterers
  * 
+ * This Job can only be used on Canopy Clusterers at the moment
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
 class WekaClustererSparkJob extends java.io.Serializable{

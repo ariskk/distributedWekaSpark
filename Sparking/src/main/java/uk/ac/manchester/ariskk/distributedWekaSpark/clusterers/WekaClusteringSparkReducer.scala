@@ -15,7 +15,7 @@
 
 /*
  *    WekaClusteringSparkReducer.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -31,6 +31,11 @@ import weka.core.ManhattanDistance
 import weka.core.MinkowskiDistance
 import weka.core.Instances
 
+/** 
+ *  Reduce Task for Distributed Clustering Job
+ *  
+ *  @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ *  */
 class WekaClusteringSparkReducer(head:Instances,distance:String) extends java.io.Serializable{
   
   var normalizedDistance:NormalizableDistance=null
@@ -48,10 +53,8 @@ class WekaClusteringSparkReducer(head:Instances,distance:String) extends java.io
     val list=new ArrayList[Canopy]
     list.add(clustA)
     list.add(clustB)
-    //val dist=new distance(clustA.getCanopies())
     normalizedDistance.setInstances(clustA.getCanopies())
     val aggregated=Canopy.aggregateCanopies(list, clustA.getActualT1(), clustA.getActualT2(), normalizedDistance, null, numofcanopies)
-    //println(aggregated)
     return aggregated
   }
 

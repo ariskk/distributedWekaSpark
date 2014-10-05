@@ -15,7 +15,7 @@
 
 /*
  *    UpdatableRule.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -34,7 +34,7 @@ import java.util.Arrays
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com) 
  */
 class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ordered[UpdatableRule]{
-  //To-Do : accept accuracies
+ 
   var support=rule.getTotalSupport()
   var premise=rule.getPremiseSupport()
   var consequence=rule.getConsequenceSupport()
@@ -42,14 +42,14 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   val ruleID=makeRuleID(rule.getPremise(), rule.getConsequence())
   val premiseItems=rule.getPremise.asInstanceOf[ArrayList[BinaryItem]]
   val consequenceItems=rule.getConsequence().asInstanceOf[ArrayList[BinaryItem]]
-  //
+  
   val premiseString=makeString(rule.getPremise().toArray)
   val consequeceString=makeString(rule.getConsequence().toArray)
   val numOfItems=rule.getPremise().toArray.size+rule.getConsequence().toArray.size
   
   def getPremiseString:String=return premiseString
   def getConsequenceString:String=return consequeceString
-  //
+ 
   def getPremiseItems:ArrayList[BinaryItem]=return premiseItems
   def getConsequenceItems:ArrayList[BinaryItem]=return consequenceItems
   
@@ -77,7 +77,7 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
   def setTransactions(tr:Int):Unit=transactions=tr
   def addTransactions(tr:Int):Unit=transactions+=tr
   
-  //semantic checking
+ 
   def getRuleSupport:Double=if(transactions>0)return round(support.toDouble/transactions.toDouble) else return 0
   
   
@@ -104,15 +104,11 @@ class UpdatableRule (rule:AssociationRule) extends java.io.Serializable with Ord
     
    list.addAll(premise.asInstanceOf[Collection[String]])
     list.addAll(consequence.asInstanceOf[Collection[String]])
-    //list.addAll(premise)
-    //list.addAll(consequence)
     Collections.sort(list)
-   // Arrays.sort(list.toArray())
-    println(list.toString)
     return list.toString()
   }
   
-  //
+
   def makeString(arrObj:Array[Object]):String={
     var str=""
     arrObj.foreach{x => str+=(x.toString.trim.replace("'","").split("=")(0)+",")}

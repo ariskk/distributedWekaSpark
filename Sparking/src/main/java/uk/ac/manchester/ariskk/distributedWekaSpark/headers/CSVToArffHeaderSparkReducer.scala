@@ -15,7 +15,7 @@
 
 /*
  *    CSVToArffHeaderSparkReducer.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -36,7 +36,7 @@ class CSVToArffHeaderSparkReducer extends java.io.Serializable {
 
   var r_task=new CSVToARFFHeaderReduceTask
   
-  /**   Spark  wrapper for CSVToArffMapTask base task
+  /**   Spark  wrapper for CSVToArffReduceTask base task
     *    @param HeaderA represents aggregated headers
     *    @param HeaderB the next Header to aggregate
     *    @return Aggregated headers

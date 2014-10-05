@@ -15,7 +15,7 @@
 
 /*
  *    TaskExecutor.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -40,6 +40,9 @@ import org.apache.spark.SparkContext
 import uk.ac.manchester.ariskk.distributedWekaSpark.wekaRDDs.WekaInstancesRDDBuilder
 import uk.ac.manchester.ariskk.distributedWekaSpark.wekaRDDs.WekaInstanceArrayRDDBuilder
 import weka.core.Instance
+import org.apache.spark.storage.StorageLevel
+import org.apache.spark.rdd.HadoopRDD
+import org.apache.spark.rdd.HadoopRDD
 
 
 /**Task Configuration and submission class
@@ -48,14 +51,16 @@ import weka.core.Instance
  * it configures and initialized the execution of the task
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  * */
-class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java.io.Serializable{
+class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser,caching:StorageLevel) extends java.io.Serializable{
   
      val utils=new wekaSparkUtils
-     val caching=options.getCachingStrategy
      val datasetType=options.getDatasetType
     
      
      var dataset=hdfsHandler.loadRDDFromHDFS(options.getHdfsDatasetInputPath, options.getNumberOfPartitions)
+    
+     
+     
      dataset.persist(caching)
      
      var dataArrayInstance:RDD[Array[Instance]]=null
@@ -64,11 +69,8 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
      
      var rddmadeflag=false
      var randomFlag=false
-     //////////////Needs o finish
-//     if(options.getNumberOfRandomChunks>0){randomFlag=true
-//       dataset.repartition(options.getNumberOfRandomChunks);}
-     //val classIndex=
-     //caching here or in main? maybe rename??
+
+     //strat++
      
      
      options.getTask match  {
@@ -79,7 +81,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
        case "buildFoldBasedClassifierEvaluation"=> buildFoldBasedClassifierEvaluation
        case "buildClusterer"=> buildClusterer
        case "buildClustererEvaluation"=>buildClustererEvaluation
-       case "findAssociationRules"=> findAssociationRules
+       case "findAssociationRules"=> findAssociationRules 
        case _ => throw new DistributedWekaException("Unknown Task Identifier!")  
      }
        
@@ -92,7 +94,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       if(path!=""){
       names=hdfsHandler.loadRDDFromHDFS(path,1).collect.mkString("")
       }
-      headers=headerjob.buildHeaders(options.getParserOptions,utils.getNamesFromString(names), options.getNumberOfAttributes, dataset)
+      headers=headerjob.buildHeaders(options.getParserOptions,utils.getNamesFromString(names), options.getNumberOfAttributes, dataset,options.generateHeaderStatistics)
       println(headers)
       hdfsHandler.saveObjectToHDFS(headers, options.getHdfsOutputPath, null)}
       else{
@@ -113,11 +115,10 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
         case "Instances"     => println("Instances");classifier=classifierjob.buildClassifier(dataInstances,options.getMetaLearner, options.getClassifier, headers,  options.getParserOptions, options.getWekaOptions) 
         case "ArrayString"  => println("ArrayString");classifier=classifierjob.buildClassifier(dataset,options.getMetaLearner, options.getClassifier, headers,options.getParserOptions, options.getWekaOptions)
       }
-      println(classifier)
+      println("Done!")
       hdfsHandler.saveObjectToHDFS(classifier, options.getHdfsOutputPath, null)
       }
       else{
-      //++ for exception handling
       classifier=utils.convertDeserializedObjectToClassifier(hdfsHandler.loadObjectFromHDFS(options.getHdfsClassifierInputPath))
       
       }
@@ -132,11 +133,10 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       val classifier=buildClassifier
       val evaluationJob=new WekaClassifierEvaluationSparkJob
       datasetType match{
-        case "ArrayInstance" => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataArrayInstance, options.getClassIndex) 
-        case "Instances"     => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataInstances, options.getClassIndex) 
-        case "ArrayString"   => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex) 
+        case "ArrayInstance" => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataArrayInstance, options.getClassIndex,options.getParserOptions) 
+        case "Instances"     => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataInstances, options.getClassIndex,options.getParserOptions) 
+        case "ArrayString"   => evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex,options.getParserOptions) 
       }
-      //evaluation=evaluationJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
       evaluationJob.displayEval(evaluation)
       hdfsHandler.saveObjectToHDFS(evaluation, options.getHdfsOutputPath, null)
       return evaluation
@@ -154,7 +154,6 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
         case "Instances"     => classifier=foldJob.buildFoldBasedModel(dataInstances,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
         case "ArrayString"   => classifier=foldJob.buildFoldBasedModel(dataset,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
       }
-      //classifier=foldJob.buildFoldBasedModel(dataset, headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
       println(classifier)
       hdfsHandler.saveObjectToHDFS(classifier, options.getHdfsOutputPath, null)
       }
@@ -172,11 +171,10 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       val classifier=buildFoldBasedClassifier
       val evalFoldJob=new WekaClassifierEvaluationSparkJob
       datasetType match{
-        case "ArrayInstance" => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataArrayInstance, options.getClassIndex) 
-        case "Instances"     => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataInstances, options.getClassIndex) 
-        case "ArrayString"   => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex) 
+        case "ArrayInstance" => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataArrayInstance, options.getClassIndex,options.getParserOptions) 
+        case "Instances"     => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataInstances, options.getClassIndex,options.getParserOptions) 
+        case "ArrayString"   => evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex,options.getParserOptions) 
       }
-      //evaluation=evalFoldJob.evaluateClassifier(classifier, headers, dataset, options.getClassIndex)
       evalFoldJob.displayEval(evaluation)  
       hdfsHandler.saveObjectToHDFS(evaluation, options.getHdfsOutputPath, null)
       return evaluation
@@ -220,7 +218,6 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser) extends java
       associationRulesJob.displayRules(rules)
       return rules
     }
-    //what happens if I persist dataset before/after I persist the others????
     def buildRDD():Unit={
       if(rddmadeflag==false){
       datasetType match {

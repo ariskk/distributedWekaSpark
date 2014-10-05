@@ -15,7 +15,7 @@
 
 /*
  *    WekaAssociationRulesSparkJob.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *     Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -37,7 +37,7 @@ import scala.util.Sorting
  */
 class WekaAssociationRulesSparkJob extends java.io.Serializable{
   
-  /**Method that processes a dataset in two phases and returns the association rules in HashMap
+  /**Method that processes a dataset in two phases and returns the association rules in a HashMap
    * 
    * @param headers are the arff headers of the dataset
    * @param dataset

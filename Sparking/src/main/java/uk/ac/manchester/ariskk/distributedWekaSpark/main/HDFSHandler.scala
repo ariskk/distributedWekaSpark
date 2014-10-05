@@ -15,7 +15,7 @@
 
 /*
  *    HDFSHandler.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -51,7 +51,6 @@ import java.io.ObjectInputStream
  */
 class HDFSHandler (@transient val sc:SparkContext) extends java.io.Serializable{
   
-//maybe singleton
   
   /**Loads a serialized object from HDFS  */
   def loadObjectFromHDFS(path:String):Object={
@@ -65,8 +64,10 @@ class HDFSHandler (@transient val sc:SparkContext) extends java.io.Serializable{
   
    /**Loads a file from HDFS as an RDD*/
   def loadRDDFromHDFS(path:String, partitions:Int):RDD[String]={
+   if (partitions==0) return sc.textFile(path)
    return sc.textFile(path, partitions)
  }
+  
   
    /**Serializes and Saves an object to HDFS*/
   def saveObjectToHDFS(objectToSave:Object, path:String, key:String):Boolean={
@@ -89,8 +90,15 @@ class HDFSHandler (@transient val sc:SparkContext) extends java.io.Serializable{
   
   /**Method to save an RDD to HDFS*/
   def saveRDDToHDFS(rdd:RDD[String],path:String):Boolean={
-    //To-Do: try-catch
     rdd.saveAsTextFile(path)
     return true
+  }
+  
+  /**Gets the size of a file in a path*/
+  def getFileSize(path:String):Long={
+    val URI=new URI(path)
+    val fs=FileSystem.get(URI,sc.hadoopConfiguration)
+    val filenamePath = new Path(path)
+    return fs.getContentSummary(filenamePath).getLength;
   }
 }

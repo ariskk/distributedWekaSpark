@@ -15,7 +15,7 @@
 
 /*
  *    WekaAssociationRulesSparkReducer.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -41,20 +41,17 @@ class WekaAssociationRulesSparkReducer extends java.io.Serializable{
    * @return the merged HashMap
    * */
   def reduce(rulesMapA:HashMap[String,UpdatableRule],rulesMapB:HashMap[String,UpdatableRule]):HashMap[String,UpdatableRule]={
-    println(rulesMapA.isEmpty+" "+rulesMapA.keys.size)
-    println(rulesMapB.isEmpty+" "+rulesMapB.keys.size)
     var rulesMapA1=rulesMapA
     rulesMapB.foreach{
        rule=>{
         if(rulesMapA1.contains(rule._1)){
-      //  println("hooray")
-        var modifiedRule=rulesMapA1(rule._1)
-        modifiedRule.addConsequenceSupport(rule._2.getConsequenceSupport)
-        modifiedRule.addPremiseSupport(rule._2.getPremiseSupport)
-        modifiedRule.addSupportCount(rule._2.getSupportCount)
-        modifiedRule.addTransactions(rule._2.getTransactions)
-        rulesMapA1+=(rule._1 ->modifiedRule)
-        modifiedRule=null
+        	var modifiedRule=rulesMapA1(rule._1)
+        	modifiedRule.addConsequenceSupport(rule._2.getConsequenceSupport)
+        	modifiedRule.addPremiseSupport(rule._2.getPremiseSupport)
+        	modifiedRule.addSupportCount(rule._2.getSupportCount)
+        	modifiedRule.addTransactions(rule._2.getTransactions)
+        	rulesMapA1+=(rule._1 ->modifiedRule)
+        	modifiedRule=null
       }
       else{
         rulesMapA1+=(rule._1 -> rule._2)

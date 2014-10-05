@@ -1,15 +1,37 @@
+/*
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ *    WekaRandomizedChunksSparkJob.scala
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
+ *
+ */
+
 package uk.ac.manchester.ariskk.distributedWekaSpark.wekaRDDs
 
-import org.apache.spark.rdd.RDD
+
 import weka.core.Instances
 import weka.distributed.CSVToARFFHeaderMapTask
 import scala.util.Random
 import weka.distributed.CSVToARFFHeaderReduceTask
+import org.apache.spark.rdd.RDD
 
 /**Spark Job that randomizes (shuffles)  a dataset's partitions with numeric class value or stratifies in case of  nominal class value
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
- */
+ **/
 class WekaRandomizedChunksSparkJob {
   
      //Parses CSV rows
@@ -31,13 +53,12 @@ class WekaRandomizedChunksSparkJob {
        if(!strippedHeaders.classAttribute().isNominal()) {
           m_rowParser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeaders))
           var randomGen=new Random(1L)
-          //throw away the first 10 numbers. They tend to be less random
-          for(i<-1 to 10){randomGen.nextInt} 
-          //send each nominal value to partition based on a couter. 
+          
+          //send each nominal value to partition based on a counter. 
           //Example :value:a,b,c and 8 partitions {x,a},{x,a},{x,b}...{x,c} first a goes to part0 (i++), second a goes to part1, first b goes to part0 etc
           //Or each value goes to random partition. Needs semantic checking
           //ToDo: find a way to ensure each chunk has similar class distribution
-          //return random shuffling for nominal values as well in this version
+          //return random shuffling for nominal values in this version
           return dataset.repartition(numOfChunks)
        }
        else{
@@ -51,12 +72,14 @@ class WekaRandomizedChunksSparkJob {
        for(x<-rows){
          m_rowParser.makeInstance(strippedHeaders, true, m_rowParser.parseRowOnly(x))
         }
+       //To-Do: should be moved to a separate class
         return null
     }
    
     
     /**Reducer for the stratification tasks*/
     def reduce(rows:Array[String]) :RDD[String]={
+      //To-Do: should be moved to a separate class
        return null
     }
 }

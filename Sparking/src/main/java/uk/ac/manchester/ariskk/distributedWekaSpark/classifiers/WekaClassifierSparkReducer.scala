@@ -15,7 +15,7 @@
 
 /*
  *    WekaClassifierSparkReducer.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -28,7 +28,7 @@ import java.util.ArrayList
 
 /**Reducer class for the classifier training job
  * 
- * Commutative and associative function that takes two classifiers, aggregates them (merging them if aggregatable or forming a voted ensemlbe if not)
+ * Commutative and associative function that takes two classifiers, aggregates them (merging them if aggregatable or forming a voted ensemble if not)
  * and produces one classifier
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com) 
  */

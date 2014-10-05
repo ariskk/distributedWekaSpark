@@ -15,7 +15,7 @@
 
 /*
  *    WekaClassifierFoldBasedSparkJob.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -85,7 +85,7 @@ class WekaClassifierFoldBasedSparkJob extends java.io.Serializable{
     
 
      val classifiers=dataset.map(new WekaClassifierFoldBasedSparkMapper(folds,headers,classifierToTrain,metaLearner,classIndex).map(_))
-                                .reduce(new WekaClassifierFoldBasedSparkReducer(folds).reduce(_,_))   
+                                .reduce(new WekaClassifierFoldBasedSparkReducer(folds).reduce(_,_)) 
                                 
    return new WekaClassifierReduceTask().aggregate(classifiers)
   }

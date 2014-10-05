@@ -15,7 +15,7 @@
 
 /*
  *    WekaClassifierEvaluationSparkReducer.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 

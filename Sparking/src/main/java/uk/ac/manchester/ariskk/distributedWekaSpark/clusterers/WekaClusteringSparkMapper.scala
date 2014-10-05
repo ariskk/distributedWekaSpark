@@ -15,7 +15,7 @@
 
 /*
  *    WekaClusteringSparkMapper.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -30,6 +30,11 @@ import weka.filters.unsupervised.instance.ReservoirSample
 import weka.clusterers.Canopy
 import weka.core.Instance
 
+/*
+ * Map Implementation of the WekaClusteringSparkJob
+ * 
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ * */
 class WekaClusteringSparkMapper (header:Instances,options:Array[String]) extends java.io.Serializable{
   
    var m_rowparser=new CSVToARFFHeaderMapTask()
@@ -39,42 +44,36 @@ class WekaClusteringSparkMapper (header:Instances,options:Array[String]) extends
     m_rowparser.initParserOnly(CSVToARFFHeaderMapTask.instanceHeaderToAttributeNameList(strippedHeader))
   
     
-    //Convert text to clusterer as in classifiers: Only Canopy currently supported
+    // Only Canopy currently supported by this model. Other clusterers may need distributed implementations
     val clusterer=new Canopy
     clusterer.setOptions(options)
 
     
   def map(rows:Array[String]):Canopy={
     
-    
     for(x<-rows){
       val inst=m_rowparser.makeInstance(strippedHeader, true, m_rowparser.parseRowOnly(x))
-      
       header.add(inst)
-      
-     }
+      }
      clusterer.buildClusterer(header)
-
-    
-    return clusterer
+     
+  return clusterer
   }
    
    def map(rows:Array[Instance]):Canopy={
     
      for(x<-rows){
       header.add(x)
-     
      }
      clusterer.buildClusterer(header)
-     
     
-    return clusterer
+   return clusterer
   }
    
    def map(instances:Instances):Canopy={
     
      clusterer.buildClusterer(instances)
-    
+     
     return clusterer
   }
 

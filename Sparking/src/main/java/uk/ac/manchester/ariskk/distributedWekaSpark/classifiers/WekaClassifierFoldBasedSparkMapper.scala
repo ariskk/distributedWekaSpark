@@ -15,7 +15,7 @@
 
 /*
  *    WekaClassifierFoldBasedSparkMapper.scala
- *    Copyright (C) 2014 Koliopoulos Kyriakos-Aris
+ *    Copyright (C) 2014 School of Computer Science, University of Manchester
  *
  */
 
@@ -124,7 +124,7 @@ class WekaClassifierFoldBasedSparkMapper(folds:Int,headers:Instances,toTrain:Str
   def map(instances:Instances): ArrayList[Classifier]={
     val models=new ArrayList[Classifier]
    
-     //m_task.setInstaces(instances)
+    //m_task.setInstaces(instances) NOT YET IMPLEMENTED IN THE BASE TASKS
     for(j<-0 to folds-1){
       m_tasks.get(j).finalizeTask()
       models.add(m_tasks.get(j).getClassifier())
