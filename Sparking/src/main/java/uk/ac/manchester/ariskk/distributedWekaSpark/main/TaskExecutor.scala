@@ -116,6 +116,7 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser,caching:Stora
         case "ArrayString"  => println("ArrayString");classifier=classifierjob.buildClassifier(dataset,options.getMetaLearner, options.getClassifier, headers,options.getParserOptions, options.getWekaOptions)
       }
       println("Done!")
+      println(classifier)
       hdfsHandler.saveObjectToHDFS(classifier, options.getHdfsOutputPath, null)
       }
       else{
