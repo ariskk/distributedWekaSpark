@@ -33,4 +33,4 @@ However, being a proof-of-concept, it requires further work to meet industry sta
 This is a Maven project. Building with Maven (goal: package) would yield a deployable uber-jar that 
 can be directly executed on a Spark cluster.
  
-More about it to follow..
+More to follow..
