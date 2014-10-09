@@ -56,7 +56,7 @@ class WekaClassifierSparkMapper (metaLearner:String,classifierToTrain:String,cla
     val obj=Class.forName(classifierToTrain).newInstance()
     val cla=obj.asInstanceOf[Classifier]
     
-    //val classifier=obj.asInstanceOf[]
+
    
     //Check if a custom MetaLearner is requested
     if(metaLearner!="default"){
@@ -78,7 +78,7 @@ class WekaClassifierSparkMapper (metaLearner:String,classifierToTrain:String,cla
   
   
   
-  //true in make instance means classifier is updateable
+  //true in makeInstance means classifier is updateable
   /**Map task for training a classifier using an Array[String] (String represents a line of a  csv file)
    * 
    * @param rows is a dataset partition in Array[String] format
@@ -111,7 +111,7 @@ class WekaClassifierSparkMapper (metaLearner:String,classifierToTrain:String,cla
    * @return a trained classifier on the provided parition
    */
    def map(instances:Instances):Classifier={
-     //m_task.setInstances(instances)
+     //m_task.setInstances(instances) Not yet supported by the Base tasks
      m_task.finalizeTask
      return m_task.getClassifier()
    }

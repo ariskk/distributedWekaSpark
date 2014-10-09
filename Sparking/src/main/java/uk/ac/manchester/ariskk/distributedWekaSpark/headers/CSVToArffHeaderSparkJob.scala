@@ -33,7 +33,7 @@ import weka.distributed.CSVToARFFHeaderMapTask
 class CSVToArffHeaderSparkJob {
  
   
- /**Build the Header file
+ /**Builds the Header file
     * 
     * @param numOfAttributes the number of attributes in the dataset
     * @param data is a reference to the RDD of the dataset
@@ -47,6 +47,7 @@ class CSVToArffHeaderSparkJob {
        names.add("att"+i)
      }}
      
+     //Requires a way out if the statistics generation step is redundant (the commented part works, but messes the rest)
      
   ///  val tempMapTask=new CSVToARFFHeaderMapTask()
    // val tempOpt=options

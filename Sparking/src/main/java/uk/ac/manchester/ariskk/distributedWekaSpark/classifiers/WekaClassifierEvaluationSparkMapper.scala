@@ -32,6 +32,7 @@ import weka.core.Instance
 /**Mapper implementation of the Classifier Evaluation Job
  * 
  * Contains Mappers to process datasets in three different formats: Array[String], Array[Instace], Instances
+ * Works for classifiers only. (Regressors need a way out of the prior computation)
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
 class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifier,classIndex:Int,rowparserOptions:Array[String]) extends java.io.Serializable {

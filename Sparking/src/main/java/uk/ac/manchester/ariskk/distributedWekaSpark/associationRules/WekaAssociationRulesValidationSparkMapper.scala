@@ -38,6 +38,12 @@ import scala.util.Random
 import weka.core.Instance
 import scala.util.control.Breaks._
 
+
+/**Mapper implementation for the validation phase of the Association Rules Mining job
+ * 
+ * It validates each rules in the HashMap against each Instance. Can be slow for large rule sets. 
+ * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
+ */
 class WekaAssociationRulesValidationSparkMapper (headers:Instances,ruleMiner:String,rowparserOptions:Array[String]) extends java.io.Serializable{
     var ruleList:List[AssociationRule]=null
 

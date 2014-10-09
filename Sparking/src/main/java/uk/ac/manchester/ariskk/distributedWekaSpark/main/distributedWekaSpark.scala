@@ -75,9 +75,8 @@ import weka.classifiers.evaluation.AggregateableEvaluation
  *  
  *   @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  *   
- *   ToDo: user-interface, option parser and loader-saver for persistence  */
-
-
+ *   ToDo: user-interface, option parser and loader-saver for persistence  
+ *   */
 object distributedWekaSpark extends java.io.Serializable{
    def main(args : Array[String]){
      
@@ -85,7 +84,7 @@ object distributedWekaSpark extends java.io.Serializable{
       val options=new OptionsParser(args.mkString(" "))
      // Log.set(LEVEL_TRACE)
 
-      val conf=new SparkConf().setAppName("distributedWekaSpark")//.set("spark.executor.memory","100M")//.setMaster(options.getMaster).set("spark.executor.memory","2G").set("total-executor-cores","8")
+      val conf=new SparkConf().setAppName("distributedWekaSpark")
       
      conf.set("spark.locality.wait",options.getLocalityDelay)
       
@@ -110,6 +109,7 @@ object distributedWekaSpark extends java.io.Serializable{
       val hdfshandler=new HDFSHandler(sc)
       val utils=new wekaSparkUtils
       
+      //++
       val slaveMemoryMap=sc.getExecutorMemoryStatus
       var totalMem=0L
       for(x <- slaveMemoryMap){ 

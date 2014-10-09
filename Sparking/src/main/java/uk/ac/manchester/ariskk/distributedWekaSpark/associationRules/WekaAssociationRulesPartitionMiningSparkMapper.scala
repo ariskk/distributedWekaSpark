@@ -57,7 +57,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
    
      
       
-//    //Set the classifier to train 
+//   
 //    val obj=Class.forName(ruleMiner).newInstance()
 //    val cla=obj.asInstanceOf[AbstractAssociator] 
 //    
@@ -65,6 +65,7 @@ class WekaAssociationRulesPartitionMiningSparkMapper(headers:Instances,ruleMiner
 //    if(cla.isInstanceOf[Apriori]){asl=new Apriori;}
 //    else if(cla.isInstanceOf[FPGrowth]){asl=new FPGrowth}
        
+    //Apriori can be used here. Need to provide a user option on this. However asls do not have a common abstract interface as classifiers
      var associationRulesLearner=new FPGrowth
      associationRulesLearner.setOptions(ruleMinerOptions)
      var datasetHeaders=headers

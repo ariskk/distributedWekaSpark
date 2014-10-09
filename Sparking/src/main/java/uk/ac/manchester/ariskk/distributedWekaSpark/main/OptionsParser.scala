@@ -28,7 +28,7 @@ import weka.core.Utils
 import weka.distributed.DistributedWekaException
 import org.apache.spark.storage.StorageLevel
 
-/**Class that parses the String of user-provided options and has methods to return ind
+/**Class that parses the String of user-provided options
  * 
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */

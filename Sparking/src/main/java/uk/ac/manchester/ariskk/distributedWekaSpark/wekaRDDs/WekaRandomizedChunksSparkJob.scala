@@ -30,6 +30,7 @@ import org.apache.spark.rdd.RDD
 
 /**Spark Job that randomizes (shuffles)  a dataset's partitions with numeric class value or stratifies in case of  nominal class value
  * 
+ * Not Fully implemented yet.
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  **/
 class WekaRandomizedChunksSparkJob {

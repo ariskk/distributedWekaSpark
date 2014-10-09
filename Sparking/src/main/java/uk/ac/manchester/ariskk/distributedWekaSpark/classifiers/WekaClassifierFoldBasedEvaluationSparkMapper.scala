@@ -34,6 +34,8 @@ import weka.core.Instance
 
 /**Mapper task for fold-based evaluation
  * 
+ * 
+ * Similar with the simple evaluation. Works only for classifiers.
  * @author Aris-Kyriakos Koliopoulos (ak.koliopoulos {[at]} gmail {[dot]} com)
  */
 class WekaClassifierFoldBasedEvaluationSparkMapper(headers:Instances,classifier:Classifier,folds:Int,classIndex:Int) extends java.io.Serializable {
