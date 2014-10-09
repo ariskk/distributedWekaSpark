@@ -22,6 +22,8 @@ The Association Rule Learning classes are based on a MapReduce implementation of
 (R. Agrawal,J. C. Shafer, "Parallel mining of association rules." IEEE Transactions
 on knowledge and Data Engineering 8, no. 6,p 962-969, 1996.)
 
+The Kryo Serialisers for Weka were taken from https://github.com/vpa1977/stormmoa (a very interesting integration of MOA into Storm).
+
 This project was a proof of concept that aimed to demonstrate the feasibility of using Weka's libraries on
 Big Data problems and to study the effects of different caching strategies on Big Data Mining workloads.
 
@@ -50,7 +52,12 @@ bin/spark-submit --master (master-node) \ <br>
 The parameters are structured as follows:
 -parameter1-name value -parameter2-name value etc. The order is irrelevant
 
-Full details on the supported parameters as well as examples of usage can be found at the <b>Parameters.txt</b> file
+Full details on the supported parameters as well as examples of usage can be found in the <b>wiki</b> section of the repository.
+
+I will try to add some unit tests and its Travis as soon as I have the time.
+
+More to follow..
+
 
 
 
