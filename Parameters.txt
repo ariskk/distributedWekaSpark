@@ -30,3 +30,6 @@ distributedWekaSpark Options/command line parameters:
  
 -parser-options (options for the csv parser) possible values: \"-N first-last etc.. \" default: weka defaults based on the tasks DO NOT FORGET \" \" when grouping parameters
 -weka-options (options for weka algorithms (base tasks and core algorithms)) possible values: \" -depth 3 etc \" default: weka defaults based on the tasks DO NOT FORGET \" \" when grouping parameters
+
+
+
