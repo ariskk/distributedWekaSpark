@@ -53,8 +53,7 @@ class WekaClassifierEvaluationSparkMapper(headers:Instances,classifier:Classifie
    m_task.setup(strippedHeaders, computePriors(), computePriorsCount(), seed, 0) //last is predFrac and is used to compute AUC/AuPRC 
    m_task.setClassifier(classifier)
    m_task.setTotalNumFolds(1)
-   
-   
+     
    
    /**Map task for evaluation a classifier on a dataset partition (Input in String format)
     * 
