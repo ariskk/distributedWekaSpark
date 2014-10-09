@@ -52,5 +52,4 @@ class WekaClassifierEvaluationSparkReducer  extends java.io.Serializable {
     list.add(evalB)
     return r_task.aggregate(list)
   }
-  
-}
+ }
