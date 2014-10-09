@@ -34,6 +34,8 @@ However, being a proof-of-concept, it requires further work to meet industry sta
 
 Currently, only <b>CSV</b> files can be processed.
 
+The classifier evaluation classes have been successfully ported and executed on top of <b>Spark Streaming</b>. I will upload the code in a separate repository.
+
 This is a Maven project. Building with Maven (goal: package) would yield a deployable uber-jar that 
 can be directly executed on a Spark cluster.
  
