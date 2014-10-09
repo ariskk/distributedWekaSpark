@@ -1,0 +1,32 @@
+distributedWekaSpark Options/command line parameters:
+
+-task (task descriptor) possible values: buildHeaders , buildClassifier , buildClassifierEvaluation, buildFoldBasedClassifier , buildFoldBasedClassifierEvaluation , buildClusterer , findAssociationRules default:No (Exception)
+-dataset-type (dataset type to use) possible values: Instances , ArrayInstance , ArrayString default: ArrayString
+-caching  (Storage Level to use) possible values : All Spark supported ex: MEMORY_ONLY default: Cashing Strategy Selection Algorithm
+-compress (compress serialized rdds to save memory) possible values: y (or none) default: none (do not compress)
+-kryo (use kryo serializer)  possible values : y (or none) default: none (do not use kryo)
+-caching-fraction (executor caching fraction) possible values: 0.1-1.0 default: 0.6
+-overhead (dataset overhead of java objects (how much larger is the Object than the raw data)) possible values: any double default: 5.0
+
+-hdfs-dataset-path (path to the dataset on HDFS) possible values: hdfs://(host):(port)/user/username/dataset.csv default:No (Exception)
+-hdfs-names-path: (path to a names files on HDFS, names must be in a comma delimited format) possible values : hdfs://(host):(port)/user/username/names.txt default: Will try to compute att0,att1 etc
+-hdfs-headers-path (path to pre-built headers for the dataset) possible values:  hdfs://(host):(port)/user/username/someheaders.arff default: Will try to compute headers
+-hdfs-classifier-path (path to trained classifier) possible values :  hdfs://(host):(port)/user/username/someclassfier.model default: Will try to build classifier
+-hdfs-output-path (path to an HDFS folder where generated models will be saved) possible values:  hdfs://(host):(port)/user/username/somefolder/  default: No (will not save)
+
+-num-partitions (number of partitions) possible values: Any Integer default: Spark default
+-num-random-chunks (number of randomized/stratified partitions) possible values: any Integer default: No stratification/ randomisation
+-num-of-attributes (number of attributes in the dataset) possible values: any Integer default: will try to compute from the dataset if no headers provided
+-class-index (index of the class attribute) possible values: any Integer [0,num-of-attributes-1] default: num-of-attributes-1
+-num-folds (number of folds) possible values: Any Integer default:1
+-names (attribute names) possible values: a comma delimited list of names default:Will produce a list att0,att1 etc
+-classifier (the name and package path of the classifier to use) possible values: weka.classifier.bayes.NaiveBayes (any weka core) default: NaiveBayes
+-meta (meta learner to use) possible values: weka.classifiers.meta.Bagging (any weka core) default:None (WekaClassifierReduceTask default)
+-rule-learner (association rule learner to use) posible values: weka.associations.Apriori and weka.associations.FPGrowth only default: FPGrowth
+
+
+-clusterer (clusterer to use) possible value : weka.clusterer.Canopy only. default: Canopy
+-num-clusters (number of clusters to find) possible values: any Integer default: 0 (the task will try to set a number of the clusterer supports auto-config)
+ 
+-parser-options (options for the csv parser) possible values: \"-N first-last etc.. \" default: weka defaults based on the tasks DO NOT FORGET \" \" when grouping parameters
+-weka-options (options for weka algorithms (base tasks and core algorithms)) possible values: \" -depth 3 etc \" default: weka defaults based on the tasks DO NOT FORGET \" \" when grouping parameters
