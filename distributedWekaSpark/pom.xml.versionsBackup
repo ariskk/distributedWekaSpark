@@ -3,7 +3,7 @@
   <groupId>ariskk</groupId>
   <artifactId>distributedWekaSpark</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.0.1-SNAPSHOT</version>
   
   <build>
     <plugins>
@@ -48,19 +48,24 @@
   
   <dependencies>
   	<dependency>
-  		<groupId>org.apache.spark</groupId>
-  		<artifactId>spark-core_2.10</artifactId>
-  		<version>1.0.2</version>
+  		<groupId>org.apache.hadoop</groupId>
+  		<artifactId>hadoop-client</artifactId>
+  		<version>2.2.0</version>
   	</dependency>
   	<dependency>
-  		<groupId>nz.ac.waikato.cms.weka</groupId>
-  		<artifactId>distributedWekaBase</artifactId>
-  		<version>1.0.6</version>
+  		<groupId>org.apache.spark</groupId>
+  		<artifactId>spark-core_2.10</artifactId>
+  		<version>1.0.0</version>
   	</dependency>
   	<dependency>
   		<groupId>nz.ac.waikato.cms.weka</groupId>
   		<artifactId>weka-dev</artifactId>
   		<version>3.7.11</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>nz.ac.waikato.cms.weka</groupId>
+  		<artifactId>distributedWekaBase</artifactId>
+  		<version>1.0.4</version>
   	</dependency>
   </dependencies>
   <organization>
