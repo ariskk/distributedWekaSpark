@@ -54,7 +54,8 @@ The parameters are structured as follows:
 
 Full details on the supported parameters as well as examples of usage can be found in the <b>wiki</b> section of the repository.
 
-I will try to add some unit tests and its Travis as soon as I have the time.
+I will try to add unit tests, Travis, Logging and error handling as soon as I have the time.
+
 
 More to follow..
 
