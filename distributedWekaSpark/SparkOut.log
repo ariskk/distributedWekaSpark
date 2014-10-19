@@ -5047,3 +5047,29 @@ Trying to register BlockManager
 Registering block manager sandbox.hortonworks.com:34203 with 766.4 MB RAM
 Registered BlockManager
 Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Slf4jLogger started
+Created local directory at /tmp/spark-local-20141019093127-1330
+MemoryStore started with capacity 459.8 MB
+Trying to register BlockManager
+Registering block manager sandbox.hortonworks.com:60034 with 459.8 MB RAM
+Registered BlockManager
+Stopping DAGScheduler
+MemoryStore cleared
+BlockManager stopped
+BlockManagerMaster stopped
+Shutting down remote daemon.
+Remote daemon shut down; proceeding with flushing remote transports.
+Remoting shut down.
+Slf4jLogger started
+Created local directory at /tmp/spark-local-20141019093300-2326
+MemoryStore started with capacity 459.8 MB
+Trying to register BlockManager
+Registering block manager sandbox.hortonworks.com:34602 with 459.8 MB RAM
+Registered BlockManager
+Stopping DAGScheduler
+MemoryStore cleared
+BlockManager stopped
+BlockManagerMaster stopped
+Shutting down remote daemon.
+Remote daemon shut down; proceeding with flushing remote transports.
+Remoting shut down.

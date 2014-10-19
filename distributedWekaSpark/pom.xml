@@ -7,6 +7,7 @@
   
   <build>
     <plugins>
+    
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -40,6 +41,25 @@
           </execution>
         </executions>
       </plugin>
+      
+      <plugin>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+          <junitxml>.</junitxml>
+          <filereports>WDF TestSuite.txt</filereports>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+             <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   
@@ -50,7 +70,7 @@
   	<dependency>
   		<groupId>org.apache.spark</groupId>
   		<artifactId>spark-core_2.10</artifactId>
-  		<version>1.0.2</version>
+  		<version>1.1.0</version>
   	</dependency>
   	<dependency>
   		<groupId>nz.ac.waikato.cms.weka</groupId>
@@ -61,6 +81,18 @@
   		<groupId>nz.ac.waikato.cms.weka</groupId>
   		<artifactId>weka-dev</artifactId>
   		<version>3.7.11</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.scalatest</groupId>
+  		<artifactId>scalatest-maven-plugin</artifactId>
+  		<version>1.0</version>
+  		<type>maven-plugin</type>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.scalatest</groupId>
+  		<artifactId>scalatest_2.10</artifactId>
+  		<version>2.2.3-SNAP2</version>
+  		<scope>test</scope>
   	</dependency>
   </dependencies>
   <organization>

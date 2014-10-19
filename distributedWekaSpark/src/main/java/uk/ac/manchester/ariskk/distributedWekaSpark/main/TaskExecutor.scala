@@ -151,9 +151,9 @@ class TaskExecutor (hdfsHandler:HDFSHandler, options:OptionsParser,caching:Stora
       headers.setClassIndex(options.getClassIndex)
       val foldJob=new WekaClassifierFoldBasedSparkJob
        datasetType match{
-        case "ArrayInstance" => classifier=foldJob.buildFoldBasedModel(dataArrayInstance,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
-        case "Instances"     => classifier=foldJob.buildFoldBasedModel(dataInstances,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
-        case "ArrayString"   => classifier=foldJob.buildFoldBasedModel(dataset,headers, options.getNumFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
+        case "ArrayInstance" => classifier=foldJob.buildFoldBasedModel(dataArrayInstance,headers, options.getNumberOfFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
+        case "Instances"     => classifier=foldJob.buildFoldBasedModel(dataInstances,headers, options.getNumberOfFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
+        case "ArrayString"   => classifier=foldJob.buildFoldBasedModel(dataset,headers, options.getNumberOfFolds, options.getClassifier, options.getMetaLearner, options.getClassIndex)
       }
       println(classifier)
       hdfsHandler.saveObjectToHDFS(classifier, options.getHdfsOutputPath, null)

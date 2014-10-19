@@ -172,7 +172,7 @@ class OptionsParser (options:String) extends java.io.Serializable{
   }
   
   /**Number of folds in case of cross-validation*/
-  def getNumFolds():Int={
+  def getNumberOfFolds():Int={
     if(folds=="") return 1
     else return folds.toInt
   }
