@@ -16,7 +16,7 @@ The work was partially supported by an IBM Faculty Award (Big Data Engineering).
 Currently this project supports classification/regression (any Weka Classifier) training and evaluation, Canopy Clustering 
 and Association Rule Learning.
 
-The classification/reggresion classes were based on the <b>excellent</b> work of Mark Hall (http://markahall.blogspot.co.uk/2013/10/weka-and-hadoop-part-1.html) 
+The classification/reggresion classes were based on the <b>excellent</b> work of Dr. Mark Hall (http://markahall.blogspot.co.uk/2013/10/weka-and-hadoop-part-1.html) 
 on porting Weka to Hadoop.
 The Association Rule Learning classes are based on a MapReduce implementation of the Partition algorithm 
 (R. Agrawal,J. C. Shafer, "Parallel mining of association rules." IEEE Transactions
