@@ -1,2 +1,3 @@
 language: java
-script: mvn test
+before_script:
+- cd distributedWekaSpark
