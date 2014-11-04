@@ -1,5 +1,7 @@
-distributedWekaSpark
+distributedWekaSpark  
 ========
+<br>
+<img src="https://travis-ci.org/ariskk/distributedWekaSpark.svg?branch=master" alt="Build Status" data-canonical-src="https://travis-ci.org/qmetric/spark-authentication.png" style="max-width:100%;">
 
 This repository contains Map and Reduce Wrappers of <b>Weka</b> classes for the Apache <b>Spark</b> distributed 
 computing framework, as well as a set of utilities and a commmand line interface that enable the execution of Data Mining jobs
