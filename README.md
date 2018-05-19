@@ -3,6 +3,10 @@ distributedWekaSpark
 <br>
 <img src="https://travis-ci.org/ariskk/distributedWekaSpark.svg?branch=master" alt="Build Status" style="max-width:100%;">
 
+UPDATE
+This repository has been inactive for more than 4 years and requires a full rewrite in order to be any useful.
+I doubt I will ever get the time to do it.
+
 This repository contains Map and Reduce Wrappers of <b>Weka</b> classes for the Apache <b>Spark</b> distributed 
 computing framework, as well as a set of utilities and a commmand line interface that enable the execution of Data Mining jobs
 on a Spark cluster.

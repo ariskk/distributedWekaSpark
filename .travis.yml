@@ -1,7 +1,0 @@
-language: java
-before_install:
-- cd distributedWekaSpark
-install:
-- mvn install -DskipTests=true
-script:
-- mvn test 
